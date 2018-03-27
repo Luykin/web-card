@@ -5,7 +5,19 @@
         <div>登陆</div>
         <div class="min-font flex">登陆后开始下单</div>
       </div>
-      <!-- <el-input v-model="input" placeholder="请输入内容"></el-input> -->
+      <div class="input-box flex">
+        <input type="text" placeholder="用户名" class="i-ipnput">
+        <i class="iconfont icon-msnui-user"></i>
+      </div>
+      <div class="input-box flex">
+        <input type="text" placeholder="密码" class="i-ipnput">
+        <i class="iconfont icon-mima"></i>
+      </div>
+      <div class="input-box flex">
+        <input type="text" placeholder="验证码" class="i-ipnput">
+        <i class="iconfont icon-duanxin"></i>
+      </div>
+      <div class="btn flex">登陆</div>
     </div>
   </div>
 </template>

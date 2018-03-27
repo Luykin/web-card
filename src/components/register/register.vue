@@ -2,8 +2,8 @@
   <div id="main-body">
     <div class="login-box" id="login-box">
       <div class="login-box-title flex">
-        <div>修改密码</div>
-        <div class="min-font flex">修改当前密码</div>
+        <div>注册</div>
+        <div class="min-font flex">注册帐号开始下单</div>
       </div>
       <div class="input-box flex">
         <input type="text" placeholder="用户名" class="i-ipnput">

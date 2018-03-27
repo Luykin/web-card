@@ -2,8 +2,8 @@
   <div id="main-body">
     <div class="login-box" id="login-box">
       <div class="login-box-title flex">
-        <div>修改密码</div>
-        <div class="min-font flex">修改当前密码</div>
+        <div>找回密码</div>
+        <div class="min-font flex">找回原始密码</div>
       </div>
       <div class="input-box flex">
         <input type="text" placeholder="用户名" class="i-ipnput">
@@ -17,7 +17,7 @@
         <input type="text" placeholder="验证码" class="i-ipnput">
         <i class="iconfont icon-duanxin"></i>
       </div>
-      <div class="btn flex">注册</div>
+      <div class="btn flex">提交</div>
     </div>
   </div>
 </template>

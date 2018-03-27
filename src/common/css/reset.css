@@ -90,3 +90,57 @@ input
 .border-bottom-color{
   display: none;
 }
+.input-box{
+  width: 90%;
+  height: 45px;
+  border: 1px solid #bcbcbc;
+  margin: 20px auto;
+/*  animation: gradientOut .5s ease 1 forwards;*/
+}
+.input-box:hover{
+  animation: gradientIn .5s ease 1 forwards;
+}
+.i-ipnput{
+  border: none;
+  outline: none;
+  width: 90%;
+  height: 100%;
+  color: #666;
+}
+.iconfont{
+  color: #ff9430;
+}
+
+@keyframes gradientIn {
+  0% {
+    border: 1px solid #bcbcbc;
+  }
+  100% {
+    border: 1px solid #ff9430;
+  }
+}
+@keyframes gradientOut {
+  0% {
+    border: 1px solid #ff9430;
+  }
+  100% {
+    border: 1px solid #bcbcbc;
+  }
+}
+.btn{
+  max-width: 60px;
+  min-width: 30px;
+  height: 45px;
+  padding: 0 20px;
+  word-spacing: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  background: #ff9430;
+  box-shadow: 2px 2px 5px rgba(0,0,0,.2);
+  color: #fff;
+  font-size: 14px;
+  margin: 20px 5%;
+}
+.router-div{
+  width: 100%;
+}

@@ -21,5 +21,5 @@ export default {
 <style>
 @import url(common/css/reset.css);
 @import url(common/css/adaptation.css);
-
+@import url(common/icon/iconfont.css);
 </style>

@@ -93,13 +93,4 @@ export default {
 .select-item{
   margin: 10px auto;
 }
-.btn{
-  width: 115px;
-  height: 45px;
-  background: #ff9430;
-  box-shadow: 2px 2px 5px rgba(0,0,0,.2);
-  color: #fff;
-  font-size: 14px;
-  margin: 10px 20px;
-}
 </style>
