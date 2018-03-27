@@ -1,0 +1,92 @@
+html{font-size: 14px; font-family: PingFang SC,STHeitiSC-Light,Helvetica-Light,arial,sans-serif; user-select: none;font-family: 微软雅黑;}
+body {margin:0; padding:0; user-select: none; -webkit-text-size-adjust: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); line-height: 1; min-width: 320px; background: #f1f1f1;}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,blockquote,p{padding:0; margin:0;}
+ol,ul {list-style:none;}
+li{list-style-type:none;}
+img{vertical-align:top;border:0;max-width: 100%; height:auto;}
+h1,h2,h3,h4,h5,h6{font-size:inherit; font-weight:normal;}
+address,cite,code,em,th,i,var{font-weight:normal; font-style:normal;}
+.clearfix{*zoom:1;}
+.clearfix:after{display:block; overflow:hidden; clear:both; height:0; visibility:hidden; content:".";}
+a:link,a:visited
+{
+  color:#000;
+  text-decoration: none;
+}
+input
+{
+  outline: 0;
+  outline: none;
+}
+.ellipsis
+{
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+.flex{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.main-box {
+  width: 40%;
+  min-width: 300px;
+  height: auto;
+  min-height: 200px;
+  background: #fff;
+  margin-top: 100px;
+  margin-left: 15%;
+  padding-bottom: 20px;
+}
+.login-box{
+  width: 28%;
+  min-width: 300px;
+  height: auto;
+  min-height: 200px;
+  background: #fff;
+  margin-top: 50px;
+  margin-left: 15%;
+  padding-bottom: 20px;
+}
+.center-position{
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.el-select-dropdown__item.selected{
+  color: #ff9430;
+}
+.el-select .el-input .el-select__caret{
+  color: #ff9430;
+}
+.el-input__inner{
+  border: none;
+  border-radius: 0px;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.el-select .el-input.is-focus .el-input__inner{
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.el-select .el-input__inner:focus{
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.el-input__inner:focus{
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.el-input__inner:hover{
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.el-submenu.is-active .el-submenu__title{
+  border-bottom: none;
+}
+.el-menu--horizontal{
+  border-bottom: none;
+}
+.border-bottom-color{
+  display: none;
+}
