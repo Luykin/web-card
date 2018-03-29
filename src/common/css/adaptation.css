@@ -7,6 +7,10 @@
   }
   #main-body {
     min-height: 730px;
+    height: auto;
+  }
+  #i-table, #i-title, #i-page{
+    width: 72%;
   }
 }
 
@@ -19,6 +23,10 @@
   }
   #main-body {
     min-height: 500px;
+    height: auto;
+  }
+  #i-table, #i-title, #i-page{
+    width: 95%;
   }
 }
 
@@ -67,11 +75,11 @@
 
 @media screen and (max-width: 450px) {
   #main-box {
-    margin: 50px auto;
+    margin: 40px auto;
     width: 95%;
   }
   #login-box {
-    margin: 50px auto;
+    margin: 40px auto;
     width: 95%;
   }
   #footer-item {
@@ -100,6 +108,6 @@
 
 @media screen and (min-width: 601px) {
   .select-item {
-    width: 49%;
+    width: 46%;
   }
 }

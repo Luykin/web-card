@@ -1,5 +1,5 @@
 import md5 from 'js-md5'
-const PRIVATE_KEY = 'MelonBlock2017'
+const PRIVATE_KEY = 'FansMelonBlock2017'
 
 export function normalOrders (list) {
   let ret = list
