@@ -54,8 +54,7 @@ export default {
         return false
       }
       findPassword(this.phone, this.password, this.rePassword, this.code).then((res) => {
-        console.log(res)
-        if (res.data.status === 'ok') {
+        if (res.data.err_code === 0) {
           this.$message({
             showClose: true,
             message: '密码修改成功',
@@ -68,24 +67,24 @@ export default {
             }
           })
           return true
-        }
-        if (res.data.status === 'error') {
-          this.code = ''
-          this.$message({
-            showClose: true,
-            message: res.data.err_msg,
-            type: 'error'
-          })
-          return false
         } else {
-          this.password = ''
-          this.rePassword = ''
-          this.code = ''
-          this.$message({
-            showClose: true,
-            message: '似乎出错了',
-            type: 'error'
-          })
+          if (res.data.err_msg) {
+            this.code = ''
+            this.$message({
+              showClose: true,
+              message: res.data.err_msg,
+              type: 'error'
+            })
+          } else {
+            this.password = ''
+            this.rePassword = ''
+            this.code = ''
+            this.$message({
+              showClose: true,
+              message: '似乎出错了',
+              type: 'error'
+            })
+          }
         }
       })
     },
@@ -129,18 +128,26 @@ export default {
     },
     netSendCode() {
       sendVerify(this.phone).then((res) => {
-        if (res.data.status !== 'ok') {
-          this.$message({
-            showClose: true,
-            message: res.data.err_msg,
-            type: 'error'
-          })
-        } else {
+        if (res.data.err_code === 0) {
           this.$message({
             showClose: true,
             message: '验证码已发送',
             type: 'success'
           })
+        } else {
+          if (res.data.err_msg) {
+            this.$message({
+              showClose: true,
+              message: res.data.err_msg,
+              type: 'error'
+            })
+          } else {
+            this.$message({
+              showClose: true,
+              message: '似乎出错了',
+              type: 'error'
+            })
+          }
         }
       })
     }
@@ -157,11 +164,11 @@ export default {
 }
 
 .code {
-  width: 55%;
+  width: 40%;
 }
 
 .getcode {
-  width: 40%;
+  width: 55%;
   height: 100%;
   justify-content: flex-end;
   overflow: hidden;
@@ -179,7 +186,11 @@ export default {
   flex-shrink: 0;
   min-width: 30%;
   color: #ff9430;
-  margin: 0 20px;
+  margin: 0 5px;
+}
+
+.iconfont {
+  margin: 0 10px;
 }
 
 </style>

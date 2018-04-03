@@ -6,19 +6,19 @@
         <div class="min-font flex">注册帐号开始下单</div>
       </div>
       <div class="input-box flex">
-        <input type="text" placeholder="手机号" class="i-ipnput" v-model="phone">
+        <input type="text" placeholder="手机号" class="i-ipnput" v-model="phone" @keyup.enter="_register">
         <i class="iconfont icon-msnui-user"></i>
       </div>
       <div class="input-box flex">
-        <input type="password" placeholder="密码" class="i-ipnput" v-model="password">
+        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" @keyup.enter="_register">
         <i class="iconfont icon-mima"></i>
       </div>
       <div class="input-box flex">
-        <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword">
+        <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register">
         <i class="iconfont icon-mima"></i>
       </div>
       <label class="input-box flex" foe='code-input'>
-        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code">
+        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
         <div class="flex getcode">
           <div class="flex getcode-btn cursor" @click="_getcode">{{time}}
             <span v-if="time > 0">s后重新获取</span>
@@ -54,8 +54,7 @@ export default {
         return false
       }
       register(this.phone, this.password, this.rePassword, this.code).then((res) => {
-        console.log(res)
-        if (res.data.status === 'ok') {
+        if (res.data.err_code === 0) {
           this.$message({
             showClose: true,
             message: '注册成功',
@@ -68,24 +67,24 @@ export default {
             }
           })
           return true
-        }
-        if (res.data.status === 'error') {
-          this.code = ''
-          this.$message({
-            showClose: true,
-            message: res.data.err_msg,
-            type: 'error'
-          })
-          return false
         } else {
-          this.password = ''
-          this.rePassword = ''
-          this.code = ''
-          this.$message({
-            showClose: true,
-            message: '似乎出错了',
-            type: 'error'
-          })
+          if (res.data.err_msg) {
+            this.code = ''
+            this.$message({
+              showClose: true,
+              message: res.data.err_msg,
+              type: 'error'
+            })
+          } else {
+            this.password = ''
+            this.rePassword = ''
+            this.code = ''
+            this.$message({
+              showClose: true,
+              message: '似乎出错了',
+              type: 'error'
+            })
+          }
         }
       })
     },
@@ -129,18 +128,26 @@ export default {
     },
     netSendCode() {
       sendVerify(this.phone).then((res) => {
-        if (res.data.status !== 'ok') {
-          this.$message({
-            showClose: true,
-            message: res.data.err_msg,
-            type: 'error'
-          })
-        } else {
+        if (res.data.err_code === 0) {
           this.$message({
             showClose: true,
             message: '验证码已发送',
             type: 'success'
           })
+        } else {
+          if (res.data.err_msg) {
+            this.$message({
+              showClose: true,
+              message: res.data.err_msg,
+              type: 'error'
+            })
+          } else {
+            this.$message({
+              showClose: true,
+              message: '似乎出错了',
+              type: 'error'
+            })
+          }
         }
       })
     }
@@ -157,11 +164,11 @@ export default {
 }
 
 .code {
-  width: 55%;
+  width: 40%;
 }
 
 .getcode {
-  width: 40%;
+  width: 55%;
   height: 100%;
   justify-content: flex-end;
   overflow: hidden;
@@ -180,6 +187,10 @@ export default {
   min-width: 30%;
   color: #ff9430;
   margin: 0 20px;
+}
+
+.iconfont {
+  margin: 0 10px;
 }
 
 </style>

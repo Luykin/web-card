@@ -20,6 +20,17 @@ export const normalMixin = {
       }
       return true
     },
+    _verifyOldPassword(password) {
+      if (!password) {
+        this.$message({
+          showClose: true,
+          message: '请填写旧密码哦',
+          type: 'warning'
+        })
+        return false
+      }
+      return true
+    },
     _verifyPassword(password) {
       if (!password) {
         this.$message({

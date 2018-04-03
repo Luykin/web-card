@@ -51,6 +51,12 @@
 .el-pagination .el-pager .number:hover {
   color: #ff9430 !important;
 }
+.number{
+  color: #fff !important;
+}
+.el-pagination .btn-next, .el-pagination .btn-prev{
+  color: #fff !important;
+}
 
 .el-pager li:hover {
   color: #ff9430 !important;

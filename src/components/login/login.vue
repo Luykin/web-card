@@ -7,12 +7,12 @@
       </div>
       <div class="input-box flex">
         <i class="hover-out"></i>
-        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocomplete='on'>
+        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocomplete='on' @keyup.enter="_login">
         <i class="iconfont icon-msnui-user"></i>
       </div>
       <div class="input-box flex">
         <i class="hover-out"></i>
-        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on'>
+        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login">
         <i class="iconfont icon-mima"></i>
       </div>
       <!--       <div class="input-box flex">
@@ -49,10 +49,10 @@ export default {
       }
       const that = this
       login(this.phone, this.password).then((res) => {
-        if (res.data.status === 'ok') {
-          if (res.data.user) {
-            that.setUser(res.data.user)
-            that.$root.eventHub.$emit('user')
+        if (res.data.err_code === 0) {
+          if (res.data.data.user) {
+            that.setUser(res.data.data.user)
+            // that.$root.eventHub.$emit('user')
             that.$message({
               showClose: true,
               message: '登录成功',
@@ -62,9 +62,13 @@ export default {
               path: '/'
             })
           }
-          if (res.data.token) {
-            that.setToken(res.data.token)
+          console.log(res.data)
+          if (res.data.data.token) {
+            let tokenTime = +new Date() + 60 * 55 * 1000
+            localStorage.setItem('tokenTime', tokenTime)
+            that.setToken(res.data.data.token)
           } else {
+            that.password = ''
             that.$message({
               showClose: true,
               message: 'token错误',
@@ -72,21 +76,22 @@ export default {
             })
           }
           return true
-        }
-        if (res.data.status === 'error') {
-          that.password = ''
-          that.$message({
-            showClose: true,
-            message: res.data.err_msg,
-            type: 'error'
-          })
         } else {
-          that.password = ''
-          that.$message({
-            showClose: true,
-            message: '似乎出错了',
-            type: 'error'
-          })
+          if (res.data.err_msg) {
+            that.password = ''
+            that.$message({
+              showClose: true,
+              message: res.data.err_msg,
+              type: 'error'
+            })
+          } else {
+            that.password = ''
+            that.$message({
+              showClose: true,
+              message: '似乎出错了',
+              type: 'error'
+            })
+          }
         }
       })
     },
@@ -129,6 +134,10 @@ export default {
 
 .to-register:hover {
   color: #ff9480;
+}
+
+.iconfont {
+  margin: 0 10px;
 }
 
 </style>

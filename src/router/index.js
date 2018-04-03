@@ -10,6 +10,10 @@ export default new Router({
   routes: [
     {
       path: '/',
+      redirect: '/index'
+    },
+    {
+      path: '/index',
       name: 'index',
       component: () => import('components/index/index')
     },
@@ -42,12 +46,10 @@ export default new Router({
       path: '/order',
       name: 'order',
       component: () => import('components/order/order'),
-      children: [
-        {
-          path: ':id',
-          component: () => import('components/order/order')
-        }
-      ]
+      children: [{
+        path: ':id',
+        component: () => import('components/order/order')
+      }]
     }
   ]
 })

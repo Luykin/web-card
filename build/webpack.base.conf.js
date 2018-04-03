@@ -4,7 +4,7 @@ const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -27,21 +27,28 @@ module.exports = {
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',
-    publicPath: process.env.NODE_ENV === 'production'
-      ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+    publicPath: process.env.NODE_ENV === 'production' ?
+      config.build.assetsPublicPath :
+      config.dev.assetsPublicPath
+  },
+  // 忽略打包，使用CDN
+  externals: {
+    'vue': 'Vue',
+    'vue-router': 'VueRouter',
+    'vuex': 'Vuex',
+    'axios': 'axios'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      'api':resolve('src/api'),
-      'base':resolve('src/base'),
-      'common':resolve('src/common'),
-      'router':resolve('src/router'),
-      'components':resolve('src/components'),
-      'assets':resolve('src/assets')
+      'api': resolve('src/api'),
+      'base': resolve('src/base'),
+      'common': resolve('src/common'),
+      'router': resolve('src/router'),
+      'components': resolve('src/components'),
+      'assets': resolve('src/assets')
     }
   },
   module: {

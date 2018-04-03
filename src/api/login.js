@@ -50,3 +50,15 @@ export function findPassword(phone, password, repassword, code) {
     return Promise.resolve(res)
   })
 }
+export function updatePassword(password, newpassword, renewpassword, token) {
+  const url = `${PREFIX_URL}/update_password`
+  return axios.post(url, qs.stringify({
+    password: password,
+    new_password: newpassword,
+    re_new_password: renewpassword,
+    token: token,
+    key: getKey()
+  })).then(function(res) {
+    return Promise.resolve(res)
+  })
+}

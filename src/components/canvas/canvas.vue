@@ -4,7 +4,7 @@
 <script type="text/javascript">
 const arryFlower = []
 const allNumber = 60
-const color = ['rgba(255,255,255,.4)', 'rgba(255,255,255,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)']
+const color = ['rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)']
 const size = [3, 4, 5, 6]
 const speed = 1.5
 const headerHeight = 80
@@ -71,6 +71,9 @@ export default {
         const y = Math.floor((Math.random() * this.$refs.canvas.height))
         let vx = Math.random() * speed.toFixed(2)
         let vy = Math.random() * speed.toFixed(2)
+        if (vx * vy < speed * 0.04) {
+          vy = speed * 0.5
+        }
         if (Math.random() > 0.5) {
           vx = -vx
         }
@@ -92,10 +95,20 @@ export default {
       window.requestAnimationFrame(() => {
         this.$refs.canvas.width = document.body.clientWidth || window.screen.width
         arryFlower.forEach((item) => {
-          if (item.x >= this.$refs.canvas.width || item.x <= 0) {
+          if (item.x > this.$refs.canvas.width) {
+            item.x = this.$refs.canvas.width
             item.reverseX()
           }
-          if (item.y > this.$refs.canvas.height || item.y <= 0) {
+          if (item.x < 0) {
+            item.x = 0
+            item.reverseX()
+          }
+          if (item.y > this.$refs.canvas.height) {
+            item.y = this.$refs.canvas.height
+            item.reverseY()
+          }
+          if (item.y < 0) {
+            item.y = 0
             item.reverseY()
           }
           item.move()

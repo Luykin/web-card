@@ -9,8 +9,17 @@
     min-height: 730px;
     height: auto;
   }
-  #i-table, #i-title, #i-page{
+  #i-table,
+  #i-title,
+  #i-page {
     width: 72%;
+  }
+  .course-box {
+    width: 45%;
+  }
+  .popup {
+    width: 500px;
+    height: 330px;
   }
 }
 
@@ -25,8 +34,22 @@
     min-height: 500px;
     height: auto;
   }
-  #i-table, #i-title, #i-page{
+  #i-table,
+  #i-title,
+  #i-page {
     width: 95%;
+  }
+  .course-box {
+    width: 95%;
+    left: 50% !important;
+    transform: translate(-50%, 0);
+  }
+  .popup {
+    width: 95%;
+    height: 330px;
+  }
+  .logo-class {
+    margin-left: -50px;
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="layer" :class="{layerIn:layerIn, layerOut:layerOut}" @click="_close">
+  <div class="layer" :class="{layerIn:layerIn, layerOut:layerOut}" @click="_close" ref='layer'>
   </div>
 </template>
 <script type="text/javascript">
@@ -18,6 +18,9 @@ export default {
     _hiddenLayer () {
       this.layerIn = false
       this.layerOut = true
+    },
+    _setZIndex (z) {
+      this.$refs.layer.style.zIndex = z
     },
     _close () {
       this.$emit('close')
