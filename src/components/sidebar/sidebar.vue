@@ -36,7 +36,7 @@ export default {
     z-index: 9999;
     box-shadow: 1px 0 5px rgba(0,0,0, .1);
     transform: translate3d(-300px, 0px, 0px);
-    overflow: scroll;
+    overflow: hidden;
   }
   .siderbarIn{
     animation: siderbarIn .25s ease-in 1 forwards;

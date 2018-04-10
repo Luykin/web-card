@@ -7,17 +7,17 @@
       <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
         <el-table-column prop="code" label="订单号" width="180" fixed>
         </el-table-column>
-        <el-table-column prop="price" label="充值金额">
-        </el-table-column>
         <el-table-column prop="score" label="充值积分">
-        </el-table-column>
-        <el-table-column prop="pay_type" label="支付方式">
         </el-table-column>
         <el-table-column prop="status" label="状态">
         </el-table-column>
+        <el-table-column prop="pay_type" label="支付方式">
+        </el-table-column>
+        <el-table-column prop="price" label="充值金额">
+        </el-table-column>
         <el-table-column prop="create" label="提交时间">
         </el-table-column>
-<!--         <el-table-column fixed="right" label="操作" width="100">
+        <!--         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small">继续支付</el-button>
           </template>
@@ -34,6 +34,7 @@
 import { getOrders } from 'api/score-record'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken, timeChange } from 'common/js/util'
+import { SUCCESS_CODE } from 'api/config'
 const NUM = 11
 export default {
   data() {
@@ -53,18 +54,20 @@ export default {
       this._getOrders()
     })
     this._getOrders()
+    this.$root.eventHub.$emit('canvas')
   },
   computed: {
     ...mapGetters([
-      'token'
+      'token',
+      'tokenTime'
     ])
   },
   methods: {
     _getOrders() {
-      if (!testToken() || !this.token) {
+      if (!testToken(this.tokenTime) || !this.token) {
         this.setUser(false)
         this.setToken(false)
-        localStorage['tokenTime'] = false
+        this.setTokenTime(false)
         this.$message({
           showClose: true,
           message: '登录已失效',
@@ -79,7 +82,7 @@ export default {
       const that = this
       getOrders(this.token, NUM, this.page).then((res) => {
         this.loading = false
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.total = res.data.data.count
           this.tableData = that._normalTime(res.data.data.data)
         }
@@ -90,6 +93,7 @@ export default {
       list.forEach((item) => {
         item.create = timeChange(item.create)
         item.status = item.status === 2 ? '已支付' : '未支付'
+        item.pay_type = item.pay_type === 'wx' ? '微信' : item.pay_type === 'ali' ? '支付宝' : item.pay_type === 'qq' ? '腾讯' : item.pay_type
       })
       return list
     },
@@ -108,7 +112,8 @@ export default {
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
-      setScorerate: 'SET_SCORERATE'
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
     })
   }
 }

@@ -5,7 +5,7 @@
         <i class="iconfont icon-gengduo"></i>
       </nav>
       <div class="logo flex">
-        <img src="../../assets/logo.png" class="logo-class">
+        <img src="../../assets/logo.png" class="logo-class" @click="_toIndex">
       </div>
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
@@ -18,11 +18,11 @@
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
               <template slot="title">我的账户</template>
-              <el-menu-item index="/none" class='phone-item disable'>{{user.phone}}</el-menu-item>
-              <el-menu-item index="/none" class='phone-item disable'>我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
-              <el-menu-item index="/modify-password">修改密码</el-menu-item>
-              <el-menu-item index="/none" class='disable'>
-                <div class="log-out" @click="_logout($event)">注销</div>
+              <el-menu-item index="/none" class='phone-item disable' v-show="user">{{user.phone}}</el-menu-item>
+              <el-menu-item index="/none" class='phone-item disable' v-show="user">我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
+              <el-menu-item index="/modify-password" v-show="user">修改密码</el-menu-item>
+              <el-menu-item index="/none" class='disable' v-show="user">
+                <div class="log-out-min log-out" @click="_logout($event)">注销</div>
               </el-menu-item>
             </el-submenu>
             <el-menu-item index="/login" v-show="!user">登录帐号</el-menu-item>
@@ -63,7 +63,7 @@
               <el-menu-item index="/none" class='phone-item disable'><i class="iconfont icon-jifen"></i>我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
               <el-menu-item index="/modify-password">修改密码</el-menu-item>
               <el-menu-item index="/none" class='disable'>
-                <div class="log-out" @click="_logout($event)">注销</div>
+                <div class="log-out log-out-min" @click="_logout($event)">注销</div>
               </el-menu-item>
             </el-submenu>
             <el-menu-item index="/login" v-show="!user">
@@ -73,35 +73,46 @@
         </el-col>
       </el-row>
     </sidebar>
-    <interlayer ref="interlayer" @close="_hiddenSidebar"></interlayer>
+    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
     <popup ref="popup">
       <div class="recharge-box flex">
         <div class="recharge-box-title flex" v-show="!payUrl">积分充值</div>
         <div class="recharge-box-title flex" v-show="payUrl">微信扫码支付</div>
         <div class="content-qr flex" v-if="payUrl">
-          <div class="code-div flex">订单编号:{{code}} 充值金额: {{money}}元</div>
+          <div class="code-div flex">订单编号:{{code}} 充值金额: {{money||choseGood.price}}元</div>
           <div class="qrcode-box flex">
             <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
           </div>
-          <div class="showWX flex">请用微信扫描二维码支付</div>
+          <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
           <div class="qrcode-box flex">
+            <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div>
             <div class="sureBtn flex" @click="_sureCompletionPayment">确定已完成支付</div>
+            <!-- <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div> -->
           </div>
         </div>
         <!-- <div class="net-item flex" v-show="!payUrl">微信支付</div> -->
+        <!-- app  支付方式 -->
+        <div v-for="(value, key) in app.payments" v-if='value' @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key}" class="cursor">{{key}} : {{value}}</div>
+        <!-- app  支付方式  end -->
         <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img">
         <div class="flex input-defult" v-show="!payUrl">
           <!-- onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" -->
-          <input type="text" placeholder="请输入充值金额（1元）" class="i-ipnput" v-model="money">
+          <input type="text" placeholder="请输入充值金额（元）" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" @keyup.enter="_addOrder">
         </div>
-        <div class="min-tips-text flex" v-show="!payUrl&&money">充值{{money|| 0}}元等于<span class="course-btn">{{money*100}}</span>积分</div>
-        <div class="min-tips-text flex" v-show="!payUrl&&!money">如果支付异常，请联系客服进行充值。</div>
+        <div class="min-tips-text flex" v-show="!payUrl&&((money&& money>=Math.ceil(app.min_recharge)) || choseGood)">充值<span class="my-money">{{money|| choseGood.price}}</span>元等于<span class="course-btn">{{Math.ceil(money*scorerate) || choseGood.score}}</span>积分</div>
+        <div class="min-tips-text flex" v-show="!payUrl&&(!money || money<Math.ceil(app.min_recharge)) && !choseGood">最小充值金额为<span class="my-money">{{Math.ceil(app.min_recharge)}}</span>元。</div>
+        <!-- app  商品 -->
+        <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor">{{item.label}}</div>
+        <!-- app  商品  end -->
         <div class="recharge-btn-box flex" v-show="!payUrl">
           <div class="recharge-btn-sure flex" @click="_addOrder">确认</div>
           <div class="recharge-btn-sure flex" @click='_hiddenSidebar'>取消</div>
         </div>
       </div>
     </popup>
+    <centerTips ref='centerTips'>
+      <div class="tips-class flex ellipsis">{{centerTips}}</div>
+    </centerTips>
   </div>
 </template>
 <script type="text/javascript" scoped>
@@ -112,34 +123,97 @@ import popup from 'base/popup/popup'
 import { addOrder } from 'api/header'
 import { testToken } from 'common/js/util'
 import QrcodeVue from 'qrcode.vue'
-import { getUserInfo, getScoreRate } from 'api/index'
+import { getUserInfo, getAppInfo } from 'api/index'
+import { SUCCESS_CODE } from 'api/config'
+import centerTips from 'base/centerTips/centerTips'
 
 export default {
   data() {
     return {
-      money: 0,
+      money: '',
       sidebar: false,
       popup: false,
       payUrl: false,
       size: 120,
-      code: false
+      code: false,
+      centerTips: '',
+      choseGoodId: -1,
+      inputFocus: true,
+      activePayType: 'wx'
     }
   },
   created() {
     this.$root.eventHub.$on('user', () => {
-      // console.log('更新用户')
       this._updataUser()
     })
-    this._getScoreRate()
+    this.$root.eventHub.$on('showPopup', () => {
+      this._showPopup()
+    })
+    this.$root.eventHub.$emit('canvas')
+    this._getAppInfo(this)
   },
   computed: {
+    choseGood() {
+      if (this.choseGoodId > -1) {
+        let ret = false
+        for (let i = 0; i < this.app.goods.length; i++) {
+          if (this.app.goods[i].id === this.choseGoodId) {
+            ret = this.app.goods[i]
+            break
+          }
+        }
+        return ret
+      } else {
+        return false
+      }
+    },
+    payType() {
+      return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
+    },
     ...mapGetters([
       'user',
       'token',
-      'scorerate'
+      'scorerate',
+      'tokenTime',
+      'app'
     ])
   },
   methods: {
+    _inputFocus() {
+      if (!this.inputFocus) {
+        this.inputFocus = true
+      }
+    },
+    _inputBlur() {
+      if (this.inputFocus) {
+        this.inputFocus = false
+      }
+    },
+    _chosePayType(key, value) {
+      if (value && this.activePayType !== key) {
+        this.activePayType = key
+      }
+    },
+    _choseGood(id) {
+      this.choseGoodId = id
+      this.money = ''
+    },
+    _rectifyMoney() {
+      if (this.choseGoodId && this.money) {
+        this.choseGoodId = -1
+      }
+      if (this.money.indexOf('.') > -1) {
+        // console.log('有小数点')
+        // console.log(this.money.indexOf('.'))
+        const end = this.money.indexOf('.')
+        this.money = this.money.slice(0, end + 3)
+      }
+    },
+    // _moneyChange() {
+    //   if (this.choseGoodId && this.money) {
+    //     this.choseGoodId = -1
+    //   }
+    // },
     checkTock() {
       if (!this.user) {
         this.$message({
@@ -152,10 +226,11 @@ export default {
         })
         return false
       }
-      if (!testToken()) {
+      if (!testToken(this.tokenTime)) {
+        // console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
-        localStorage['tokenTime'] = false
+        this.setTokenTime(false)
         this.$message({
           showClose: true,
           message: '登录已失效',
@@ -173,14 +248,14 @@ export default {
         return false
       }
       getUserInfo(this.token).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(res.data.data)
           // this.$root.eventHub.$emit('user')
         } else {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -194,88 +269,103 @@ export default {
       })
     },
     _addOrder() {
-      if (!isNaN(this.money)) {
-        if (!testToken()) {
-          this.setUser(false)
-          this.setToken(false)
-          localStorage['tokenTime'] = false
-          this.$message({
-            showClose: true,
-            message: '登录已失效',
-            type: 'warning'
-          })
-          this.$router.replace({
-            path: '/login'
-          })
-          this._hiddenSidebar()
-          return false
-        }
-        console.log(this.scorerate)
-        if (!this.scorerate) {
-          this._getScoreRate()
-          this.$message({
-            showClose: true,
-            message: '网络错误',
-            type: 'warning'
-          })
-          this._hiddenSidebar()
-          return
-        }
-        if (this.money < 0.01) {
-          this.$message({
-            showClose: true,
-            message: '最小充值0.01元',
-            type: 'warning'
-          })
-          return
-        }
-        addOrder(this.token, this.scorerate * this.money, 'wx', this.money).then((res) => {
-          console.log(res.data.data.pay_url)
-          if (res.data.err_code === 0) {
-            // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
-            this.code = res.data.data.code
-            this.payUrl = res.data.data.pay_url
-          } else {
-            if (res.data.err_msg) {
-              this.$message({
-                showClose: true,
-                message: res.data.err_msg,
-                type: 'error'
-              })
-            } else {
-              this.$message({
-                showClose: true,
-                message: '似乎出错了',
-                type: 'error'
-              })
-            }
-          }
+      if (!this.activePayType) {
+        this.centerTips = '请选择支付方式'
+        this.$refs.centerTips._open()
+        return
+      }
+      if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
+        addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
+          this._afterAddOrder(res)
         })
       } else {
-        this.$message({
-          showClose: true,
-          message: '请输入数字',
-          type: 'error'
-        })
+        if (!isNaN(this.money)) {
+          if (!testToken(this.tokenTime)) {
+            this.setUser(false)
+            this.setToken(false)
+            this.setTokenTime(false)
+            this.$message({
+              showClose: true,
+              message: '登录已失效',
+              type: 'warning'
+            })
+            this.$router.replace({
+              path: '/login'
+            })
+            this._hiddenSidebar()
+            return false
+          }
+          if (!this.scorerate) {
+            this._getAppInfo()
+            this.centerTips = '网络错误，请刷新后重试'
+            this.$refs.centerTips._open()
+            this._hiddenSidebar()
+            return
+          }
+          if (this.money < Math.ceil(this.app.min_recharge)) {
+            this.centerTips = `最小充值${Math.ceil(this.app.min_recharge)}元`
+            this.$refs.centerTips._open()
+            return
+          }
+          if (!this.activePayType) {
+            this.centerTips = '请选择支付方式'
+            this.$refs.centerTips._open()
+            return
+          }
+          addOrder(this.token, Math.ceil(this.scorerate * this.money), this.activePayType, this.money).then((res) => {
+            this._afterAddOrder(res)
+          })
+        } else {
+          this.$message({
+            showClose: true,
+            message: '请输入数字',
+            type: 'error'
+          })
+        }
+      }
+    },
+    _afterAddOrder(res) {
+      if (res.data.err_code === SUCCESS_CODE) {
+        // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
+        this.code = res.data.data.code
+        this.payUrl = res.data.data.pay_url
+      } else {
+        this._hiddenSidebar()
+        this.money = ''
+        if (res.data.err_msg) {
+          this.$message({
+            showClose: true,
+            message: this.$root.errorCode[res.data.err_code],
+            type: 'error'
+          })
+        } else {
+          this.$message({
+            showClose: true,
+            message: '似乎出错了',
+            type: 'error'
+          })
+        }
       }
     },
     _sureCompletionPayment() {
       this._hiddenSidebar()
-      this.$root.eventHub.$emit('user')
-      this.$root.eventHub.$emit('updateScoreRecord')
       this.$router.replace({
         path: '/score-record'
       })
+      this.$root.eventHub.$emit('canvas', true)
     },
-    _getScoreRate(that) {
-      getScoreRate().then((res) => {
-        if (res.data.err_code === 0) {
-          this.setScorerate(res.data.data[0].value)
+    _getAppInfo(that) {
+      getAppInfo().then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+          if (res.data.data.score_rate) {
+            this.setScorerate(res.data.data.score_rate)
+            this.setApp(res.data.data)
+          }
         } else {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -292,7 +382,7 @@ export default {
       e.stopPropagation()
       this.setUser(false)
       this.setToken(false)
-      localStorage['tokenTime'] = false
+      this.setTokenTime(false)
       this.$message({
         showClose: true,
         message: '已注销',
@@ -301,9 +391,19 @@ export default {
       this.$router.replace({
         path: '/login'
       })
+      this.$root.eventHub.$emit('canvas', true)
+    },
+    _toIndex() {
+      this.$root.eventHub.$emit('updateOrder')
+      this.$root.eventHub.$emit('user')
+      this.$root.eventHub.$emit('updateScoreRecord')
+      this.$router.replace({
+        path: '/index'
+      })
+      this.$root.eventHub.$emit('canvas', true)
     },
     _buy() {
-      console.log('buy')
+      // console.log('buy')
     },
     _showSidebar() {
       this.sidebar = true
@@ -314,16 +414,22 @@ export default {
       })
     },
     _showPopup(e) {
-      e.stopPropagation()
+      if (e) {
+        e.stopPropagation()
+      }
       this.$nextTick(() => {
         this.popup = true
         this.$refs.popup._showPopup()
         this.$refs.interlayer._setZIndex(9999)
         this.$refs.interlayer._showLayer()
+        this.$refs.input.focus()
       })
     },
     _hiddenSidebar() {
-      console.log('11')
+      if (this.payUrl) {
+        this.$root.eventHub.$emit('user')
+        this.$root.eventHub.$emit('updateScoreRecord')
+      }
       this.payUrl = false
       if (this.sidebar && !this.popup) {
         this.sidebar = false
@@ -341,14 +447,27 @@ export default {
         this.$refs.interlayer._setZIndex(1500)
       }
     },
+    _interlayerHide() {
+      if (this.sidebar && !this.popup) {
+        this.sidebar = false
+        this.$refs.sidebar._hiddenSidebar()
+        this.$refs.interlayer._hiddenLayer()
+      }
+    },
     handleSelect(key, keyPath) {
-      console.log(key, keyPath)
+      this.$root.eventHub.$emit('canvas')
       if (key.indexOf('/none') > -1) {
         return false
       }
       this.$router.replace({
         path: key
       })
+      if (key === '/order') {
+        this.$root.eventHub.$emit('updateOrder')
+      }
+      if (key === '/score-record') {
+        this.$root.eventHub.$emit('updateScoreRecord')
+      }
       if (this.sidebar) {
         this._hiddenSidebar()
       }
@@ -356,14 +475,17 @@ export default {
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
-      setScorerate: 'SET_SCORERATE'
+      setApp: 'SET_APP',
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
     })
   },
   components: {
     sidebar,
     interlayer,
     popup,
-    QrcodeVue
+    QrcodeVue,
+    centerTips
   }
 }
 
@@ -450,6 +572,10 @@ export default {
   cursor: pointer;
 }
 
+.log-out-min {
+  line-height: 36px;
+}
+
 .green-text {
   display: inline-block;
   font-size: 15px;
@@ -530,14 +656,15 @@ export default {
 
 .recharge-btn-sure:hover {
   background: #eee;
-  color: #ff9430;
+  color: #d94d37;
   cursor: pointer;
 }
 
 .min-tips-text {
   width: 100%;
   height: 20px;
-  text-indent: 30px;
+  /*text-indent: 30px;*/
+  padding-left: 30px;
   font-size: 13px;
   color: #999;
   justify-content: flex-start;
@@ -565,14 +692,29 @@ export default {
 }
 
 .sureBtn {
-  /*background-color: #BCEE68;*/
   border: 1px solid #ff9430;
   border-radius: 20px;
   color: #ff9430;
   padding: 10px;
   height: 10px;
   min-width: 120px;
-  margin-bottom: 10px;
+  margin: 0 15px 10px;
+}
+
+.colseBtn {
+  border: 1px solid #999;
+  border-radius: 20px;
+  color: #999;
+  padding: 10px;
+  height: 10px;
+  min-width: 120px;
+  margin: 0 15px 10px;
+}
+
+.colseBtn:hover {
+  background: #666;
+  color: #fff;
+  cursor: pointer;
 }
 
 .sureBtn:hover {
@@ -593,10 +735,33 @@ export default {
   /*  margin-left: -50px;*/
 }
 
+.logo-class:hover {
+  cursor: pointer;
+}
+
 .pay-img {
   width: 144px;
   height: 44px;
   margin: 0 30px;
+}
+
+.my-money {
+  color: #d94d37;
+  text-indent: 0px;
+}
+
+.active-good {
+  color: red;
+}
+
+.active-pay-type {
+  color: red;
+}
+
+.good-item {}
+
+.i-ipnput {
+  text-indent: 15px;
 }
 
 </style>

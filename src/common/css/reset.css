@@ -1,4 +1,5 @@
 html {
+  --main-color: #ff6b4e;
   font-size: 14px;
   font-family: PingFang SC, STHeitiSC-Light, Helvetica-Light, arial, sans-serif;
   user-select: none;
@@ -13,7 +14,7 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   line-height: 1;
   min-width: 320px;
-  background: url('http://ozp5yj4ke.bkt.clouddn.com/bg.c72fa3d.png');
+  background: url('http://ozp5yj4ke.bkt.clouddn.com/bg.c72fa3d.png') no-repeat;
   overflow-x: hidden;
 }
 
@@ -100,4 +101,8 @@ a:visited {
 input {
   outline: 0;
   outline: none;
+}
+
+input:focus::-webkit-contacts-auto-fill-button {
+  opacity: 0;
 }

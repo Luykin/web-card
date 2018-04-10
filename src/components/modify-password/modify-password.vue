@@ -2,22 +2,22 @@
   <div id="main-body">
     <div class="login-box" id="login-box">
       <div class="login-box-title flex">
-        <div>修改密码</div>
+        <div class="login-title">修改密码</div>
         <div class="min-font flex">修改当前密码</div>
       </div>
       <div class="input-box flex">
+        <i class="iconfont icon-mima"></i>
         <input type="password" placeholder="旧密码" class="i-ipnput" v-model="password">
-        <i class="iconfont icon-mima"></i>
       </div>
       <div class="input-box flex">
+        <i class="iconfont icon-mima"></i>
         <input type="password" placeholder="设置新的密码" class="i-ipnput" v-model="newPassword">
-        <i class="iconfont icon-mima"></i>
       </div>
       <div class="input-box flex">
-        <input type="password" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword">
         <i class="iconfont icon-mima"></i>
+        <input type="password" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword">
       </div>
-      <div class="btn flex" @click="_sublime">修改密码</div>
+      <div class="btn flex modifybtn" @click="_sublime">修改密码</div>
     </div>
   </div>
 </template>
@@ -26,6 +26,7 @@ import { updatePassword } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
+import { SUCCESS_CODE } from 'api/config'
 export default {
   mixins: [normalMixin],
   data() {
@@ -35,10 +36,14 @@ export default {
       reNewPassword: ''
     }
   },
+  created() {
+    this.$root.eventHub.$emit('canvas', true)
+  },
   computed: {
     ...mapGetters([
       'user',
-      'token'
+      'token',
+      'tokenTime'
     ])
   },
   methods: {
@@ -54,10 +59,10 @@ export default {
         })
         return false
       }
-      if (!testToken()) {
+      if (!testToken(this.tokenTime)) {
         this.setUser(false)
         this.setToken(false)
-        localStorage['tokenTime'] = false
+        this.setTokenTime(false)
         this.$message({
           showClose: true,
           message: '登录已失效',
@@ -78,7 +83,7 @@ export default {
         return false
       }
       updatePassword(this.password, this.newPassword, this.reNewPassword, this.token).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(false)
           this.setToken(false)
           this.$message({
@@ -86,6 +91,7 @@ export default {
             message: '设置成功，请重新登录',
             type: 'success'
           })
+          this.password = ''
           this.$router.replace({
             path: '/login'
           })
@@ -94,7 +100,7 @@ export default {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -110,7 +116,8 @@ export default {
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
-      setScorerate: 'SET_SCORERATE'
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
     })
   }
 }
@@ -125,15 +132,17 @@ export default {
   align-content: center;
 }
 
-.min-font {
-  width: 100%;
-  font-size: 13px;
-  color: #bdbdbd;
-  margin: 10px auto;
+.iconfont {
+  font-size: 20px;
+  margin: 0 10px;
 }
 
-.iconfont {
-  margin: 0 10px;
+.modifybtn {
+  margin: 0 auto 30px;
+}
+
+.input-box {
+  margin-bottom: 20px !important;
 }
 
 </style>

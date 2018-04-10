@@ -2,38 +2,41 @@
   <div id="main-body">
     <div class="login-box flex" id="login-box">
       <div class="login-box-title flex">
-        <div>注册</div>
+        <div class="login-title">注册</div>
         <div class="min-font flex">注册帐号开始下单</div>
       </div>
       <div class="input-box flex">
-        <input type="text" placeholder="手机号" class="i-ipnput" v-model="phone" @keyup.enter="_register">
         <i class="iconfont icon-msnui-user"></i>
+        <input type="text" placeholder="手机号" class="i-ipnput" v-model="phone" @keyup.enter="_register" autofocus="autofocus">
       </div>
       <div class="input-box flex">
+        <i class="iconfont icon-mima"></i>
         <input type="password" placeholder="密码" class="i-ipnput" v-model="password" @keyup.enter="_register">
-        <i class="iconfont icon-mima"></i>
       </div>
       <div class="input-box flex">
-        <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register">
         <i class="iconfont icon-mima"></i>
+        <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register">
       </div>
       <label class="input-box flex" foe='code-input'>
-        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
         <div class="flex getcode">
+          <i class="iconfont icon-duanxin"></i>
           <div class="flex getcode-btn cursor" @click="_getcode">{{time}}
             <span v-if="time > 0">s后重新获取</span>
           </div>
-          <i class="iconfont icon-duanxin"></i>
         </div>
+        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
       </label>
-      <div class="btn flex" @click="_register">注册</div>
-      <router-link tag="div" class="to-register ellipsis cursor" to="/login">已有帐号？立即登录</router-link>
+      <div class="btn flex modifybtn" @click="_register">注册</div>
+      <div class="flex login-item">
+        <router-link tag="div" class="to-register ellipsis cursor flex" to="/login">已有帐号？立即登录</router-link>
+      </div>
     </div>
   </div>
 </template>
 <script type="text/javascript">
 import { sendVerify, register } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
+import { SUCCESS_CODE } from 'api/config'
 export default {
   mixins: [normalMixin],
   data() {
@@ -47,6 +50,7 @@ export default {
   },
   created() {
     this._setTime()
+    this.$root.eventHub.$emit('canvas')
   },
   methods: {
     _register() {
@@ -54,7 +58,7 @@ export default {
         return false
       }
       register(this.phone, this.password, this.rePassword, this.code).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.$message({
             showClose: true,
             message: '注册成功',
@@ -72,7 +76,7 @@ export default {
             this.code = ''
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -128,7 +132,7 @@ export default {
     },
     netSendCode() {
       sendVerify(this.phone).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.$message({
             showClose: true,
             message: '验证码已发送',
@@ -138,7 +142,7 @@ export default {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -156,28 +160,22 @@ export default {
 
 </script>
 <style type="text/css" scoped>
-.min-font {
-  width: 100%;
-  font-size: 13px;
-  color: #bdbdbd;
-  margin: 10px auto;
-}
-
 .code {
   width: 40%;
 }
 
 .getcode {
-  width: 55%;
+  width: auto;
+  min-width: 25%;
   height: 100%;
-  justify-content: flex-end;
+  justify-content: flex-start;
   overflow: hidden;
 }
 
 .getcode-btn {
   width: auto;
   height: 100%;
-  margin: 0 10px;
+  margin-right: 5px;
   color: #ff9430;
 }
 
@@ -190,7 +188,11 @@ export default {
 }
 
 .iconfont {
+  font-size: 20px;
   margin: 0 10px;
+}
+.input-box{
+  margin-bottom: 20px !important;
 }
 
 </style>

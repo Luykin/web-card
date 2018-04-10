@@ -1,18 +1,42 @@
 import axios from 'axios'
 import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
-import { getKey } from 'common/js/util'
+import { getSign } from 'common/js/util'
 
-export function addOrder(token, score, paytype, price) {
+export function addOrder(token, score, paytype, price, id) {
   const url = `${PREFIX_URL}/add_order`
-  return axios.post(url, qs.stringify({
+  let data = {
     token: token,
     score: score,
     pay_type: paytype,
     price: price,
-    uaid: UAID,
-    key: getKey()
-  })).then(function(res) {
-    return Promise.resolve(res)
-  })
+    uaid: UAID
+  }
+  if (id || id === 0) {
+    data = Object.assign({ good_id: id }, data)
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }

@@ -32,6 +32,7 @@ module.exports = {
       config.dev.assetsPublicPath
   },
   // 忽略打包，使用CDN
+  // 前一个key 是引用三方库名  后一个value是你在项目中起的别名
   externals: {
     'vue': 'Vue',
     'vue-router': 'VueRouter',

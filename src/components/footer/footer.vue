@@ -1,8 +1,8 @@
 <template>
     <footer>
       <div id="footer-item" class="footer-item font-max flex">联系我们</div>
-      <div id="footer-item" class="footer-item font-min flex">客服QQ：123456789</div>
-      <div id="footer-item" class="footer-item font-min flex">客服微信：123456789</div>
+      <div id="footer-item" class="footer-item font-min flex">客服电话：13212399922</div>
+      <div id="footer-item" class="footer-item font-min flex">客服微信：fans10005</div>
     </footer>
 </template>
 <script type="text/javascript">

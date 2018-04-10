@@ -2,75 +2,86 @@
   <div id="main-body">
     <div class="main-box" id="main-box">
       <div class="main-box-header flex">
-        <div class="mbh-item flex" v-for="item in serviceCategory" :class="{'activeCategory':activeCategory == item.id}" @click="_chose(item.id)" v-bind:key="item.id+Math.random()">
+        <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose(item.id)" v-bind:key="item.id+Math.random()">
           <img :src="item.icon" class="mbh-icon" v-if="item.icon">
           <div v-else class="mbh-icon"></div>
           <div class="mbh-label flex">{{item.label}}</div>
         </div>
       </div>
-      <div class="course" v-if="nowServices">
-        {{nowServices.tips || '快去下单吧~'}}
+      <div class="course" v-if="nowServices" v-html='nowServices.tips'>
       </div>
       <div class="select-box flex">
         <div class="select-item">
           <div class="select-item-label flex">
-            <span v-if="nowServices">{{nowServices.category>0&&nowServices.category<10?'QQ号': '链接'}}</span>
-            <el-popover ref="popover4" placement="right" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">
+            <span v-if="nowServices">{{nowServices.category>0&&nowServices.category < 10 ? 'QQ号': '链接/快手号,抖音号'}}</span>
+            <el-popover ref="popover4" placement="right" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link && !hiddenPop)">
               <div class="p-course-box" v-if="nowServices">
-                <scroller>
-                  <div v-if="!nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
-                  <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
-                  <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
-                  <div v-if="sayList && (nowServices.category ===2 || nowServices.category ===4)" v-for="item in sayList">
-                    {{item}}
-                  </div>
-                </scroller>
+                <div v-if="!nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
+                <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList && !lodingS" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
+                <div class="flex no-tutorials loding" v-if="lodingS">加载中</div>
+                <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+                <div v-if="sayList && (nowServices.category ===2 || nowServices.category ===4)" v-for="item in sayList" class="say-list-item" @click="_choseSayList(item)">
+                  {{item.content}}
+                </div>
               </div>
             </el-popover>
-            <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">{{nowServices.category>0&&nowServices.category
-              <10? '获取说说列表': '查看教程'}}</el-button>
-                <!--             <span class="chose-shuoshuo" v-for="item in showService" v-show="(item.category === 2 || item.category === 4) && item.id === choseServiceValue" @click="_choseShuoShuo">点击选择说说</span> -->
+            <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link && !hiddenPop)">{{nowServices.category > 0&&nowServices.category
+              < 10 ? '获取说说列表': '查看教程'}}</el-button>
           </div>
           <div class="flex input-defult" v-if="nowServices">
-            <input type="text" :placeholder="nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接'" class="i-ipnput" v-model="link">
+            <input type="text" :placeholder="nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接'" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
           </div>
         </div>
         <div class="select-item">
           <div class="select-item-label flex">数量</div>
           <div class="flex input-defult">
-            <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/">
+            <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" @keyup.enter="_sublime(nowServices.category)">
           </div>
         </div>
         <div class="select-item">
           <div class="select-item-label flex">业务</div>
-          <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" v-if="showService" no-data-text="暂无业务">
+          <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" v-if="showService" no-data-text="暂无业务" @change="_clear">
             <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
             </el-option>
           </el-select>
         </div>
       </div>
       <div v-if="nowServices">
+        <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
         <div class="rule-hints flex ellipsis">
-          所需积分:<span class="need-score-sapn">{{quantity || 0}} / {{nowServices.rate}} <span v-if="user.discount!==1">{{'* ' + (user.discount || 1)*10 + '折'}}</span> = {{Math.ceil((quantity||0)/nowServices.rate*(user.discount || 1))}}</span>
+          <span class="rh-title">所需积分:</span>
+          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}} <span v-if="user.discount!==1">{{'* ' + (user.discount || 1)*10 + '折'}}</span> = {{consumeNum + '积分'}}</span>
         </div>
         <div class="rule-hints flex ellipsis">
-          剩余积分:<span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1积分等于'+ nowServices.rate || '0'}}{{nowServices.units}}{{nowServices.label}}等于1元钱)</span>
+          <span class="rh-title">剩余积分:</span>
+          <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
+        </div>
+        <div class="rule-hints flex ellipsis">
+          <span class="rh-title">下单范围:</span>
+          <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span">最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span>
         </div>
       </div>
-      <div class="btn flex" @click="_sublime">提交订单</div>
+      <div class="btn flex" @click="_sublime(nowServices.category)">提交订单</div>
     </div>
+    <centerTips ref='centerTips'>
+      <div class="tips-class flex ellipsis">{{centerTips}}</div>
+    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getkjInfo } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
+import { SUCCESS_CODE } from 'api/config'
+import centerTips from 'base/centerTips/centerTips'
+
 export default {
   data() {
     return {
       popoverWidth: 400,
       link: '',
-      quantity: 0,
+      centerTips: '',
+      quantity: '',
       shuoshuoPage: 0,
       choseServiceValue: '',
       serviceCategory: false,
@@ -78,10 +89,15 @@ export default {
       sayList: false,
       activeCategory: false,
       showService: false,
+      targetid: false,
+      suosuo: false,
+      lodingS: false,
+      hiddenPop: false,
       scorerate: false // 一元购买多少积分
     }
   },
   created() {
+    // 由app 统一返回
     this._initNet()
     this._setPopoverWidth()
     if (this.user) {
@@ -89,6 +105,7 @@ export default {
         this.$root.eventHub.$emit('user')
       })
     }
+    this.$root.eventHub.$emit('canvas')
   },
   computed: {
     nowServices() {
@@ -102,13 +119,26 @@ export default {
       }
       return nowServer
     },
+    consumeNum() {
+      return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.discount || 1))
+    },
     ...mapGetters([
       'user',
-      'token'
+      'token',
+      'tokenTime',
+      'app'
     ])
   },
   methods: {
-    _sublime() {
+    _choseSayList(item) {
+      this.hiddenPop = true
+      setTimeout(() => {
+        this.hiddenPop = false
+      }, 0)
+      this.targetid = item.tid
+      this.suosuo = item.content
+    },
+    _sublime(category) {
       if (this.choseServiceValue === '' || !this.choseServiceValue) {
         this.$message({
           showClose: true,
@@ -120,13 +150,32 @@ export default {
       if (!this.checkTock()) {
         return false
       }
-      if (!this.link || this.link.indexOf('http') < 0) {
-        this.$message({
-          showClose: true,
-          message: '请正确填写链接',
-          type: 'warning'
-        })
-        return false
+      if (category === 2 || category === 4) {
+        if (!this.targetid) {
+          this.$message({
+            showClose: true,
+            message: '请选择说说',
+            type: 'warning'
+          })
+          return false
+        }
+      } else {
+        if (!this.link && category < 10) {
+          this.$message({
+            showClose: true,
+            message: '请正确填写QQ号',
+            type: 'warning'
+          })
+          return false
+        }
+        if ((!this.link || this.link.indexOf('http') < 0) && category > 10) {
+          this.$message({
+            showClose: true,
+            message: '请正确填写链接',
+            type: 'warning'
+          })
+          return false
+        }
       }
       let max = 0
       let min = 0
@@ -147,74 +196,90 @@ export default {
         return false
       }
       if (this.quantity > max || this.quantity < min) {
-        this.$message({
-          showClose: true,
-          message: `最大数量${max},最小数量${min}`,
-          type: 'warning'
-        })
+        // this.$message({
+        //   showClose: true,
+        //   message: `最大数量${max},最小数量${min}`,
+        //   type: 'warning'
+        // })
+        this.centerTips = `最大数量${max},最小数量${min}`
+        this.$refs.centerTips._open()
         return false
       }
-      if (Math.ceil(this.quantity / rate * this.user.discount > this.user.score)) {
-        this.$message({
-          showClose: true,
-          message: '积分不足',
-          type: 'warning'
-        })
+      if (this.consumeNum > this.user.score) {
+        // this.$message({
+        //   showClose: true,
+        //   message: '积分不足',
+        //   type: 'warning'
+        // })
+        this.centerTips = '积分不足'
+        this.$refs.centerTips._open()
+        this.$root.eventHub.$emit('showPopup')
         return false
       }
-      addTask(this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
-        if (res.data.err_code === 0) {
+      if (category === 2 || category === 4) {
+        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+          this._afterAddtask(res)
+        })
+        return true
+      } else {
+        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
+          this._afterAddtask(res)
+        })
+      }
+    },
+    _afterAddtask(res) {
+      if (res.data.err_code === SUCCESS_CODE) {
+        this.$message({
+          showClose: true,
+          message: '下单成功',
+          type: 'success'
+        })
+        this.$root.eventHub.$emit('updateOrder')
+        this.$root.eventHub.$emit('canvas', true)
+        this.$router.replace({
+          path: '/order'
+        })
+        if (!this.checkTock()) {
+          return false
+        }
+        getUserInfo(this.token).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
+            this.setUser(res.data.data)
+            this.$root.eventHub.$emit('user')
+          } else {
+            if (res.data.err_msg) {
+              this.$message({
+                showClose: true,
+                message: this.$root.errorCode[res.data.err_code],
+                type: 'error'
+              })
+            } else {
+              this.$message({
+                showClose: true,
+                message: '似乎出错了',
+                type: 'error'
+              })
+            }
+          }
+        })
+      } else {
+        if (res.data.err_msg) {
           this.$message({
             showClose: true,
-            message: '下单成功',
-            type: 'success'
-          })
-          this.$root.eventHub.$emit('updateOrder')
-          this.$router.replace({
-            path: '/order'
-          })
-          if (!this.checkTock()) {
-            return false
-          }
-          getUserInfo(this.token).then((res) => {
-            if (res.data.err_code === 0) {
-              this.setUser(res.data.data)
-              this.$root.eventHub.$emit('user')
-            } else {
-              if (res.data.err_msg) {
-                this.$message({
-                  showClose: true,
-                  message: res.data.err_msg,
-                  type: 'error'
-                })
-              } else {
-                this.$message({
-                  showClose: true,
-                  message: '似乎出错了',
-                  type: 'error'
-                })
-              }
-            }
+            message: this.$root.errorCode[res.data.err_code],
+            type: 'error'
           })
         } else {
-          if (res.data.err_msg) {
-            this.$message({
-              showClose: true,
-              message: res.data.err_msg,
-              type: 'error'
-            })
-          } else {
-            this.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
-          }
+          this.$message({
+            showClose: true,
+            message: '似乎出错了',
+            type: 'error'
+          })
         }
-      })
+      }
     },
     _choseShuoShuo(category) {
-      console.log(category)
+      // console.log(category)
       if (category !== 2 && category !== 4) {
         return
       }
@@ -240,13 +305,14 @@ export default {
       if (!this.checkTock()) {
         return false
       }
-      getkjInfo(typeid, page, this.token).then((res) => {
-        if (res.data.err_code === 0) {
-          if (res.data.msglist) {
-            if (!this.sayList) {
-              this.sayList = res.data.msglist
-            }
-            this.sayList = this.sayList.concat(res.data.msglist)
+      this.sayList = false
+      this.lodingS = true
+      getShuoshuoList(typeid, this.token).then((res) => {
+        this.lodingS = false
+        if (res.data.err_code === SUCCESS_CODE) {
+          // console.log(res.data.data.msglist)
+          if (res.data.data.msglist) {
+            this.sayList = res.data.data.msglist
           } else {
             this.$message({
               showClose: true,
@@ -258,7 +324,7 @@ export default {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -283,10 +349,11 @@ export default {
         })
         return false
       }
-      if (!testToken()) {
+      if (!testToken(this.tokenTime)) {
+        console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
-        localStorage['tokenTime'] = false
+        this.setTokenTime(false)
         this.$message({
           showClose: true,
           message: '登录已失效',
@@ -315,7 +382,12 @@ export default {
         this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
       }
       this.link = ''
+      this.suosuo = false
       this.activeCategory = id
+    },
+    _clear() {
+      this.link = ''
+      this.suosuo = false
     },
     // _normalShowService(services) {
     //   console.log(services)
@@ -326,22 +398,25 @@ export default {
     // },
     _initNet() {
       const that = this
-      this._getServiceCategory(that) // 服务类别
+      // 2018.4.10 luoyukun-更改serviceCategory（服务类别）获取方式,减少一个网络请求.
+      // this._getServiceCategory(that) // 服务类别
       // this._getScoreRate(that)
+      that.activeCategory = that.app.service_categories[0].id
+      that._getServices(that, that.app.service_categories[0].id) // 服务
     },
     _getServiceCategory(that) {
       getServiceCategory().then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           that.serviceCategory = res.data.data
           // console.log(res.data.data[0].id)
           that.activeCategory = res.data.data[0].id
-          console.log(that.activeCategory)
+          // console.log(that.activeCategory)
           that._getServices(that, res.data.data[0].id) // 服务
         } else {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -357,7 +432,7 @@ export default {
     _getServices(that, id) {
       // const that = this
       getServices(id).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           const services = this._normalServices(res.data.data)
           // console.log(services)
           that.services[that.activeCategory] = services
@@ -367,7 +442,7 @@ export default {
           if (res.data.err_msg) {
             this.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -394,11 +469,12 @@ export default {
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
-      setScorerate: 'SET_SCORERATE'
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
     })
   },
-  watch: {
-
+  components: {
+    centerTips
   }
 }
 
@@ -415,7 +491,8 @@ export default {
 }
 
 .activeCategory {
-  background: #ff9430;
+  background: #ff6b4e;
+  background: var(--main-color);
   /*animation: activeCategory .3s ease 1 forwards;*/
 }
 
@@ -475,7 +552,7 @@ export default {
   height: auto;
   flex-wrap: wrap;
   justify-content: flex-start;
-  background: #dcdcdc;
+  background: #dfe1e5;
 }
 
 @keyframes color {
@@ -483,7 +560,7 @@ export default {
     color: #666;
   }
   100% {
-    color: #ff9430;
+    color: #d94d37;
   }
 }
 
@@ -491,13 +568,13 @@ export default {
   width: 85%;
   height: auto;
   margin: 20px auto;
-  background-color: #F3DFDF;
+  background-color: #ffe8d2;
   border: 1px solid #EBCED1;
   line-height: 20px;
   font-size: 14px;
   border-radius: 6px;
   padding: 10px;
-  color: #A94442;
+  color: #d94d37;
 }
 
 .select-box {
@@ -516,7 +593,10 @@ export default {
   height: 20px;
   justify-content: flex-start;
   text-indent: 16px;
-  color: #606266;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: Adobe Heiti Std R;
+  color: #353535;
 }
 
 .select-item {
@@ -562,7 +642,7 @@ export default {
   height: 30px;
   margin: 0 auto;
   justify-content: flex-start;
-  text-indent: 2%;
+  text-indent: 10px;
   color: #606266;
 }
 
@@ -576,7 +656,7 @@ export default {
 
 .gray-span {
   font-size: 13px;
-  color: #999;
+  color: #353535;
 }
 
 .need-score-sapn {
@@ -636,14 +716,16 @@ export default {
 .p-course-box {
   width: 100%;
   height: 550px;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .el-button {
   height: 100%;
   line-height: 0px !important;
   background: rgba(255, 255, 255, 0) !important;
-  color: #A94442;
+  color: #d94d37;
+  font-size: 16px;
+  font-weight: 600;
   border: none !important;
 }
 
@@ -657,16 +739,60 @@ export default {
 
 .chose-shuoshuo {
   /*  text-indent: 0;*/
-  color: #A94442;
+  color: #d94d37;
 }
 
 .chose-shuoshuo:hover {
   color: #ff9430;
   cursor: pointer;
 }
-.no-tutorials{
+
+.no-tutorials {
   width: 100%;
   height: 550px;
+  color: #d94d37;
+}
+
+.loding {
+  color: #666;
+}
+
+.say-list-item {
+  width: 90%;
+  padding: 5px 5%;
+}
+
+.say-list-item:hover {
+  background: #ff9430;
+  color: #fff;
+}
+
+.chose-box {
+  height: 20px;
+  width: 90%;
+  margin: 0 auto;
+  text-indent: 10px;
+}
+
+.red-score-sapn {
+  text-indent: 2px;
+  color: #ff6b4e;
+  color: var(--main-color);
+}
+
+.max-gray-span {
+  text-indent: 10px;
+  color: #353535;
+}
+
+.i-ipnput {
+  text-indent: 15px;
+}
+.rh-title{
+  text-indent: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #353535;
 }
 
 </style>

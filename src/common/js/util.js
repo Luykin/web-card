@@ -1,22 +1,26 @@
 import md5 from 'js-md5'
-const PRIVATE_KEY = 'FansMelonBlock2017'
+import CryptoJS from 'crypto-js'
+// const PRIVATE_KEY = decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==','') + decryptByDES('2qhuliPfW8Y=','')
 
-export function normalOrders(list) {
-  let ret = list
-  if (ret.length < 10) {
-    for (let i = 0; i < 4; i++) {
-      ret = ret.concat(ret)
-      if (ret.length >= 10) {
-        break
-      }
-    }
-  }
-  if (ret.length >= 10) {
-    ret = ret.slice(0, 10)
-  }
-  ret.push(ret[0])
-  return ret
+export function encryptByDES(message, key) {
+  const keyHex = CryptoJS.enc.Utf8.parse(key)
+  const encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  })
+  return encrypted.toString()
 }
+export function decryptByDES(ciphertext, key) {
+  const keyHex = CryptoJS.enc.Utf8.parse(key)
+  const decrypted = CryptoJS.DES.decrypt({
+    ciphertext: CryptoJS.enc.Base64.parse(ciphertext)
+  }, keyHex, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  })
+  return decrypted.toString(CryptoJS.enc.Utf8)
+}
+
 export function debounce(func, delay) {
   let timer
 
@@ -31,12 +35,27 @@ export function debounce(func, delay) {
 }
 export function getKey() {
   const timestamp = parseInt(Date.parse(new Date()) / 10000) + ''
-  const key = md5(timestamp + PRIVATE_KEY)
+  const key = md5(timestamp + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', ''))
   return key
 }
-export function testToken() {
+export function getSign(data) {
+  const timestamp = parseInt(Date.parse(new Date()) / 10000)
+  let sortedKeys = Object.keys(data).sort()
+  let signStr = ''
+  for (let item in sortedKeys) {
+    const key = sortedKeys[item]
+    signStr += key + '=' + data[key]
+  }
+  signStr += 'time=' + timestamp + 'key=' + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', '')
+  const sign = md5(signStr)
+  return sign
+}
+export function testToken(tokenTime) {
   let nowTime = +new Date()
-  let tokenTime = localStorage.getItem('tokenTime') || 0
+  console.log('当前时间' + nowTime)
+  console.log('失效时间' + tokenTime)
+  console.log(tokenTime - nowTime)
+  let tokenTimeA = tokenTime || 0
   if (nowTime > tokenTime) {
     return false
   } else {
@@ -51,4 +70,9 @@ export function timeChange(time) {
   const h = date.getHours() < 10 ? '0' + date.getHours() + ':' : date.getHours() + ':'
   const m = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
   return M + D + h + m
+}
+export function encryptedStorage(key, value) {
+  let v = JSON.stringify(value)
+  v = encryptByDES(v, '') || false
+  localStorage.setItem(key, v)
 }

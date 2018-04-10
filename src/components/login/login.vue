@@ -2,27 +2,29 @@
   <div id="main-body">
     <div class="login-box flex" id="login-box">
       <div class="login-box-title flex">
-        <div>登录</div>
+        <div class="login-title">登录</div>
         <div class="min-font flex">登录后开始下单</div>
       </div>
       <div class="input-box flex">
-        <i class="hover-out"></i>
-        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocomplete='on' @keyup.enter="_login">
         <i class="iconfont icon-msnui-user"></i>
+        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocomplete='on' @keyup.enter="_login" autofocus="autofocus">
       </div>
       <div class="input-box flex">
-        <i class="hover-out"></i>
-        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login">
         <i class="iconfont icon-mima"></i>
+        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login">
       </div>
       <!--       <div class="input-box flex">
         <i class="hover-out"></i>
         <input type="text" placeholder="验证码" class="i-ipnput">
         <i class="iconfont icon-duanxin"></i>
       </div> -->
-      <div class="btn flex" @click="_login">登录</div>
-      <router-link tag="div" class="forget cursor" to="/retrieve-password">忘记密码</router-link>
-      <router-link tag="div" class="to-register ellipsis cursor" to="/register">没有帐号？现在注册，免费获得积分</router-link>
+      <div class="btn flex modifybtn" @click="_login">登录</div>
+      <div class="flex login-item">
+        <router-link tag="span" class="forget cursor flex" to="/retrieve-password">忘记密码?</router-link>
+      </div>
+      <div class="flex login-item">
+        <router-link tag="span" class="to-register ellipsis cursor flex" to="/register">没有帐号？现在注册，免费获得积分</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -31,6 +33,7 @@ import { login } from 'api/login'
 // import { getUserInfo } from 'api/public'
 import { normalMixin } from 'common/js/mixin'
 import { mapMutations } from 'vuex'
+import { SUCCESS_CODE } from 'api/config'
 export default {
   mixins: [normalMixin],
   data() {
@@ -40,7 +43,7 @@ export default {
     }
   },
   created() {
-
+    this.$root.eventHub.$emit('canvas')
   },
   methods: {
     _login() {
@@ -49,7 +52,7 @@ export default {
       }
       const that = this
       login(this.phone, this.password).then((res) => {
-        if (res.data.err_code === 0) {
+        if (res.data.err_code === SUCCESS_CODE) {
           if (res.data.data.user) {
             that.setUser(res.data.data.user)
             // that.$root.eventHub.$emit('user')
@@ -62,10 +65,10 @@ export default {
               path: '/'
             })
           }
-          console.log(res.data)
           if (res.data.data.token) {
-            let tokenTime = +new Date() + 60 * 55 * 1000
-            localStorage.setItem('tokenTime', tokenTime)
+            let tokenTime = +new Date() + 60 * 58 * 1000
+            // localStorage.setItem('tokenTime', tokenTime)
+            that.setTokenTime(tokenTime)
             that.setToken(res.data.data.token)
           } else {
             that.password = ''
@@ -81,7 +84,7 @@ export default {
             that.password = ''
             that.$message({
               showClose: true,
-              message: res.data.err_msg,
+              message: res.data.err_code === 404 ? '该用户不存在' : this.$root.errorCode[res.data.err_code],
               type: 'error'
             })
           } else {
@@ -97,7 +100,8 @@ export default {
     },
     ...mapMutations({
       setToken: 'SET_TOKEN',
-      setUser: 'SET_USER'
+      setUser: 'SET_USER',
+      setTokenTime: 'SET_TOKENTIME'
     })
   },
   watch: {
@@ -109,19 +113,12 @@ export default {
 
 </script>
 <style type="text/css" scoped>
-.min-font {
-  width: 100%;
-  font-size: 13px;
-  color: #bdbdbd;
-  margin: 10px auto;
-}
-
 .forget {
-  color: #666;
+  color: #333;
 }
 
 .forget:hover {
-  color: #333;
+  color: #000;
 }
 
 .to-register {
@@ -137,6 +134,7 @@ export default {
 }
 
 .iconfont {
+  font-size: 20px;
   margin: 0 10px;
 }
 
