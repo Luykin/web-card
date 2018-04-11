@@ -35,6 +35,7 @@
 }
 
 .el-submenu.is-active .el-submenu__title {
+  font-size: 16px !important;
   border-bottom: none !important;
 }
 
@@ -58,13 +59,12 @@
   border-bottom: none !important;
 }
 
-.is-active {
-  color: #d94d37 !important;
-}
 
 .is-active {
   border-bottom-color: transparent !important;
   border-bottom: none !important;
+  font-size: 16px !important;
+  color: #d94d37 !important;
 }
 
 .el-menu--horizontal {

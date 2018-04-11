@@ -31,12 +31,16 @@
         <router-link tag="div" class="to-register ellipsis cursor flex" to="/login">已有帐号？立即登录</router-link>
       </div>
     </div>
+    <centerTips ref='centerTips'>
+      <div class="tips-class flex ellipsis">{{centerTips}}</div>
+    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
 import { sendVerify, register } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { SUCCESS_CODE } from 'api/config'
+import centerTips from 'base/centerTips/centerTips'
 export default {
   mixins: [normalMixin],
   data() {
@@ -74,20 +78,14 @@ export default {
         } else {
           if (res.data.err_msg) {
             this.code = ''
-            this.$message({
-              showClose: true,
-              message: this.$root.errorCode[res.data.err_code],
-              type: 'error'
-            })
+            this.centerTips = this.$root.errorCode[res.data.err_code]
+            this.$refs.centerTips._open()
           } else {
             this.password = ''
             this.rePassword = ''
             this.code = ''
-            this.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
+            this.centerTips = '似乎出错了'
+            this.$refs.centerTips._open()
           }
         }
       })
@@ -111,11 +109,8 @@ export default {
         this._countdown(60)
         this.netSendCode()
       } else {
-        this.$message({
-          showClose: true,
-          message: '请稍后再试哦',
-          type: 'warning'
-        })
+        this.centerTips = '请稍后再试哦'
+        this.$refs.centerTips._open()
       }
     },
     _countdown(time) {
@@ -133,28 +128,22 @@ export default {
     netSendCode() {
       sendVerify(this.phone).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          this.$message({
-            showClose: true,
-            message: '验证码已发送',
-            type: 'success'
-          })
+          this.centerTips = '验证码已发送'
+          this.$refs.centerTips._open()
         } else {
           if (res.data.err_msg) {
-            this.$message({
-              showClose: true,
-              message: this.$root.errorCode[res.data.err_code],
-              type: 'error'
-            })
+            this.centerTips = this.$root.errorCode[res.data.err_code]
+            this.$refs.centerTips._open()
           } else {
-            this.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
+            this.centerTips = '似乎出错了'
+            this.$refs.centerTips._open()
           }
         }
       })
     }
+  },
+  components: {
+    centerTips
   }
 }
 
@@ -191,7 +180,8 @@ export default {
   font-size: 20px;
   margin: 0 10px;
 }
-.input-box{
+
+.input-box {
   margin-bottom: 20px !important;
 }
 

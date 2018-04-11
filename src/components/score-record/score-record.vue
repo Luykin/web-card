@@ -28,6 +28,9 @@
       <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
       </el-pagination>
     </div>
+    <centerTips ref='centerTips'>
+      <div class="tips-class flex ellipsis">{{centerTips}}</div>
+    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
@@ -35,6 +38,7 @@ import { getOrders } from 'api/score-record'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import centerTips from 'base/centerTips/centerTips'
 const NUM = 11
 export default {
   data() {
@@ -68,11 +72,8 @@ export default {
         this.setUser(false)
         this.setToken(false)
         this.setTokenTime(false)
-        this.$message({
-          showClose: true,
-          message: '登录已失效',
-          type: 'warning'
-        })
+        this.centerTips = '登录已失效'
+        this.$refs.centerTips._open()
         this.$router.replace({
           path: '/login'
         })
@@ -115,6 +116,9 @@ export default {
       setScorerate: 'SET_SCORERATE',
       setTokenTime: 'SET_TOKENTIME'
     })
+  },
+  components: {
+    centerTips
   }
 }
 

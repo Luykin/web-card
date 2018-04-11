@@ -29,7 +29,7 @@ export default {
   position: fixed;
   left: 50%;
   top: 0px;
-  transform: translate3d(-50%, -100%, 0);
+  transform: translate3d(-50%, -200%, 0);
   flex-wrap: wrap;
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, .1);
@@ -43,12 +43,12 @@ export default {
 }
 
 .popupOut {
-  animation: popupOut .35s ease 1 forwards;
+  animation: popupOut .45s ease 1 forwards;
 }
 
 @keyframes popupIn {
   0% {
-    transform: translate3d(-50%, -100%, 0);
+    transform: translate3d(-50%, -150%, 0);
   }
   100% {
     transform: translate3d(-50%, 25%, 0);
@@ -60,7 +60,7 @@ export default {
     transform: translate3d(-50%, 25%, 0);
   }
   100% {
-    transform: translate3d(-50%, -100%, 0);
+    transform: translate3d(-50%, -200%, 0);
   }
 }
 

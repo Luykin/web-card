@@ -19,7 +19,8 @@
   }
   .popup {
     width: 500px;
-    height: 330px;
+    height: auto;
+    min-height: 330px;
   }
 }
 
@@ -46,7 +47,8 @@
   }
   .popup {
     width: 95%;
-    height: 330px;
+    height: auto;
+    min-height: 330px;
   }
   .logo-class {
     margin-left: -50px;

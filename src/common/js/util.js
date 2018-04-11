@@ -52,9 +52,6 @@ export function getSign(data) {
 }
 export function testToken(tokenTime) {
   let nowTime = +new Date()
-  console.log('当前时间' + nowTime)
-  console.log('失效时间' + tokenTime)
-  console.log(tokenTime - nowTime)
   let tokenTimeA = tokenTime || 0
   if (nowTime > tokenTime) {
     return false

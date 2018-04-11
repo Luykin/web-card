@@ -75,38 +75,46 @@
     </sidebar>
     <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
     <popup ref="popup">
-      <div class="recharge-box flex">
+      <div class="recharge-box">
         <div class="recharge-box-title flex" v-show="!payUrl">积分充值</div>
-        <div class="recharge-box-title flex" v-show="payUrl">微信扫码支付</div>
+        <div class="recharge-box-title flex" v-show="payUrl">{{payType}}扫码支付</div>
         <div class="content-qr flex" v-if="payUrl">
-          <div class="code-div flex">订单编号:{{code}} 充值金额: {{money||choseGood.price}}元</div>
+          <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money">{{money||choseGood.price}}</span>元</div>
           <div class="qrcode-box flex">
             <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
           </div>
           <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
-          <div class="qrcode-box flex">
-            <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div>
-            <div class="sureBtn flex" @click="_sureCompletionPayment">确定已完成支付</div>
+          <div class="recharge-btn-box-after flex flex">
+            <div class="recharge-btn-sure-after flex sure cursor" @click="_sureCompletionPayment">确定已完成支付</div>
+            <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenSidebar">我再考虑考虑</div>
             <!-- <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div> -->
           </div>
         </div>
+        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
+        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
+        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
+        <div class="goods-box flex" v-show="!payUrl && app.goods.length > 0">
+          <!-- app  商品 -->
+          <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex ellipsis">{{item.label}}</div>
+        </div>
+        <!-- app  商品  end -->
         <!-- <div class="net-item flex" v-show="!payUrl">微信支付</div> -->
-        <!-- app  支付方式 -->
-        <div v-for="(value, key) in app.payments" v-if='value' @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key}" class="cursor">{{key}} : {{value}}</div>
-        <!-- app  支付方式  end -->
-        <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img">
+        <!-- <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img"> -->
         <div class="flex input-defult" v-show="!payUrl">
           <!-- onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" -->
-          <input type="text" placeholder="请输入充值金额（元）" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" @keyup.enter="_addOrder">
+          <input type="text" :placeholder="'请输入充值金额（元）'" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder">
         </div>
         <div class="min-tips-text flex" v-show="!payUrl&&((money&& money>=Math.ceil(app.min_recharge)) || choseGood)">充值<span class="my-money">{{money|| choseGood.price}}</span>元等于<span class="course-btn">{{Math.ceil(money*scorerate) || choseGood.score}}</span>积分</div>
         <div class="min-tips-text flex" v-show="!payUrl&&(!money || money<Math.ceil(app.min_recharge)) && !choseGood">最小充值金额为<span class="my-money">{{Math.ceil(app.min_recharge)}}</span>元。</div>
-        <!-- app  商品 -->
-        <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor">{{item.label}}</div>
-        <!-- app  商品  end -->
+        <!-- app  支付方式 -->
+        <div class="goods-box flex" v-show="!payUrl">
+          <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
+            <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}</div>
+        </div>
+        <!-- app  支付方式  end -->
         <div class="recharge-btn-box flex" v-show="!payUrl">
-          <div class="recharge-btn-sure flex" @click="_addOrder">确认</div>
-          <div class="recharge-btn-sure flex" @click='_hiddenSidebar'>取消</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
+          <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
         </div>
       </div>
     </popup>
@@ -126,6 +134,7 @@ import QrcodeVue from 'qrcode.vue'
 import { getUserInfo, getAppInfo } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import centerTips from 'base/centerTips/centerTips'
+import qq from 'assets/qq.png'
 
 export default {
   data() {
@@ -139,7 +148,7 @@ export default {
       centerTips: '',
       choseGoodId: -1,
       inputFocus: true,
-      activePayType: 'wx'
+      activePayType: false
     }
   },
   created() {
@@ -199,28 +208,21 @@ export default {
       this.money = ''
     },
     _rectifyMoney() {
+      if (isNaN(this.money)) {
+        this.money = ''
+      }
       if (this.choseGoodId && this.money) {
         this.choseGoodId = -1
       }
       if (this.money.indexOf('.') > -1) {
-        // console.log('有小数点')
-        // console.log(this.money.indexOf('.'))
         const end = this.money.indexOf('.')
         this.money = this.money.slice(0, end + 3)
       }
     },
-    // _moneyChange() {
-    //   if (this.choseGoodId && this.money) {
-    //     this.choseGoodId = -1
-    //   }
-    // },
     checkTock() {
       if (!this.user) {
-        this.$message({
-          showClose: true,
-          message: '请登录',
-          type: 'warning'
-        })
+        this.centerTips = '请登录'
+        this.$refs.centerTips._open()
         this.$router.replace({
           path: '/login'
         })
@@ -231,11 +233,8 @@ export default {
         this.setUser(false)
         this.setToken(false)
         this.setTokenTime(false)
-        this.$message({
-          showClose: true,
-          message: '登录已失效',
-          type: 'warning'
-        })
+        this.centerTips = '登录已失效'
+        this.$refs.centerTips._open()
         this.$router.replace({
           path: '/login'
         })
@@ -253,17 +252,16 @@ export default {
           // this.$root.eventHub.$emit('user')
         } else {
           if (res.data.err_msg) {
-            this.$message({
-              showClose: true,
-              message: this.$root.errorCode[res.data.err_code],
-              type: 'error'
-            })
+            // this.$message({
+            //   showClose: true,
+            //   message: this.$root.errorCode[res.data.err_code],
+            //   type: 'error'
+            // })
+            this.centerTips = this.$root.errorCode[res.data.err_code]
+            this.$refs.centerTips._open()
           } else {
-            this.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
+            this.centerTips = '似乎出错了'
+            this.$refs.centerTips._open()
           }
         }
       })
@@ -284,11 +282,8 @@ export default {
             this.setUser(false)
             this.setToken(false)
             this.setTokenTime(false)
-            this.$message({
-              showClose: true,
-              message: '登录已失效',
-              type: 'warning'
-            })
+            this.centerTips = '登录已失效'
+            this.$refs.centerTips._open()
             this.$router.replace({
               path: '/login'
             })
@@ -316,11 +311,8 @@ export default {
             this._afterAddOrder(res)
           })
         } else {
-          this.$message({
-            showClose: true,
-            message: '请输入数字',
-            type: 'error'
-          })
+          this.centerTips = '请输入数字'
+          this.$refs.centerTips._open()
         }
       }
     },
@@ -333,17 +325,11 @@ export default {
         this._hiddenSidebar()
         this.money = ''
         if (res.data.err_msg) {
-          this.$message({
-            showClose: true,
-            message: this.$root.errorCode[res.data.err_code],
-            type: 'error'
-          })
+          this.centerTips = this.$root.errorCode[res.data.err_code]
+          this.$refs.centerTips._open()
         } else {
-          this.$message({
-            showClose: true,
-            message: '似乎出错了',
-            type: 'error'
-          })
+          this.centerTips = '似乎出错了'
+          this.$refs.centerTips._open()
         }
       }
     },
@@ -363,17 +349,11 @@ export default {
           }
         } else {
           if (res.data.err_msg) {
-            this.$message({
-              showClose: true,
-              message: this.$root.errorCode[res.data.err_code],
-              type: 'error'
-            })
+            this.centerTips = this.$root.errorCode[res.data.err_code]
+            this.$refs.centerTips._open()
           } else {
-            this.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
+            this.centerTips = '似乎出错了'
+            this.$refs.centerTips._open()
           }
         }
       })
@@ -383,6 +363,9 @@ export default {
       this.setUser(false)
       this.setToken(false)
       this.setTokenTime(false)
+      this.centerTips = '已注销'
+      this.$refs.centerTips._open()
+      // this.$refs.centerTips._open()
       this.$message({
         showClose: true,
         message: '已注销',
@@ -567,9 +550,12 @@ export default {
   display: inline-block;
   height: 100%;
   width: 100%;
-  line-height: 55px;
+  line-height: 60px;
   pointer-events: auto;
   cursor: pointer;
+  zoom: 1;
+  margin-top: -3px;
+  font-size: 15px;
 }
 
 .log-out-min {
@@ -600,26 +586,18 @@ export default {
 }
 
 .recharge-box-title {
-  justify-content: flex-start;
-  width: 100%;
-  height: 22%;
+  width: 90%;
+  height: 70px;
   margin: 0 auto;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  color: #666;
-  text-indent: 5%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  color: #D94D37;
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
 }
 
 .content-qr {
-  position: absolute;
-  bottom: 0;
   width: 100%;
-  height: 77%;
+  height: auto;
   flex-wrap: wrap;
 }
 
@@ -638,33 +616,72 @@ export default {
 }
 
 .recharge-btn-box {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   height: 70px;
-  justify-content: flex-end;
+  justify-content: flex-start;
+}
+
+.recharge-btn-box-after {
+  width: 100%;
+  height: 70px;
+  margin-bottom: 10px;
 }
 
 .recharge-btn-sure {
-  width: 70px;
-  height: 40px;
-  border-radius: 10px;
-  color: #343434;
-  margin: 0 10px;
+  width: 35%;
+  height: 46px;
+  border-radius: 6px;
 }
 
-.recharge-btn-sure:hover {
+.recharge-btn-sure:nth-child(1) {
+  margin: 0 20% 0 5%;
+}
+
+.recharge-btn-sure-after {
+  width: 180px;
+  height: 46px;
+  border-radius: 6px;
+  margin: 0 5%;
+}
+
+.recharge-btn-sure-after:nth-child(1) {
+  /*margin: 0 10% 0 5%;*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*.recharge-btn-sure:hover {
   background: #eee;
   color: #d94d37;
   cursor: pointer;
-}
+}*/
 
 .min-tips-text {
   width: 100%;
   height: 20px;
   /*text-indent: 30px;*/
-  padding-left: 30px;
+  padding-left: 5%;
   font-size: 13px;
   color: #999;
   justify-content: flex-start;
@@ -688,7 +705,7 @@ export default {
   padding: 10px;
   height: 10px;
   min-width: 120px;
-  margin: 10px 0;
+  margin: 10px 0 0;
 }
 
 .sureBtn {
@@ -750,18 +767,121 @@ export default {
   text-indent: 0px;
 }
 
+.good-item {
+  width: 18.6%;
+  height: 47px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  background: #FFE8D2;
+  color: #D94D37;
+  margin-left: 5%;
+  /*  overflow-x: scroll;*/
+}
+
+.pay-item {
+  width: 26.3%;
+  height: 45px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  margin-left: 5%;
+  color: #353535;
+  font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.pay-icon {
+  max-width: 30px;
+  width: auto;
+  max-height: 26px;
+  height: auto;
+  margin-right: 2%;
+  flex-shrink: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*.i-ipnput {
+  text-indent: 15px;
+}*/
+
+.goods-box {
+  height: 50px;
+  width: 100%;
+  overflow: hidden;
+  justify-content: flex-start;
+  margin: 20px auto 5px;
+}
+
 .active-good {
-  color: red;
+  /*color: red;*/
+  color: #fff;
+  background: #FF6B4E;
+}
+
+.cancel {
+  box-sizing: border-box;
+  color: #353535;
+  background: rgba(223, 225, 229, 1);
+}
+
+.sure {
+  box-sizing: border-box;
+  color: #fff;
+  background: #FF6B4E;
+  /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
 }
 
 .active-pay-type {
-  color: red;
+  border: 1px solid #FF6B4E;
+  color: #FF6B4E;
 }
 
-.good-item {}
+.sure:hover {
+  box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
+}
 
-.i-ipnput {
-  text-indent: 15px;
+.cancel:hover {
+  box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
+}
+
+.disable-pay-type {
+  color: rgba(0, 0, 0, .2);
+  cursor: not-allowed;
+}
+
+.i-ipnput::-webkit-input-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput:-moz-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput::-moz-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput:-ms-input-placeholder {
+  color: rgba(0, 0, 0, .4);
 }
 
 </style>

@@ -26,6 +26,9 @@
         <router-link tag="span" class="to-register ellipsis cursor flex" to="/register">没有帐号？现在注册，免费获得积分</router-link>
       </div>
     </div>
+    <centerTips ref='centerTips'>
+      <div class="tips-class flex ellipsis">{{centerTips}}</div>
+    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
@@ -34,6 +37,7 @@ import { login } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
+import centerTips from 'base/centerTips/centerTips'
 export default {
   mixins: [normalMixin],
   data() {
@@ -56,7 +60,9 @@ export default {
           if (res.data.data.user) {
             that.setUser(res.data.data.user)
             // that.$root.eventHub.$emit('user')
-            that.$message({
+            this.centerTips = '登录成功'
+            this.$refs.centerTips._open()
+            this.$message({
               showClose: true,
               message: '登录成功',
               type: 'success'
@@ -72,28 +78,19 @@ export default {
             that.setToken(res.data.data.token)
           } else {
             that.password = ''
-            that.$message({
-              showClose: true,
-              message: 'token错误',
-              type: 'error'
-            })
+            this.centerTips = 'token错误'
+            this.$refs.centerTips._open()
           }
           return true
         } else {
           if (res.data.err_msg) {
             that.password = ''
-            that.$message({
-              showClose: true,
-              message: res.data.err_code === 404 ? '该用户不存在' : this.$root.errorCode[res.data.err_code],
-              type: 'error'
-            })
+            this.centerTips = res.data.err_code === 404 ? '该用户不存在' : this.$root.errorCode[res.data.err_code]
+            this.$refs.centerTips._open()
           } else {
             that.password = ''
-            that.$message({
-              showClose: true,
-              message: '似乎出错了',
-              type: 'error'
-            })
+            this.centerTips = '似乎出错了'
+            this.$refs.centerTips._open()
           }
         }
       })
@@ -103,6 +100,9 @@ export default {
       setUser: 'SET_USER',
       setTokenTime: 'SET_TOKENTIME'
     })
+  },
+  components: {
+    centerTips
   },
   watch: {
     $route() {

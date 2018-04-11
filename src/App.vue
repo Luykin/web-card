@@ -27,4 +27,5 @@ export default {
 @import url(common/css/adaptation.css);
 @import url(common/css/important.css);
 @import url(common/icon/iconfont.css);
+
 </style>
