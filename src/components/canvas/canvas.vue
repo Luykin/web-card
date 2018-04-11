@@ -2,56 +2,63 @@
   <canvas class="x-canvas" id="x-canvas" ref="canvas"></canvas>
 </template>
 <script type="text/javascript">
-const arryFlower = []
-const color = ['rgba(255,255,255,.3)', 'rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)', 'rgba(255,255,255,.8)']
-const size = [3, 3.5, 4, 4.5, 5]
-const speed = 1.5
-const headerHeight = 80
-const TPI = Math.PI * 2
-export default {
-  data() {
-    return {
-      ctx: false,
-      bg: false,
-      allNumber: 55,
-      clientWidth: '1920px',
-      clientHeight: '1080px'
-    }
-  },
-  created() {
-    const that = this
-    this.$root.eventHub.$on('canvas', (res) => {
-      that._changeSize(that, res)
-    })
-    this._windowReady()
-  },
-  mounted() {
-    const that = this
-    window.onresize = () => {
-      that._changeSize(that)
-    }
-  },
-  methods: {
-    _changeSize(that, reload) {
-      if ((that.$refs.canvas.height !== (document.body.offsetHeight || document.body.clientHeight) - headerHeight) || reload) {
+  const arryFlower = []
+  const color = ['rgba(255,255,255,.3)', 'rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)', 'rgba(255,255,255,.8)']
+  const size = [3, 3.5, 4, 4.5, 5]
+  const speed = 1.5
+  const header = 65
+  const footer = 135
+  const margin = 0
+  const H = header + footer + margin
+  const TPI = Math.PI * 2
+  export default {
+    data() {
+      return {
+        ctx: false,
+        bg: false,
+        allNumber: 55,
+        time: false
+      }
+    },
+    created() {
+      const that = this
+      this.$root.eventHub.$on('canvas', (res) => {
+        console.log('重新加载')
+        that._changeSize(that, res)
+      })
+      this._windowReady()
+    },
+    mounted() {
+      const that = this
+      window.onresize = () => {
+        that._changeSize(that)
+      }
+    },
+    methods: {
+      _changeSize(that, reload) {
         requestAnimationFrame(() => {
-          that.$nextTick(() => {
-            that.$refs.canvas.width = document.body.clientWidth || window.screen.width
-            that.$refs.canvas.height = (document.body.offsetHeight || document.body.clientHeight) - headerHeight
-          })
+          if (this.time) {
+            clearTimeout(this.time)
+          }
+          this.time = setTimeout(() => {
+            if ((that.$refs.canvas.height !== (document.body.offsetHeight - H)) || reload) {
+              console.log('更新')
+              that.$refs.canvas.width = window.screen.width
+              that.$refs.canvas.height = document.body.offsetHeight - H
+            }
+          }, 300)
         })
-      }
-    },
-    _windowReady() {
-      window.onload = () => {
-        this.$refs.canvas.width = document.body.clientWidth || window.screen.width
-        this.$refs.canvas.height = (document.body.offsetHeight || document.body.clientHeight) - headerHeight
-        this.ctx = this.$refs.canvas.getContext('2d')
-        this._initCanvas()
-        this._start(this.ctx)
-      }
-    },
-    _initCanvas() {
+      },
+      _windowReady() {
+        window.onload = () => {
+          this.$refs.canvas.width = window.screen.width
+          this.$refs.canvas.height = document.body.offsetHeight - H
+          this.ctx = this.$refs.canvas.getContext('2d')
+          this._initCanvas()
+          this._start(this.ctx)
+        }
+      },
+      _initCanvas() {
       // this.bg = new Image()
       // this.bg.src = "http://ozp5yj4ke.bkt.clouddn.com/bg.c72fa3d.png"
       let width = this.$refs.canvas.width
@@ -115,7 +122,7 @@ export default {
     },
     _start(ctx) {
       window.requestAnimationFrame(() => {
-        this.$refs.canvas.width = document.body.clientWidth || window.screen.width
+        this.$refs.canvas.width = window.screen.width
         // this._drawImg(ctx, this.bg, 0, 0)
         arryFlower.forEach((item) => {
           if (item.x > this.$refs.canvas.width) {

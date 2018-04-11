@@ -5,10 +5,10 @@
     display: none;
     opacity: 0;
   }
-  #main-body {
+/*  #main-body {
     min-height: 740px;
     height: auto;
-  }
+  }*/
   #i-table,
   #i-title,
   #i-page {
@@ -31,10 +31,10 @@
     display: none;
     opacity: 0;
   }
-  #main-body {
+/*  #main-body {
     min-height: 580px;
     height: auto;
-  }
+  }*/
   #i-table,
   #i-title,
   #i-page {

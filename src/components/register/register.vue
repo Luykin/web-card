@@ -18,134 +18,123 @@
         <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register">
       </div>
       <label class="input-box flex" foe='code-input'>
+        <i class="iconfont icon-duanxin"></i>
+        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
         <div class="flex getcode">
-          <i class="iconfont icon-duanxin"></i>
           <div class="flex getcode-btn cursor" @click="_getcode">{{time}}
             <span v-if="time > 0">s后重新获取</span>
           </div>
         </div>
-        <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
       </label>
       <div class="btn flex modifybtn" @click="_register">注册</div>
       <div class="flex login-item">
         <router-link tag="div" class="to-register ellipsis cursor flex" to="/login">已有帐号？立即登录</router-link>
       </div>
     </div>
-    <centerTips ref='centerTips'>
-      <div class="tips-class flex ellipsis">{{centerTips}}</div>
-    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
-import { sendVerify, register } from 'api/login'
-import { normalMixin } from 'common/js/mixin'
-import { SUCCESS_CODE } from 'api/config'
-import centerTips from 'base/centerTips/centerTips'
-export default {
-  mixins: [normalMixin],
-  data() {
-    return {
-      time: '获取验证码',
-      phone: '',
-      rePassword: '',
-      password: '',
-      code: ''
-    }
-  },
-  created() {
-    this._setTime()
-    this.$root.eventHub.$emit('canvas')
-  },
-  methods: {
-    _register() {
-      if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password) || !this._verifyRePassword(this.password, this.rePassword) || !this._verifyCode(this.code)) {
-        return false
-      }
-      register(this.phone, this.password, this.rePassword, this.code).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          this.$message({
-            showClose: true,
-            message: '注册成功',
-            type: 'success'
-          })
-          this.$router.replace({
-            path: '/login',
-            query: {
-              phone: this.phone
-            }
-          })
-          return true
-        } else {
-          if (res.data.err_msg) {
-            this.code = ''
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
-          } else {
-            this.password = ''
-            this.rePassword = ''
-            this.code = ''
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
-          }
-        }
-      })
-    },
-    _setTime() {
-      let nowTime = +new Date()
-      let lastTime = localStorage.getItem('codeTime') || 0
-      console.log(nowTime)
-      console.log(lastTime)
-      if (nowTime < lastTime) {
-        this._countdown(parseInt((lastTime - nowTime) / 1000))
+  import { sendVerify, register } from 'api/login'
+  import { normalMixin } from 'common/js/mixin'
+  import { SUCCESS_CODE } from 'api/config'
+  export default {
+    mixins: [normalMixin],
+    data() {
+      return {
+        time: '获取验证码',
+        phone: '',
+        rePassword: '',
+        password: '',
+        code: ''
       }
     },
-    _getcode() {
-      if (typeof this.time === 'string') {
-        if (!this._verifyPhone(this.phone)) {
+    created() {
+      this._setTime()
+      this.$root.eventHub.$emit('canvas')
+    },
+    methods: {
+      _register() {
+        if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password) || !this._verifyRePassword(this.password, this.rePassword) || !this._verifyCode(this.code)) {
           return false
         }
-        let lastTime = +new Date() + 60 * 1000
-        localStorage.setItem('codeTime', lastTime)
-        this._countdown(60)
-        this.netSendCode()
-      } else {
-        this.centerTips = '请稍后再试哦'
-        this.$refs.centerTips._open()
+        register(this.phone, this.password, this.rePassword, this.code).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
+            this.$message({
+              showClose: true,
+              message: '注册成功',
+              type: 'success'
+            })
+            this.$router.replace({
+              path: '/login',
+              query: {
+                phone: this.phone
+              }
+            })
+            return true
+          } else {
+            if (res.data.err_msg) {
+              this.code = ''
+              this.$parent._open(this.$root.errorCode[res.data.err_code])
+            } else {
+              this.password = ''
+              this.rePassword = ''
+              this.code = ''
+              this.$parent._open('似乎出错了')
+            }
+          }
+        })
+      },
+      _setTime() {
+        let nowTime = +new Date()
+        let lastTime = localStorage.getItem('codeTime') || 0
+        console.log(nowTime)
+        console.log(lastTime)
+        if (nowTime < lastTime) {
+          this._countdown(parseInt((lastTime - nowTime) / 1000))
+        }
+      },
+      _getcode() {
+        if (typeof this.time === 'string') {
+          if (!this._verifyPhone(this.phone)) {
+            return false
+          }
+          let lastTime = +new Date() + 60 * 1000
+          localStorage.setItem('codeTime', lastTime)
+          this._countdown(60)
+          this.netSendCode()
+        } else {
+          this.$parent._open('请稍后再试哦')
+        }
+      },
+      _countdown(time) {
+        this.time = time
+        let timer = setInterval(() => {
+          if (this.time > 1) {
+            this.time = this.time - 1
+          } else {
+            this.time = '重新获取验证码'
+            clearInterval(timer)
+            timer = null
+          }
+        }, 1000)
+      },
+      netSendCode() {
+        sendVerify(this.phone).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
+            this.$parent._open('验证码已发送')
+          } else {
+            if (res.data.err_msg) {
+              this.$parent._open(this.$root.errorCode[res.data.err_code])
+            } else {
+              this.$parent._open('似乎出错了')
+            }
+          }
+        })
       }
     },
-    _countdown(time) {
-      this.time = time
-      let timer = setInterval(() => {
-        if (this.time > 1) {
-          this.time = this.time - 1
-        } else {
-          this.time = '重新获取验证码'
-          clearInterval(timer)
-          timer = null
-        }
-      }, 1000)
-    },
-    netSendCode() {
-      sendVerify(this.phone).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          this.centerTips = '验证码已发送'
-          this.$refs.centerTips._open()
-        } else {
-          if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
-          } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
-          }
-        }
-      })
+    components: {
     }
-  },
-  components: {
-    centerTips
   }
-}
 
 </script>
 <style type="text/css" scoped>

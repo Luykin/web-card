@@ -1,5 +1,5 @@
 <template>
-  <div id="main-body">
+  <div id="main-body" ref='mainbody'>
     <div class="login-box flex" id="login-box">
       <div class="login-box-title flex">
         <div class="login-title">登录</div>
@@ -26,9 +26,6 @@
         <router-link tag="span" class="to-register ellipsis cursor flex" to="/register">没有帐号？现在注册，免费获得积分</router-link>
       </div>
     </div>
-    <centerTips ref='centerTips'>
-      <div class="tips-class flex ellipsis">{{centerTips}}</div>
-    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
@@ -37,78 +34,66 @@ import { login } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
-import centerTips from 'base/centerTips/centerTips'
 export default {
   mixins: [normalMixin],
   data() {
-    return {
-      phone: this.$route.query.phone || '',
-      password: ''
+  return {
+    phone: this.$route.query.phone || '',
+    password: ''
+  }
+},
+created() {
+  this.$root.eventHub.$emit('canvas')
+},
+methods: {
+  _login() {
+    if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password)) {
+      return false
     }
-  },
-  created() {
-    this.$root.eventHub.$emit('canvas')
-  },
-  methods: {
-    _login() {
-      if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password)) {
-        return false
-      }
-      const that = this
-      login(this.phone, this.password).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          if (res.data.data.user) {
-            that.setUser(res.data.data.user)
-            // that.$root.eventHub.$emit('user')
-            this.centerTips = '登录成功'
-            this.$refs.centerTips._open()
-            this.$message({
-              showClose: true,
-              message: '登录成功',
-              type: 'success'
-            })
-            that.$router.replace({
-              path: '/'
-            })
-          }
-          if (res.data.data.token) {
-            let tokenTime = +new Date() + 60 * 58 * 1000
+    const that = this
+    login(this.phone, this.password).then((res) => {
+      if (res.data.err_code === SUCCESS_CODE) {
+        if (res.data.data.user) {
+          that.setUser(res.data.data.user)
+          this.$parent._open('登录成功')
+          that.$router.replace({
+            path: '/'
+          })
+        }
+        if (res.data.data.token) {
+          let tokenTime = +new Date() + 60 * 58 * 1000
             // localStorage.setItem('tokenTime', tokenTime)
             that.setTokenTime(tokenTime)
             that.setToken(res.data.data.token)
           } else {
             that.password = ''
-            this.centerTips = 'token错误'
-            this.$refs.centerTips._open()
+            this.$parent._open('token错误')
           }
           return true
         } else {
           if (res.data.err_msg) {
             that.password = ''
-            this.centerTips = res.data.err_code === 404 ? '该用户不存在' : this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(res.data.err_code === 404 ? '该用户不存在' : this.$root.errorCode[res.data.err_code])
           } else {
             that.password = ''
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
-    },
-    ...mapMutations({
-      setToken: 'SET_TOKEN',
-      setUser: 'SET_USER',
-      setTokenTime: 'SET_TOKENTIME'
-    })
   },
-  components: {
-    centerTips
-  },
-  watch: {
-    $route() {
-      this.phone = this.$route.query.phone
-    }
+  ...mapMutations({
+    setToken: 'SET_TOKEN',
+    setUser: 'SET_USER',
+    setTokenTime: 'SET_TOKENTIME'
+  })
+},
+components: {
+},
+watch: {
+  $route() {
+    this.phone = this.$route.query.phone
   }
+}
 }
 
 </script>

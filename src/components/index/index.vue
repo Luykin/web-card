@@ -1,5 +1,5 @@
 <template>
-  <div id="main-body">
+  <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box">
       <div class="main-box-header flex">
         <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
@@ -25,86 +25,82 @@
                   {{item.content}}
                 </div>
               </div>
-              <div class="pc-course" v-show='pc && !choseSay'>
+              <div class="pc-course" v-show='pc && !choseSay' ref='pcCourse'>
                 <div v-if="!nowServices.tutorials" class="flex no-tutorials">暂无教程</div>
                 <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
               </div>
             </el-popover>
             <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link && !hiddenPop)">{{nowServices.category > 0&&nowServices.category
               < 10 ? '获取说说列表': '查看教程'}}</el-button>
+            </div>
+            <div class="flex input-defult" v-if="nowServices">
+              <input type="text" :placeholder="nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接'" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+            </div>
           </div>
-          <div class="flex input-defult" v-if="nowServices">
-            <input type="text" :placeholder="nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接'" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+          <div class="select-item">
+            <div class="select-item-label flex ellipsis">数量</div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney">
+            </div>
+          </div>
+          <div class="select-item">
+            <div class="select-item-label flex ellipsis">业务</div>
+            <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" v-if="showService" no-data-text="暂无业务" @change="_clear">
+              <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
+              </el-option>
+            </el-select>
           </div>
         </div>
-        <div class="select-item">
-          <div class="select-item-label flex ellipsis">数量</div>
-          <div class="flex input-defult">
-            <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney">
+        <div v-if="nowServices">
+          <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
+          <div class="rule-hints flex ellipsis">
+            <span class="rh-title">所需积分:</span>
+            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}} <span v-if="user.discount!==1">{{'* ' + (user.discount || 1)*10 + '折'}}</span> = {{consumeNum + '积分'}}</span>
+          </div>
+          <div class="rule-hints flex ellipsis">
+            <span class="rh-title">剩余积分:</span>
+            <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
+          </div>
+          <div class="rule-hints flex ellipsis">
+            <span class="rh-title">下单范围:</span>
+            <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span">最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span>
           </div>
         </div>
-        <div class="select-item">
-          <div class="select-item-label flex ellipsis">业务</div>
-          <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" v-if="showService" no-data-text="暂无业务" @change="_clear">
-            <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
-            </el-option>
-          </el-select>
-        </div>
+        <div class="btn flex" @click="_sublime(nowServices.category)">提交订单</div>
       </div>
-      <div v-if="nowServices">
-        <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-        <div class="rule-hints flex ellipsis">
-          <span class="rh-title">所需积分:</span>
-          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}} <span v-if="user.discount!==1">{{'* ' + (user.discount || 1)*10 + '折'}}</span> = {{consumeNum + '积分'}}</span>
-        </div>
-        <div class="rule-hints flex ellipsis">
-          <span class="rh-title">剩余积分:</span>
-          <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
-        </div>
-        <div class="rule-hints flex ellipsis">
-          <span class="rh-title">下单范围:</span>
-          <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span">最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span>
-        </div>
-      </div>
-      <div class="btn flex" @click="_sublime(nowServices.category)">提交订单</div>
     </div>
-    <centerTips ref='centerTips'>
-      <div class="tips-class flex ellipsis">{{centerTips}}</div>
-    </centerTips>
-  </div>
-</template>
-<script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId } from 'api/index'
-import { testToken } from 'common/js/util'
-import { mapGetters, mapMutations } from 'vuex'
-import { SUCCESS_CODE } from 'api/config'
-import centerTips from 'base/centerTips/centerTips'
-// import waveCanvas from 'base/waveCanvas/waveCanvas'
-
-export default {
-  data() {
-    return {
-      popoverWidth: 1000,
-      link: '',
-      centerTips: '',
-      quantity: '',
-      shuoshuoPage: 0,
-      choseServiceValue: '',
-      serviceCategory: false,
-      services: [],
-      sayList: false,
-      activeCategory: false,
-      showService: false,
-      targetid: false,
-      suosuo: false,
-      lodingS: false,
-      hiddenPop: false,
+  </template>
+  <script type="text/javascript">
+  import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId } from 'api/index'
+  import { testToken } from 'common/js/util'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { SUCCESS_CODE } from 'api/config'
+  const BILI = 0.8
+  export default {
+    data() {
+  return {
+    popoverWidth: 1000,
+    link: '',
+    quantity: '',
+    shuoshuoPage: 0,
+    choseServiceValue: '',
+    serviceCategory: false,
+    services: [],
+    sayList: false,
+    activeCategory: false,
+    showService: false,
+    targetid: false,
+    suosuo: false,
+    lodingS: false,
+    hiddenPop: false,
       scorerate: false, // 一元购买多少积分
       pc: true,
       choseSay: false
     }
   },
   created() {
+    // console.log(this.$parent)
+    // this.$parent._open()
     // 由app 统一返回
     this._initNet()
     this._setPopoverWidth()
@@ -115,210 +111,187 @@ export default {
     }
     this.$root.eventHub.$emit('canvas')
   },
-  computed: {
-    nowServices() {
-      let nowServer
-      if (this.showService) {
-        this.showService.forEach((item) => {
-          if (item.id === this.choseServiceValue) {
-            nowServer = item
-          }
-        })
-      }
-      return nowServer
-    },
-    consumeNum() {
-      return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.discount || 1))
-    },
-    ...mapGetters([
-      'user',
-      'token',
-      'tokenTime',
-      'app'
-    ])
-  },
-  methods: {
-    _choseSayList(item) {
-      this.hiddenPop = true
-      setTimeout(() => {
-        this.hiddenPop = false
-      }, 0)
-      this.targetid = item.tid
-      this.suosuo = item.content
-    },
-    _rectifyMoney() {
-      if (isNaN(this.quantity) || this.quantity.indexOf('.') > -1 || this.quantity <= 0) {
-        this.quantity = ''
-      }
-    },
-    _sublime(category) {
-      if (this.choseServiceValue === '' || !this.choseServiceValue) {
-        this.centerTips = '未知错误'
-        this.$refs.centerTips._open()
-        return false
-      }
-      if (!this.checkTock()) {
-        return false
-      }
-      if (category === 2 || category === 4) {
-        if (!this.targetid) {
-          this.centerTips = '请选择说说'
-          this.$refs.centerTips._open()
-          return false
-        }
-      } else {
-        if (!this.link && category < 10) {
-          this.centerTips = '请正确填写QQ号'
-          this.$refs.centerTips._open()
-          return false
-        }
-        if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !==21 && category !==40) {
-          this.centerTips = '请正确填写链接'
-          this.$refs.centerTips._open()
-          return false
-        }
-      }
-      let max = 0
-      let min = 0
-      let rate = 0
-      this.services[this.activeCategory].forEach((item) => {
+  updated() {
+  if (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`) {
+    this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
+    this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
+  }
+},
+computed: {
+  nowServices() {
+    let nowServer
+    if (this.showService) {
+      this.showService.forEach((item) => {
         if (item.id === this.choseServiceValue) {
-          max = item.max_num
-          min = item.min_num
-          rate = item.rate
+          nowServer = item
         }
       })
-      if (!max || !rate) {
-        this.centerTips = '后台数量限制有误'
-        this.$refs.centerTips._open()
+    }
+    return nowServer
+  },
+  consumeNum() {
+    return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.discount || 1))
+  },
+  ...mapGetters([
+    'user',
+    'token',
+    'tokenTime',
+    'app'
+    ])
+},
+methods: {
+  _choseSayList(item) {
+    this.hiddenPop = true
+    setTimeout(() => {
+      this.hiddenPop = false
+    }, 0)
+    this.targetid = item.tid
+    this.suosuo = item.content
+  },
+  _rectifyMoney() {
+    if (isNaN(this.quantity) || this.quantity.indexOf('.') > -1 || this.quantity <= 0) {
+      this.quantity = ''
+    }
+  },
+  _sublime(category) {
+    if (this.choseServiceValue === '' || !this.choseServiceValue) {
+      this.$parent._open('未知错误')
+      return false
+    }
+    if (!this.checkTock()) {
+      return false
+    }
+    if (category === 2 || category === 4) {
+      if (!this.targetid) {
+        this.$parent._open('请选择说说')
         return false
       }
-      if (this.quantity > max || this.quantity < min) {
-        // this.$message({
-        //   showClose: true,
-        //   message: `最大数量${max},最小数量${min}`,
-        //   type: 'warning'
-        // })
-        this.centerTips = `最大数量${max},最小数量${min}`
-        this.$refs.centerTips._open()
+    } else {
+      if (!this.link && category < 10) {
+        this.$parent._open('请正确填写QQ号')
         return false
-      }
-      if (this.consumeNum > this.user.score) {
-        // this.$message({
-        //   showClose: true,
-        //   message: '积分不足',
-        //   type: 'warning'
-        // })
-        this.centerTips = '积分不足'
-        this.$refs.centerTips._open()
-        this.$root.eventHub.$emit('showPopup')
-        return false
-      }
-      if (category === 2 || category === 4) {
-        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
-          this._afterAddtask(res)
-        })
-        return true
-      } else {
-        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
-          this._afterAddtask(res)
-        })
-      }
-    },
-    _afterAddtask(res) {
-      if (res.data.err_code === SUCCESS_CODE) {
-        this.centerTips = '下单成功'
-        this.$refs.centerTips._open()
-        this.$message({
-          showClose: true,
-          message: '下单成功',
-          type: 'success'
-        })
-        this.$root.eventHub.$emit('updateOrder')
-        this.$root.eventHub.$emit('canvas', true)
-        this.$router.replace({
-          path: '/order'
-        })
-        if (!this.checkTock()) {
-          return false
-        }
-        getUserInfo(this.token).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.setUser(res.data.data)
-            this.$root.eventHub.$emit('user')
-          } else {
-            if (res.data.err_msg) {
-              this.centerTips = this.$root.errorCode[res.data.err_code]
-              this.$refs.centerTips._open()
-            } else {
-              this.centerTips = '似乎出错了'
-              this.$refs.centerTips._open()
-            }
-          }
-        })
-      } else {
-        if (res.data.err_msg) {
-          this.centerTips = this.$root.errorCode[res.data.err_code]
-          this.$refs.centerTips._open()
-        } else {
-          this.centerTips = '似乎出错了'
-          this.$refs.centerTips._open()
-        }
-      }
-    },
-    _choseShuoShuo(category) {
-      if (category !== 2 && category !== 4) {
-        return
       }
       if (!this.link) {
-        this.centerTips = '请输入QQ号'
-        this.$refs.centerTips._open()
-        return
+        this.$parent._open('请正确填写')
+        return false
       }
-      if (this.link.length < 5) {
-        this.centerTips = '请正确输入QQ号'
-        this.$refs.centerTips._open()
-        return
+      if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !==21 && category !==40) {
+        this.$parent._open('请正确填写链接')
+        return false
       }
-      this._getKjInfo(this.link, this.shuoshuoPage)
-    },
-    _getKjInfo(typeid, page) {
+    }
+    let max = 0
+    let min = 0
+    let rate = 0
+    this.services[this.activeCategory].forEach((item) => {
+      if (item.id === this.choseServiceValue) {
+        max = item.max_num
+        min = item.min_num
+        rate = item.rate
+      }
+    })
+    if (!max || !rate) {
+      this.$parent._open('后台数量限制有误')
+      return false
+    }
+    if (this.quantity > max || this.quantity < min) {
+      this.$parent._open(`最大数量${max},最小数量${min}`)
+      return false
+    }
+    if (this.consumeNum > this.user.score) {
+      this.$parent._open('积分不足')
+      this.$root.eventHub.$emit('showPopup')
+      return false
+    }
+    if (category === 2 || category === 4) {
+      addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+        this._afterAddtask(res)
+      })
+      return true
+    } else {
+      addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
+        this._afterAddtask(res)
+      })
+    }
+  },
+  _afterAddtask(res) {
+    if (res.data.err_code === SUCCESS_CODE) {
+      this.$parent._open('下单成功')
+      this.$root.eventHub.$emit('updateOrder')
+      this.$root.eventHub.$emit('canvas', true)
+      this.$router.replace({
+        path: '/order'
+      })
       if (!this.checkTock()) {
         return false
       }
-      this.sayList = false
-      this.lodingS = true
-      getShuoshuoList(typeid, this.token).then((res) => {
-        this.lodingS = false
+      getUserInfo(this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
+          this.setUser(res.data.data)
+          this.$root.eventHub.$emit('user')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    } else {
+      if (res.data.err_msg) {
+        this.$parent._open(this.$root.errorCode[res.data.err_code])
+      } else {
+        this.$parent._open('似乎出错了')
+      }
+    }
+  },
+  _choseShuoShuo(category) {
+    if (category !== 2 && category !== 4) {
+      return
+    }
+    if (!this.link) {
+      this.$parent._open('请输入QQ号')
+      return
+    }
+    if (this.link.length < 5) {
+      this.$parent._open('请正确输入QQ号')
+      return
+    }
+    this._getKjInfo(this.link, this.shuoshuoPage)
+  },
+  _getKjInfo(typeid, page) {
+    if (!this.checkTock()) {
+      return false
+    }
+    this.sayList = false
+    this.lodingS = true
+    getShuoshuoList(typeid, this.token).then((res) => {
+      this.lodingS = false
+      if (res.data.err_code === SUCCESS_CODE) {
           // console.log(res.data.data.msglist)
           if (res.data.data.msglist) {
             this.sayList = res.data.data.msglist
           } else {
-            this.centerTips = '似乎没有权限查看,请打开空间权限'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎没有权限查看,请打开空间权限')
           }
         } else {
           if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
-    },
-    checkTock() {
-      if (!this.user) {
-        this.centerTips = '请登录'
-        this.$refs.centerTips._open()
-        this.$router.replace({
-          path: '/login'
-        })
-        return false
-      }
-      if (!testToken(this.tokenTime)) {
+  },
+  checkTock() {
+    if (!this.user) {
+      this.$parent._open('请登录')
+      this.$router.replace({
+        path: '/login'
+      })
+      return false
+    }
+    if (!testToken(this.tokenTime)) {
         // console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
@@ -331,24 +304,35 @@ export default {
       return true
     },
     _setPopoverWidth() {
-      console.log('设置宽度')
       const width = document.body.clientWidth || window.screen.width
-      if (width > 1100) {
-        this.popoverWidth = 950
+      if (this.browserRedirect) {
+        this.popoverWidth = BILI * window.screen.height
         this.pc = true
       } else {
         this.pc = false
-        console.log('111')
         this.popoverWidth = 300
         if (width <= 320) {
           this.popoverWidth = 240
         }
       }
     },
+    browserRedirect() {
+      const sUserAgent = navigator.userAgent.toLowerCase()
+      const bIsIpad = sUserAgent.match(/ipad/i) == "ipad"
+      const bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os"
+      const bIsMidp = sUserAgent.match(/midp/i) == "midp"
+      const bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4"
+      const bIsUc = sUserAgent.match(/ucweb/i) == "ucweb"
+      const bIsAndroid = sUserAgent.match(/android/i) == "android"
+      const bIsCE = sUserAgent.match(/windows ce/i) == "windows ce"
+      const bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile"
+      if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+        return false
+      } else {
+        return true
+      }
+    },
     _chose(e, id) {
-      // if (e) {
-      //   this.$refs[id][0]._drawCircle(e, id)
-      // }
       if (!this.services[id]) {
         this._getServices(this, id)
       } else {
@@ -365,8 +349,8 @@ export default {
         this.popoverWidth = 320
         this.choseSay = true
       } else {
-        if (this.popoverWidth !== 950 && this.pc) {
-          this.popoverWidth = 950
+        if (this.popoverWidth < 400 && this.pc) {
+          this.popoverWidth = BILI * window.screen.height
         }
         if (this.choseSay) {
           this.choseSay = false
@@ -384,8 +368,8 @@ export default {
         this.popoverWidth = 320
         this.choseSay = true
       } else {
-        if (this.popoverWidth !== 950 && this.pc) {
-          this.popoverWidth = 950
+        if (this.popoverWidth < 400 && this.pc) {
+          this.popoverWidth = BILI * window.screen.height
         }
         if (this.choseSay) {
           this.choseSay = false
@@ -417,11 +401,9 @@ export default {
           that._getServices(that, res.data.data[0].id) // 服务
         } else {
           if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
@@ -431,17 +413,14 @@ export default {
       getServices(id).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           const services = this._normalServices(res.data.data)
-          // console.log(services)
           that.services[that.activeCategory] = services
           that.showService = services
           that.choseServiceValue = that.showService[0] ? that.showService[0].id : ''
         } else {
           if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
@@ -465,7 +444,6 @@ export default {
     })
   },
   components: {
-    centerTips
   }
 }
 
@@ -485,7 +463,7 @@ export default {
 .activeCategory {
   background: #ff6b4e;
   background: var(--main-color);
-  /*animation: activeCategory .3s ease 1 forwards;*/
+/*animation: activeCategory .3s ease 1 forwards;*/
 }
 
 @keyframes activeCategory {
@@ -531,9 +509,9 @@ export default {
   left: 50%;
   top: 12%;
   transform: translate(-50%, 0);
-  width: 30px;
-  height: 30px;
-  pointer-events: none;
+width: 30px;
+height: 30px;
+pointer-events: none;
 }
 
 .mbh-label {
@@ -542,11 +520,11 @@ export default {
   left: 50%;
   bottom: 12%;
   transform: translate(-50%, 0);
-  width: 100%;
-  flex-shrink: 0;
-  color: #666;
-  font-size: 13px;
-  pointer-events: none;
+width: 100%;
+flex-shrink: 0;
+color: #666;
+font-size: 13px;
+pointer-events: none;
 }
 
 .main-box-header {
@@ -628,10 +606,10 @@ export default {
 @keyframes gradientIndex {
   0% {
     border-bottom: 1px solid rgba(0, 0, 0, .1);
-  }
-  100% {
-    border-bottom: 1px solid #ff9430;
-  }
+}
+100% {
+  border-bottom: 1px solid #ff9430;
+}
 }
 
 .i-ipnput:focus {
@@ -695,7 +673,7 @@ export default {
   border-radius: 10px;
   z-index: 999;
   box-shadow: 0 0 5px rgba(0, 0, 0, .2);
-  background: rgba(255, 255, 255, .1);
+background: rgba(255, 255, 255, .1);
 }
 
 .course-box-inside {
@@ -732,10 +710,10 @@ export default {
   height: 100%;
   line-height: 0px !important;
   background: rgba(255, 255, 255, 0) !important;
-  color: #d94d37;
-  font-size: 16px;
-  font-weight: 600;
-  border: none !important;
+color: #d94d37;
+font-size: 16px;
+font-weight: 600;
+border: none !important;
 }
 
 .p-course-box:hover {

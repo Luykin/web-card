@@ -19,9 +19,6 @@
       </div>
       <div class="btn flex modifybtn" @click="_sublime">修改密码</div>
     </div>
-    <centerTips ref='centerTips'>
-      <div class="tips-class flex ellipsis">{{centerTips}}</div>
-    </centerTips>
   </div>
 </template>
 <script type="text/javascript">
@@ -30,7 +27,6 @@ import { normalMixin } from 'common/js/mixin'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
-import centerTips from 'base/centerTips/centerTips'
 export default {
   mixins: [normalMixin],
   data() {
@@ -90,11 +86,7 @@ export default {
         if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(false)
           this.setToken(false)
-          this.$message({
-            showClose: true,
-            message: '设置成功，请重新登录',
-            type: 'success'
-          })
+          this.$parent._open('设置成功，请重新登录')
           this.password = ''
           this.$router.replace({
             path: '/login'
@@ -102,11 +94,9 @@ export default {
         } else {
           this.password = ''
           if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
@@ -119,7 +109,6 @@ export default {
     })
   },
   components: {
-    centerTips
   }
 }
 

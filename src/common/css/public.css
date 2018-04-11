@@ -69,8 +69,24 @@
   width: 95%;
   height: 100%;
   flex-grow: 1;
+  font-size: 15px;
   /*text-indent: 15px;*/
-  color: #666 !important;
+  color: #333 !important;
+}
+.i-ipnput::-webkit-input-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput:-moz-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput::-moz-placeholder {
+  color: rgba(0, 0, 0, .4);
+}
+
+.i-ipnput:-ms-input-placeholder {
+  color: rgba(0, 0, 0, .4);
 }
 
 .inputFocus {
@@ -123,11 +139,11 @@
 
 .modifybtn {
   max-width: none;
- /* flex-grow: 1;*/
+  font-size: 15px;
   width: 70%;
   margin: 0 auto 15px;
   border-radius: 5px;
-  box-shadow: 0px 2px 12px rgba(0, 0, 0, .5);
+  /*  box-shadow: 0px 2px 12px rgba(0, 0, 0, .5);*/
   letter-spacing: 5px;
 }
 
@@ -186,7 +202,7 @@
 }
 
 .login-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: #d94d37;
   letter-spacing: 8px;
@@ -203,4 +219,7 @@
   flex-shrink: 0;
   flex-grow: 1;
   margin: 0px auto 15px;
+}
+#main-body{
+  height: auto;
 }

@@ -110,131 +110,124 @@
         <div class="goods-box flex" v-show="!payUrl">
           <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
             <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}</div>
+          </div>
+          <!-- app  支付方式  end -->
+          <div class="recharge-btn-box flex" v-show="!payUrl">
+            <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
+            <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
+          </div>
         </div>
-        <!-- app  支付方式  end -->
-        <div class="recharge-btn-box flex" v-show="!payUrl">
-          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
-          <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
-        </div>
-      </div>
-    </popup>
-    <centerTips ref='centerTips'>
-      <div class="tips-class flex ellipsis">{{centerTips}}</div>
-    </centerTips>
-  </div>
-</template>
-<script type="text/javascript" scoped>
-import sidebar from 'components/sidebar/sidebar'
-import { mapGetters, mapMutations } from 'vuex'
-import interlayer from 'base/interlayer/interlayer'
-import popup from 'base/popup/popup'
-import { addOrder } from 'api/header'
-import { testToken } from 'common/js/util'
-import QrcodeVue from 'qrcode.vue'
-import { getUserInfo, getAppInfo } from 'api/index'
-import { SUCCESS_CODE } from 'api/config'
-import centerTips from 'base/centerTips/centerTips'
-import qq from 'assets/qq.png'
+      </popup>
+    </div>
+  </template>
+  <script type="text/javascript" scoped>
+    import sidebar from 'components/sidebar/sidebar'
+    import { mapGetters, mapMutations } from 'vuex'
+    import interlayer from 'base/interlayer/interlayer'
+    import popup from 'base/popup/popup'
+    import { addOrder } from 'api/header'
+    import { testToken } from 'common/js/util'
+    import QrcodeVue from 'qrcode.vue'
+    import { getUserInfo, getAppInfo } from 'api/index'
+    import { SUCCESS_CODE } from 'api/config'
 
-export default {
-  data() {
-    return {
-      money: '',
-      sidebar: false,
-      popup: false,
-      payUrl: false,
-      size: 120,
-      code: false,
-      centerTips: '',
-      choseGoodId: -1,
-      inputFocus: true,
-      activePayType: false
-    }
-  },
-  created() {
-    this.$root.eventHub.$on('user', () => {
-      this._updataUser()
-    })
-    this.$root.eventHub.$on('showPopup', () => {
-      this._showPopup()
-    })
-    this.$root.eventHub.$emit('canvas')
-    this._getAppInfo(this)
-  },
-  computed: {
-    choseGood() {
-      if (this.choseGoodId > -1) {
-        let ret = false
-        for (let i = 0; i < this.app.goods.length; i++) {
-          if (this.app.goods[i].id === this.choseGoodId) {
-            ret = this.app.goods[i]
-            break
-          }
+    export default {
+      data() {
+        return {
+          money: '',
+          sidebar: false,
+          popup: false,
+          payUrl: false,
+          size: 120,
+          code: false,
+          choseGoodId: -1,
+          inputFocus: true,
+          activePayType: false
         }
-        return ret
-      } else {
-        return false
-      }
-    },
-    payType() {
-      return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
-    },
-    ...mapGetters([
-      'user',
-      'token',
-      'scorerate',
-      'tokenTime',
-      'app'
-    ])
-  },
-  methods: {
-    _inputFocus() {
-      if (!this.inputFocus) {
-        this.inputFocus = true
-      }
-    },
-    _inputBlur() {
-      if (this.inputFocus) {
-        this.inputFocus = false
-      }
-    },
-    _chosePayType(key, value) {
-      if (value && this.activePayType !== key) {
-        this.activePayType = key
-      }
-    },
-    _choseGood(id) {
-      this.choseGoodId = id
-      this.money = ''
-    },
-    _rectifyMoney() {
-      if (isNaN(this.money)) {
-        this.money = ''
-      }
-      if (this.choseGoodId && this.money) {
-        this.choseGoodId = -1
-      }
-      if (this.money.indexOf('.') > -1) {
-        const end = this.money.indexOf('.')
-        this.money = this.money.slice(0, end + 3)
-      }
-    },
-    checkTock() {
-      if (!this.user) {
-        this.centerTips = '请登录'
-        this.$refs.centerTips._open()
-        this.$router.replace({
-          path: '/login'
+      },
+      created() {
+        this.$root.eventHub.$on('user', () => {
+          this._updataUser()
         })
-        return false
-      }
-      if (!testToken(this.tokenTime)) {
+        this.$root.eventHub.$on('showPopup', () => {
+          this._showPopup()
+        })
+        this.$root.eventHub.$emit('canvas')
+        this._getAppInfo(this)
+      },
+      computed: {
+        choseGood() {
+          if (this.choseGoodId > -1) {
+            let ret = false
+            for (let i = 0; i < this.app.goods.length; i++) {
+              if (this.app.goods[i].id === this.choseGoodId) {
+                ret = this.app.goods[i]
+                break
+              }
+            }
+            return ret
+          } else {
+            return false
+          }
+        },
+        payType() {
+          return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
+        },
+        ...mapGetters([
+          'user',
+          'token',
+          'scorerate',
+          'tokenTime',
+          'app'
+          ])
+      },
+      methods: {
+        _inputFocus() {
+          if (!this.inputFocus) {
+            this.inputFocus = true
+          }
+        },
+        _inputBlur() {
+          if (this.inputFocus) {
+            this.inputFocus = false
+          }
+        },
+        _chosePayType(key, value) {
+          if (value && this.activePayType !== key) {
+            this.activePayType = key
+          }
+        },
+        _choseGood(id) {
+          this.choseGoodId = id
+          this.money = ''
+        },
+        _rectifyMoney() {
+          if (isNaN(this.money)) {
+            this.money = ''
+          }
+          if (this.choseGoodId && this.money) {
+            this.choseGoodId = -1
+          }
+          if (this.money.indexOf('.') > -1) {
+            const end = this.money.indexOf('.')
+            this.money = this.money.slice(0, end + 3)
+          }
+        },
+        checkTock() {
+          if (!this.user) {
+
+            this.$parent._open('请登录')
+            this.$router.replace({
+              path: '/login'
+            })
+            return false
+          }
+          if (!testToken(this.tokenTime)) {
         // console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
         this.setTokenTime(false)
-        this.centerTips = '登录已失效'
-        this.$refs.centerTips._open()
+        this.$parent._open('登录已失效')
         this.$router.replace({
           path: '/login'
         })
@@ -252,24 +245,16 @@ export default {
           // this.$root.eventHub.$emit('user')
         } else {
           if (res.data.err_msg) {
-            // this.$message({
-            //   showClose: true,
-            //   message: this.$root.errorCode[res.data.err_code],
-            //   type: 'error'
-            // })
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
     },
     _addOrder() {
       if (!this.activePayType) {
-        this.centerTips = '请选择支付方式'
-        this.$refs.centerTips._open()
+        this.$parent._open('请选择支付方式')
         return
       }
       if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
@@ -282,8 +267,7 @@ export default {
             this.setUser(false)
             this.setToken(false)
             this.setTokenTime(false)
-            this.centerTips = '登录已失效'
-            this.$refs.centerTips._open()
+            this.$parent._open('登录已失效')
             this.$router.replace({
               path: '/login'
             })
@@ -292,27 +276,23 @@ export default {
           }
           if (!this.scorerate) {
             this._getAppInfo()
-            this.centerTips = '网络错误，请刷新后重试'
-            this.$refs.centerTips._open()
+            this.$parent._open('网络错误，请刷新后重试')
             this._hiddenSidebar()
             return
           }
           if (this.money < Math.ceil(this.app.min_recharge)) {
-            this.centerTips = `最小充值${Math.ceil(this.app.min_recharge)}元`
-            this.$refs.centerTips._open()
+            this.$parent._open(`最小充值${Math.ceil(this.app.min_recharge)}元`)
             return
           }
           if (!this.activePayType) {
-            this.centerTips = '请选择支付方式'
-            this.$refs.centerTips._open()
+            this.$parent._open('请选择支付方式')
             return
           }
           addOrder(this.token, Math.ceil(this.scorerate * this.money), this.activePayType, this.money).then((res) => {
             this._afterAddOrder(res)
           })
         } else {
-          this.centerTips = '请输入数字'
-          this.$refs.centerTips._open()
+          this.$parent._open('请输入数字')
         }
       }
     },
@@ -325,11 +305,9 @@ export default {
         this._hiddenSidebar()
         this.money = ''
         if (res.data.err_msg) {
-          this.centerTips = this.$root.errorCode[res.data.err_code]
-          this.$refs.centerTips._open()
+          this.$parent._open(this.$root.errorCode[res.data.err_code])
         } else {
-          this.centerTips = '似乎出错了'
-          this.$refs.centerTips._open()
+          this.$parent._open('似乎出错了')
         }
       }
     },
@@ -349,11 +327,9 @@ export default {
           }
         } else {
           if (res.data.err_msg) {
-            this.centerTips = this.$root.errorCode[res.data.err_code]
-            this.$refs.centerTips._open()
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            this.centerTips = '似乎出错了'
-            this.$refs.centerTips._open()
+            this.$parent._open('似乎出错了')
           }
         }
       })
@@ -363,14 +339,7 @@ export default {
       this.setUser(false)
       this.setToken(false)
       this.setTokenTime(false)
-      this.centerTips = '已注销'
-      this.$refs.centerTips._open()
-      // this.$refs.centerTips._open()
-      this.$message({
-        showClose: true,
-        message: '已注销',
-        type: 'success'
-      })
+      this.$parent._open('已注销')
       this.$router.replace({
         path: '/login'
       })
@@ -467,8 +436,7 @@ export default {
     sidebar,
     interlayer,
     popup,
-    QrcodeVue,
-    centerTips
+    QrcodeVue
   }
 }
 
@@ -675,213 +643,176 @@ export default {
   background: #eee;
   color: #d94d37;
   cursor: pointer;
-}*/
+  }*/
 
-.min-tips-text {
-  width: 100%;
-  height: 20px;
-  /*text-indent: 30px;*/
-  padding-left: 5%;
-  font-size: 13px;
-  color: #999;
-  justify-content: flex-start;
-}
+  .min-tips-text {
+    width: 100%;
+    height: 20px;
+    /*text-indent: 30px;*/
+    padding-left: 5%;
+    font-size: 13px;
+    color: #999;
+    justify-content: flex-start;
+  }
 
-.course-btn {
-  color: #42A5F5;
-  text-indent: 0px;
-}
+  .course-btn {
+    color: #42A5F5;
+    text-indent: 0px;
+  }
 
-.code-div {
-  width: 100%;
-  height: 40px;
-}
+  .code-div {
+    width: 100%;
+    height: 40px;
+  }
 
-.showWX {
-  background-color: #E8F8FF;
-  border: 1px solid #D9F3FF;
-  border-radius: 20px;
-  color: #55C2F5;
-  padding: 10px;
-  height: 10px;
-  min-width: 120px;
-  margin: 10px 0 0;
-}
+  .showWX {
+    background-color: #E8F8FF;
+    border: 1px solid #D9F3FF;
+    border-radius: 20px;
+    color: #55C2F5;
+    padding: 10px;
+    height: 10px;
+    min-width: 120px;
+    margin: 10px 0 0;
+  }
 
-.sureBtn {
-  border: 1px solid #ff9430;
-  border-radius: 20px;
-  color: #ff9430;
-  padding: 10px;
-  height: 10px;
-  min-width: 120px;
-  margin: 0 15px 10px;
-}
+  .sureBtn {
+    border: 1px solid #ff9430;
+    border-radius: 20px;
+    color: #ff9430;
+    padding: 10px;
+    height: 10px;
+    min-width: 120px;
+    margin: 0 15px 10px;
+  }
 
-.colseBtn {
-  border: 1px solid #999;
-  border-radius: 20px;
-  color: #999;
-  padding: 10px;
-  height: 10px;
-  min-width: 120px;
-  margin: 0 15px 10px;
-}
+  .colseBtn {
+    border: 1px solid #999;
+    border-radius: 20px;
+    color: #999;
+    padding: 10px;
+    height: 10px;
+    min-width: 120px;
+    margin: 0 15px 10px;
+  }
 
-.colseBtn:hover {
-  background: #666;
-  color: #fff;
-  cursor: pointer;
-}
+  .colseBtn:hover {
+    background: #666;
+    color: #fff;
+    cursor: pointer;
+  }
 
-.sureBtn:hover {
-  background: #ff9430;
-  color: #fff;
-  cursor: pointer;
-}
+  .sureBtn:hover {
+    background: #ff9430;
+    color: #fff;
+    cursor: pointer;
+  }
 
-.qrcode-box {
-  width: 100%;
-  flex-shrink: 0;
-  height: auto;
-}
+  .qrcode-box {
+    width: 100%;
+    flex-shrink: 0;
+    height: auto;
+  }
 
-.logo-class {
-  width: 155px;
-  height: 47px;
-  /*  margin-left: -50px;*/
-}
+  .logo-class {
+    width: 155px;
+    height: 47px;
+    /*  margin-left: -50px;*/
+  }
 
-.logo-class:hover {
-  cursor: pointer;
-}
+  .logo-class:hover {
+    cursor: pointer;
+  }
 
-.pay-img {
-  width: 144px;
-  height: 44px;
-  margin: 0 30px;
-}
+  .pay-img {
+    width: 144px;
+    height: 44px;
+    margin: 0 30px;
+  }
 
-.my-money {
-  color: #d94d37;
-  text-indent: 0px;
-}
+  .my-money {
+    color: #d94d37;
+    text-indent: 0px;
+  }
 
-.good-item {
-  width: 18.6%;
-  height: 47px;
-  flex-shrink: 0;
-  flex-grow: 0;
-  background: #FFE8D2;
-  color: #D94D37;
-  margin-left: 5%;
-  /*  overflow-x: scroll;*/
-}
+  .good-item {
+    width: 18.6%;
+    height: 47px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    background: #FFE8D2;
+    color: #D94D37;
+    margin-left: 5%;
+    /*  overflow-x: scroll;*/
+  }
 
-.pay-item {
-  width: 26.3%;
-  height: 45px;
-  flex-shrink: 0;
-  flex-grow: 0;
-  margin-left: 5%;
-  color: #353535;
-  font-size: 15px;
-  border: 1px solid rgba(0, 0, 0, .2);
-}
+  .pay-item {
+    width: 26.3%;
+    height: 45px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-left: 5%;
+    color: #353535;
+    font-size: 15px;
+    border: 1px solid rgba(0, 0, 0, .2);
+  }
 
-.pay-icon {
-  max-width: 30px;
-  width: auto;
-  max-height: 26px;
-  height: auto;
-  margin-right: 2%;
-  flex-shrink: 1;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  .pay-icon {
+    max-width: 30px;
+    width: auto;
+    max-height: 26px;
+    height: auto;
+    margin-right: 2%;
+    flex-shrink: 1;
+  }
 
 /*.i-ipnput {
   text-indent: 15px;
-}*/
+  }*/
 
-.goods-box {
-  height: 50px;
-  width: 100%;
-  overflow: hidden;
-  justify-content: flex-start;
-  margin: 20px auto 5px;
-}
+  .goods-box {
+    height: 50px;
+    width: 100%;
+    overflow: hidden;
+    justify-content: flex-start;
+    margin: 20px auto 5px;
+  }
 
-.active-good {
-  /*color: red;*/
-  color: #fff;
-  background: #FF6B4E;
-}
+  .active-good {
+    /*color: red;*/
+    color: #fff;
+    background: #FF6B4E;
+  }
 
-.cancel {
-  box-sizing: border-box;
-  color: #353535;
-  background: rgba(223, 225, 229, 1);
-}
+  .cancel {
+    box-sizing: border-box;
+    color: #353535;
+    background: rgba(223, 225, 229, 1);
+  }
 
-.sure {
-  box-sizing: border-box;
-  color: #fff;
-  background: #FF6B4E;
-  /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
-}
+  .sure {
+    box-sizing: border-box;
+    color: #fff;
+    background: #FF6B4E;
+    /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
+  }
 
-.active-pay-type {
-  border: 1px solid #FF6B4E;
-  color: #FF6B4E;
-}
+  .active-pay-type {
+    border: 1px solid #FF6B4E;
+    color: #FF6B4E;
+  }
 
-.sure:hover {
-  box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
-}
+  .sure:hover {
+    box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
+  }
 
-.cancel:hover {
-  box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
-}
+  .cancel:hover {
+    box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
+  }
 
-.disable-pay-type {
-  color: rgba(0, 0, 0, .2);
-  cursor: not-allowed;
-}
-
-.i-ipnput::-webkit-input-placeholder {
-  color: rgba(0, 0, 0, .4);
-}
-
-.i-ipnput:-moz-placeholder {
-  color: rgba(0, 0, 0, .4);
-}
-
-.i-ipnput::-moz-placeholder {
-  color: rgba(0, 0, 0, .4);
-}
-
-.i-ipnput:-ms-input-placeholder {
-  color: rgba(0, 0, 0, .4);
-}
+  .disable-pay-type {
+    color: rgba(0, 0, 0, .2);
+    cursor: not-allowed;
+  }
 
 </style>

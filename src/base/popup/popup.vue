@@ -28,8 +28,8 @@ export default {
 .popup {
   position: fixed;
   left: 50%;
-  top: 0px;
-  transform: translate3d(-50%, -200%, 0);
+  top: -50%;
+  transform: translate3d(-50%, -80%, 0);
   flex-wrap: wrap;
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, .1);
@@ -39,28 +39,32 @@ export default {
 }
 
 .popupIn {
-  animation: popupIn .35s ease-in 1 forwards;
+  animation: popupIn .5s ease-in 1 forwards;
 }
 
 .popupOut {
-  animation: popupOut .45s ease 1 forwards;
+  animation: popupOut .5s ease-out 1 forwards;
 }
 
 @keyframes popupIn {
   0% {
-    transform: translate3d(-50%, -150%, 0);
+    top: -50%;
+    transform: translate3d(-50%, -80%, 0);
   }
   100% {
-    transform: translate3d(-50%, 25%, 0);
+    top: 50%;
+    transform: translate3d(-50%, -80%, 0);
   }
 }
 
 @keyframes popupOut {
   0% {
-    transform: translate3d(-50%, 25%, 0);
+    top: 50%;
+    transform: translate3d(-50%, -80%, 0);
   }
   100% {
-    transform: translate3d(-50%, -200%, 0);
+    top: -50%;
+    transform: translate3d(-50%, -80%, 0);
   }
 }
 
