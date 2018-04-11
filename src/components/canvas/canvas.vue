@@ -23,7 +23,6 @@
     created() {
       const that = this
       this.$root.eventHub.$on('canvas', (res) => {
-        console.log('重新加载')
         that._changeSize(that, res)
       })
       this._windowReady()
@@ -42,7 +41,6 @@
           }
           this.time = setTimeout(() => {
             if ((that.$refs.canvas.height !== (document.body.offsetHeight - H)) || reload) {
-              console.log('更新')
               that.$refs.canvas.width = window.screen.width
               that.$refs.canvas.height = document.body.offsetHeight - H
             }

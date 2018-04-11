@@ -15,7 +15,7 @@
         <div class="select-item">
           <div class="select-item-label flex ellipsis">
             <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
-            <el-popover ref="popover4" placement="right" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link && !hiddenPop)">
+            <el-popover ref="popover4" placement="right-start" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link && !hiddenPop)">
               <div class="p-course-box" v-show="!pc || choseSay">
                 <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
                 <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList && !lodingS" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
@@ -305,7 +305,7 @@ methods: {
     },
     _setPopoverWidth() {
       const width = document.body.clientWidth || window.screen.width
-      if (this.browserRedirect) {
+      if (this.browserRedirect()) {
         this.popoverWidth = BILI * window.screen.height
         this.pc = true
       } else {
@@ -318,6 +318,7 @@ methods: {
     },
     browserRedirect() {
       const sUserAgent = navigator.userAgent.toLowerCase()
+      console.log(sUserAgent)
       const bIsIpad = sUserAgent.match(/ipad/i) == "ipad"
       const bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os"
       const bIsMidp = sUserAgent.match(/midp/i) == "midp"
