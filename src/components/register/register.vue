@@ -11,14 +11,14 @@
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" @keyup.enter="_register">
+        <input type="text" placeholder="密码" class="i-ipnput" v-model="password" @keyup.enter="_register" onfocus="this.type='password'">
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register">
+        <input type="text" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" @keyup.enter="_register" onfocus="this.type='password'">
       </div>
       <label class="input-box flex" foe='code-input'>
-        <i class="iconfont icon-duanxin"></i>
+        <i class="iconfont icon-fasongyoujian"></i>
         <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
         <div class="flex getcode">
           <div class="flex getcode-btn cursor" @click="_getcode">{{time}}
@@ -59,11 +59,12 @@
         }
         register(this.phone, this.password, this.rePassword, this.code).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {
-            this.$message({
-              showClose: true,
-              message: '注册成功',
-              type: 'success'
-            })
+            // this.$message({
+            //   showClose: true,
+            //   message: '注册成功',
+            //   type: 'success'
+            // })
+            this.$parent._open('注册成功')
             this.$router.replace({
               path: '/login',
               query: {

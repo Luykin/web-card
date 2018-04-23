@@ -1,28 +1,32 @@
 <template>
-  <div class="layer" :class="{layerIn:layerIn, layerOut:layerOut}" @click="_close" ref='layer'>
+  <div class="layer" :class="{layerIn:layerIn, layerOut:layerOut}" @click="_close(e)" ref='layer'>
   </div>
 </template>
 <script type="text/javascript">
 export default {
-  data () {
+  data() {
     return {
       layerIn: false,
       layerOut: false
     }
   },
   methods: {
-    _showLayer () {
+    _showLayer() {
       this.layerIn = true
       this.layerOut = false
     },
-    _hiddenLayer () {
+    _hiddenLayer() {
       this.layerIn = false
       this.layerOut = true
     },
-    _setZIndex (z) {
+    _setZIndex(z) {
       this.$refs.layer.style.zIndex = z
     },
-    _close () {
+    _close(e) {
+      if (e) {
+        e.stopPropagation()
+        // e.preventDefault()
+      }
       this.$emit('close')
     }
   }

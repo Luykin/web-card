@@ -3,12 +3,20 @@
     <div class="i-title flex" id="i-title">
       订单记录查询
     </div>
+    <div class="i-chose flex">
+      <el-select v-model="chose" placeholder="请选择" no-data-text="暂无业务">
+        <el-option v-for="item in choseItem" :key="item.choseTitle" :label="item.choseTitle" :value="item.id">
+        </el-option>
+      </el-select>
+      <div class="btn flex order-btn" @click='_chose'>筛选</div>
+      <div class="btn flex order-btn" @click='_reset'>重置</div>
+    </div>
     <div class="i-table" id="i-table">
-      <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
-        <el-table-column prop="label" label="业务" width="120" fixed>
+      <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+        <el-table-column prop="label" label="业务" width="140" fixed>
         </el-table-column>
-        <el-table-column prop="id" label="订单ID">
-        </el-table-column>
+        <!--         <el-table-column prop="id" label="订单ID">
+        </el-table-column> -->
         <el-table-column prop="addition" label="分享链接/用户ID">
         </el-table-column>
         <el-table-column prop="point" label="数量">
@@ -20,6 +28,8 @@
         <el-table-column prop="status" label="状态">
         </el-table-column>
         <el-table-column prop="time" label="预计完成">
+        </el-table-column>
+        <el-table-column prop="appointment_time" label="预约时间">
         </el-table-column>
         <el-table-column prop="createA" label="提交时间">
         </el-table-column>
@@ -65,7 +75,10 @@ export default {
         '3': '进行中',
         '4': '订单取消',
         '5': '订单取消'
-      }
+      },
+      chose: '全部订单',
+      time: false,
+      choseItem: []
     }
   },
   created() {
@@ -76,15 +89,61 @@ export default {
       this._getTasks()
     })
     this.$root.eventHub.$emit('canvas')
+    this._orderInt()
   },
   computed: {
     ...mapGetters([
       'token',
-      'tokenTime'
+      'tokenTime',
+      'app'
     ])
   },
   methods: {
-    _getTasks() {
+    _orderInt() {
+      this.choseItem = this.app.service_categories.concat([])
+      this.choseItem.forEach((item) => {
+        item.choseTitle = item.label + '订单'
+      })
+      this.choseItem.unshift({
+        choseTitle: '全部订单',
+        id: -1
+      })
+    },
+    _chose() {
+      if (this.time) {
+        this.$parent._open('请勿频繁筛选')
+        return false
+      }
+      if (!this.chose) {
+        this.$parent._open('请选择一个类别筛选')
+        return false
+      }
+      // console.log(this.chose)
+      if (this.chose < 0 || isNaN(this.chose)) {
+        this._reset()
+        return false
+      }
+      this._getTasks(this.chose)
+      const that = this
+      this.time = setTimeout(() => {
+        clearTimeout(that.time)
+        that.time = false
+      }, 1500)
+    },
+    _reset() {
+      this.chose = '全部订单'
+      this._getTasks()
+    },
+    tableRowClassName({ row, rowIndex }) {
+      // console.log(row)
+      if (row.status === '已完成') {
+        return 'success-row'
+      } else if (row.status === '进行中') {
+        return 'doing-row'
+      }
+      return ''
+    },
+    _getTasks(id) {
       if (!testToken(this.tokenTime) || !this.token) {
         this.setUser(false)
         this.setToken(false)
@@ -96,25 +155,37 @@ export default {
         return false
       }
       this.loading = true
-      const that = this
-      getTasks(this.token, NUM, this.page).then((res) => {
-        this.loading = false
-        if (res.data.err_code === SUCCESS_CODE) {
-          this.total = res.data.data.count
-          this.tableData = that._normalTasks(res.data.data.tasks)
-          // this._timing(this.tableData)
-          setInterval(() => {
-            that._countDown(this.tableData)
-          }, 1000)
-        }
-      })
+      // const that = this
+      if (id) {
+        // console.log(id)
+        getTasks(this.token, NUM, this.page, id).then((res) => {
+          this.afterGetTasks(res, this)
+        })
+      } else {
+        getTasks(this.token, NUM, this.page).then((res) => {
+          this.afterGetTasks(res, this)
+        })
+      }
+    },
+    afterGetTasks(res, that) {
+      this.loading = false
+      if (res.data.err_code === SUCCESS_CODE) {
+        this.total = res.data.data.count
+        this.tableData = that._normalTasks(res.data.data.tasks)
+        // this._timing(this.tableData)
+        setInterval(() => {
+          that._countDown(this.tableData)
+        }, 1000)
+      }
     },
     _countDown(list) {
       const that = this
       let time = Date.parse(new Date()) / 1000
       list.forEach((item) => {
-        if (item.status === '已完成') {
+        // console.log(item.status)
+        if (item.status.indexOf('完成') >= 0) {
           item.time = '-'
+          return
         }
         if (item.status === '准备中') {
           item.time = '-'
@@ -122,7 +193,7 @@ export default {
           if (item.cost_time + item.create > time) {
             item.time = that.normalTimeCountDown(item.cost_time + item.create - time)
           } else {
-            item.time = '00:01'
+            item.time = '00:00:01'
           }
         }
       })
@@ -133,7 +204,7 @@ export default {
       let minute = (item - day * 24 * 3600 - hour * 3600) / 60 >= 1 ? parseInt((item - day * 24 * 3600 - hour * 3600) / 60) : 0 // 分钟
       let second = item - day * 24 * 3600 - hour * 3600 - minute * 60 // 秒
       day = day === 0 ? '' : day + ':'
-      hour = hour === 0 ? '' : hour < 10 ? '0' + hour + ':' : hour + ':'
+      hour = hour === 0 ? '00:' : hour < 10 ? '0' + hour + ':' : hour + ':'
       minute = minute === 0 ? '' : minute < 10 ? '0' + minute + ':' : minute + ':'
       second = second < 10 ? '0' + second : second
       return day + hour + minute + second
@@ -145,6 +216,15 @@ export default {
         item.createA = timeChange(item.create)
         item.currentNum = '-'
         item.time = '-'
+        if (item.appointment_time) {
+          item.appointment_time = timeChange(item.appointment_time)
+        } else {
+          item.appointment_time = '-'
+        }
+        if (item.addition.length >= 15) {
+          item.addition = item.addition.slice(0, 12) + '...'
+          // console.log(item.addition)
+        }
       })
       return list
     },
@@ -164,9 +244,9 @@ export default {
       let ret = list
       ret.forEach((item, index) => {
         promiseList[index] = new Promise(function(resolve, reject) {
-          console.log(item)
+          // console.log(item)
           if (item.status === 1 || item.status === 3 || item.status === -5 || item.status === -7 || item.status === -9) {
-            console.log('进行中')
+            // console.log('进行中')
             item.status = that.state[item.status]
             item.currentNum = that._queryNum(index, item, resolve)
           } else {
@@ -187,7 +267,7 @@ export default {
       const category = item.service_category
       // console.log(category)
       custom(item.addition).then((res) => {
-        console.log(res)
+        // console.log(res)
         if (res) {
           // 快手
           if (category >= 20 && category < 30) {
@@ -264,13 +344,23 @@ export default {
       setTokenTime: 'SET_TOKENTIME'
     })
   },
-  components: {
-  },
+  components: {},
   watch: {}
 }
 
 </script>
 <style type="text/css" scoped>
+.i-chose {
+  width: 72%;
+  margin: 0 auto -10px;
+  justify-content: flex-start;
+}
 
+.i-chose .order-btn {
+  height: 35px;
+  padding: 0 20px;
+  margin: 0 0 0 10px;
+  border-radius: 5px;
+}
 
 </style>

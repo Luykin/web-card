@@ -11,7 +11,7 @@
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login">
+        <input type="text" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login" onfocus="this.type='password'">
       </div>
       <!--       <div class="input-box flex">
         <i class="hover-out"></i>
@@ -56,6 +56,7 @@ methods: {
         if (res.data.data.user) {
           that.setUser(res.data.data.user)
           this.$parent._open('登录成功')
+          this.password = ''
           that.$router.replace({
             path: '/'
           })

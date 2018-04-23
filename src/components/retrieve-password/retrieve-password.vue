@@ -11,14 +11,14 @@
 			</div>
 			<div class="input-box flex">
 				<i class="iconfont icon-mima"></i>
-				<input type="password" placeholder="设置新的密码" class="i-ipnput" v-model="password">
+				<input type="text" placeholder="设置新的密码" class="i-ipnput" v-model="password" onfocus="this.type='password'">
 			</div>
 			<div class="input-box flex">
 				<i class="iconfont icon-mima"></i>
-				<input type="password" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword">
+				<input type="text" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" onfocus="this.type='password'">
 			</div>
 			<label class="input-box flex" foe='code-input'>
-				<i class="iconfont icon-duanxin"></i>
+				<i class="iconfont icon-fasongyoujian"></i>
 				<input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code">
 				<div class="flex getcode">
 					<div class="flex getcode-btn cursor" @click="_getcode">{{time}}
@@ -89,8 +89,8 @@ methods: {
 	_setTime() {
 		let nowTime = +new Date()
 		let lastTime = localStorage.getItem('codeTime') || 0
-		console.log(nowTime)
-		console.log(lastTime)
+		// console.log(nowTime)
+		// console.log(lastTime)
 		if (nowTime < lastTime) {
 			this._countdown(parseInt((lastTime - nowTime) / 1000))
 		}

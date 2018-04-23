@@ -40,3 +40,40 @@ export function addOrder(token, score, paytype, price, id) {
       }
     })
 }
+export function agency(token, company, proposer, phone, email, remarks) {
+  const url = `${PREFIX_URL}/agency`
+  let data = {
+    token: token,
+    company: company,
+    proposer: proposer,
+    phone: phone,
+    email: email
+  }
+  if (remarks) {
+    data = Object.assign({ remarks: remarks }, data)
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}

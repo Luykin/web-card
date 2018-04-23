@@ -3,12 +3,15 @@ import axios from 'axios'
 import { PREFIX_URL } from './config'
 import { getSign } from 'common/js/util'
 
-export function getTasks(token, num, page) {
+export function getTasks(token, num, page, id) {
   const url = `${PREFIX_URL}/tasks`
   let data = {
     token: token,
     num: num,
     page: page
+  }
+  if (id) {
+    data = Object.assign({ service_category_id: id }, data)
   }
   return axios.get(url, {
       params: Object.assign({ sign: getSign(data) }, data)

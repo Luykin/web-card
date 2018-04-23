@@ -37,7 +37,7 @@ export function getAppInfo() {
     return Promise.resolve(res)
   })
 }
-export function addTask(score, point, token, serviceid, addition, targetid) {
+export function addTask(score, point, token, serviceid, addition, targetid, sublimeTime) {
   const url = `${PREFIX_URL}/add_task`
   let data = {
     score: score,
@@ -49,6 +49,9 @@ export function addTask(score, point, token, serviceid, addition, targetid) {
   }
   if (targetid) {
     data = Object.assign({ target_id: targetid }, data)
+  }
+  if (sublimeTime) {
+    data = Object.assign({ appointment_time: sublimeTime }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

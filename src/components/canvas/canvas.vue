@@ -2,61 +2,61 @@
   <canvas class="x-canvas" id="x-canvas" ref="canvas"></canvas>
 </template>
 <script type="text/javascript">
-  const arryFlower = []
-  const color = ['rgba(255,255,255,.3)', 'rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)', 'rgba(255,255,255,.8)']
-  const size = [3, 3.5, 4, 4.5, 5]
-  const speed = 1.5
-  const header = 65
-  const footer = 135
-  const margin = 0
-  const H = header + footer + margin
-  const TPI = Math.PI * 2
-  export default {
-    data() {
-      return {
-        ctx: false,
-        bg: false,
-        allNumber: 55,
-        time: false
-      }
-    },
-    created() {
-      const that = this
-      this.$root.eventHub.$on('canvas', (res) => {
-        that._changeSize(that, res)
-      })
-      this._windowReady()
-    },
-    mounted() {
-      const that = this
-      window.onresize = () => {
-        that._changeSize(that)
-      }
-    },
-    methods: {
-      _changeSize(that, reload) {
-        requestAnimationFrame(() => {
-          if (this.time) {
-            clearTimeout(this.time)
-          }
-          this.time = setTimeout(() => {
-            if ((that.$refs.canvas.height !== (document.body.offsetHeight - H)) || reload) {
-              that.$refs.canvas.width = window.screen.width
-              that.$refs.canvas.height = document.body.offsetHeight - H
-            }
-          }, 300)
-        })
-      },
-      _windowReady() {
-        window.onload = () => {
-          this.$refs.canvas.width = window.screen.width
-          this.$refs.canvas.height = document.body.offsetHeight - H
-          this.ctx = this.$refs.canvas.getContext('2d')
-          this._initCanvas()
-          this._start(this.ctx)
+const arryFlower = []
+const color = ['rgba(255,255,255,.3)', 'rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)', 'rgba(255,255,255,.8)']
+const size = [3.2, 3.4, 3.6, 3.8, 4, 4.2, 4.4, 4.6]
+const speed = 1.8
+const header = 65
+const footer = 135
+const margin = 0
+const H = header + footer + margin
+const TPI = Math.PI * 2
+export default {
+  data() {
+    return {
+      ctx: false,
+      bg: false,
+      allNumber: 55,
+      time: false
+    }
+  },
+  created() {
+    const that = this
+    this.$root.eventHub.$on('canvas', (res) => {
+      that._changeSize(that, res)
+    })
+    this._windowReady()
+  },
+  mounted() {
+    const that = this
+    window.onresize = () => {
+      that._changeSize(that)
+    }
+  },
+  methods: {
+    _changeSize(that, reload) {
+      requestAnimationFrame(() => {
+        if (this.time) {
+          clearTimeout(this.time)
         }
-      },
-      _initCanvas() {
+        this.time = setTimeout(() => {
+          if ((that.$refs.canvas.height !== (document.body.offsetHeight - H)) || reload) {
+            that.$refs.canvas.width = window.screen.width
+            that.$refs.canvas.height = document.body.offsetHeight - H
+          }
+        }, 300)
+      })
+    },
+    _windowReady() {
+      window.onload = () => {
+        this.$refs.canvas.width = window.screen.width
+        this.$refs.canvas.height = document.body.offsetHeight - H
+        this.ctx = this.$refs.canvas.getContext('2d')
+        this._initCanvas()
+        this._start(this.ctx)
+      }
+    },
+    _initCanvas() {
       // this.bg = new Image()
       // this.bg.src = "http://ozp5yj4ke.bkt.clouddn.com/bg.c72fa3d.png"
       let width = this.$refs.canvas.width

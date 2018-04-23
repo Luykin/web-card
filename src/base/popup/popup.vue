@@ -1,10 +1,16 @@
 <template>
-  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut}">
+  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut, protocol:protocol}">
     <slot></slot>
   </div>
 </template>
 <script type="text/javascript">
 export default {
+  props: {
+    protocol: {
+      type: [Boolean],
+      default: false
+    }
+  },
   data() {
     return {
       popupIn: false,
@@ -29,12 +35,13 @@ export default {
   position: fixed;
   left: 50%;
   top: -50%;
-  transform: translate3d(-50%, -80%, 0);
+  transform: translate3d(-50%, -50%, 0);
   flex-wrap: wrap;
   background: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, .1);
   overflow: hidden;
-  z-index: 99999;
+  z-index: -999;
+  opacity: 0;
   border-radius: 10px;
 }
 
@@ -48,23 +55,31 @@ export default {
 
 @keyframes popupIn {
   0% {
+    opacity: 1;
+    z-index: 99999;
     top: -50%;
-    transform: translate3d(-50%, -80%, 0);
+    transform: translate3d(-50%, -50%, 0);
   }
   100% {
+    opacity: 1;
+    z-index: 99999;
     top: 50%;
-    transform: translate3d(-50%, -80%, 0);
+    transform: translate3d(-50%, -50%, 0);
   }
 }
 
 @keyframes popupOut {
   0% {
+    opacity: 1;
+    z-index: 99999;
     top: 50%;
-    transform: translate3d(-50%, -80%, 0);
+    transform: translate3d(-50%, -50%, 0);
   }
   100% {
+    opacity: 0;
+    z-index: -999;
     top: -50%;
-    transform: translate3d(-50%, -80%, 0);
+    transform: translate3d(-50%, -50%, 0);
   }
 }
 

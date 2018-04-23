@@ -1,9 +1,9 @@
 html {
   --main-color: #ff6b4e;
   font-size: 14px;
-  font-family: PingFang SC, STHeitiSC-Light, Helvetica-Light, arial, sans-serif;
+  /*font-family: PingFang SC, STHeitiSC-Light, Helvetica-Light, arial, sans-serif;*/
   user-select: none;
-  font-family: 微软雅黑;
+  font-family: 微软雅黑 !important;
 }
 
 body {
@@ -14,7 +14,7 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   line-height: 1;
   min-width: 320px;
-  background: url('http://ozp5yj4ke.bkt.clouddn.com/bg.jpg') no-repeat;
+  background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
   background-size: cover;
   overflow-x: hidden;
 }
@@ -107,3 +107,4 @@ input {
 input:focus::-webkit-contacts-auto-fill-button {
   opacity: 0;
 }
+

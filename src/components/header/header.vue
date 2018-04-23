@@ -10,11 +10,14 @@
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
-            <el-menu-item index="/index">提交订单</el-menu-item>
+            <el-menu-item index="/index">{{env}}</el-menu-item>
             <el-menu-item index="/order" v-show="user">我的订单</el-menu-item>
             <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item>
             <el-menu-item index="/none/1" v-show="user" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
+            </el-menu-item>
+            <el-menu-item index="/none/2" v-show="user" class="disable">
+              <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
               <template slot="title">我的账户</template>
@@ -35,7 +38,7 @@
         <el-col>
           <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
             <el-menu-item index="/index">
-              <i class="iconfont icon-tijiaodingdan"></i> 提交订单
+              <i class="iconfont icon-tijiaodingdan"></i> 主页
             </el-menu-item>
             <el-menu-item index="/order" v-show="user">
               <i class="iconfont icon-unie64a"></i> 我的订单
@@ -54,6 +57,10 @@
             <el-menu-item index="/none/1" v-show="user" class='disable'>
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
+            </el-menu-item>
+            <el-menu-item index="/none/2" v-show="user" class='disable'>
+              <i class="iconfont icon-dailishang"></i>
+              <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu v-show="user" index="5">
               <template slot="title">
@@ -84,7 +91,7 @@
             <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
           </div>
           <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
-          <div class="recharge-btn-box-after flex flex">
+          <div class="recharge-btn-box-after flex">
             <div class="recharge-btn-sure-after flex sure cursor" @click="_sureCompletionPayment">确定已完成支付</div>
             <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenSidebar">我再考虑考虑</div>
             <!-- <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div> -->
@@ -93,14 +100,17 @@
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
-        <div class="goods-box flex" v-show="!payUrl && app.goods.length > 0">
+        <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0">
           <!-- app  商品 -->
-          <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex ellipsis">{{item.label}}</div>
+          <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex">
+            <div class="good-item-label flex ellipsis">{{item.label}}</div>
+            <div class="good-item-label flex ellipsis">{{'￥'+parseInt(item.price)}}</div>
+          </div>
         </div>
         <!-- app  商品  end -->
         <!-- <div class="net-item flex" v-show="!payUrl">微信支付</div> -->
         <!-- <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img"> -->
-        <div class="flex input-defult" v-show="!payUrl">
+        <div class="flex input-defult width90" v-show="!payUrl">
           <!-- onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" -->
           <input type="text" :placeholder="'请输入充值金额（元）'" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder">
         </div>
@@ -110,119 +120,280 @@
         <div class="goods-box flex" v-show="!payUrl">
           <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
             <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}</div>
+        </div>
+        <!-- app  支付方式  end -->
+        <div class="recharge-btn-box flex" v-show="!payUrl">
+          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
+          <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
+        </div>
+      </div>
+    </popup>
+    <!-- 2018.04.21-申请代理 -->
+    <popup ref='agent' :protocol='true'>
+      <div v-show='!hadAgree'>
+        <div class="recharge-box-title flex">申请代理用户协议</div>
+        <div class="agreement-content">重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公</div>
+        <div class="recharge-btn-box-after flex bottom">
+          <div class="recharge-btn-sure-after flex sure cursor" @click='_agree'>同意并继续</div>
+          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
+        </div>
+      </div>
+      <div v-show='hadAgree'>
+        <div class="recharge-box-title flex marginbottom20">提交代理申请</div>
+        <div class="agreement-content overHiden">
+          <div class="flex agree-input-box">
+            <div class="agree-label flex ellipsis">公司简称<span class="must">*</span></div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName">
+            </div>
           </div>
-          <!-- app  支付方式  end -->
-          <div class="recharge-btn-box flex" v-show="!payUrl">
-            <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
-            <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
+          <div class="flex agree-input-box">
+            <div class="agree-label flex ellipsis">申请人<span class="must">*</span></div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写申请人" class="i-ipnput" v-model="applicant">
+            </div>
+          </div>
+          <div class="flex agree-input-box">
+            <div class="agree-label flex ellipsis">联系电话<span class="must">*</span></div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写联系电话" class="i-ipnput" v-model="telephone">
+            </div>
+          </div>
+          <div class="flex agree-input-box">
+            <div class="agree-label flex ellipsis">电子邮箱<span class="must">*</span></div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写电子邮箱" class="i-ipnput" v-model="mailBox">
+            </div>
+          </div>
+          <div class="flex agree-input-box">
+            <div class="agree-label flex ellipsis">申请需求<span class="not-must">(非必填)</span></div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请简要描述您的需求" class="i-ipnput" v-model="demand">
+            </div>
           </div>
         </div>
-      </popup>
-    </div>
-  </template>
-  <script type="text/javascript" scoped>
-    import sidebar from 'components/sidebar/sidebar'
-    import { mapGetters, mapMutations } from 'vuex'
-    import interlayer from 'base/interlayer/interlayer'
-    import popup from 'base/popup/popup'
-    import { addOrder } from 'api/header'
-    import { testToken } from 'common/js/util'
-    import QrcodeVue from 'qrcode.vue'
-    import { getUserInfo, getAppInfo } from 'api/index'
-    import { SUCCESS_CODE } from 'api/config'
+        <div class="recharge-btn-box-after flex bottom">
+          <div class="recharge-btn-sure-after flex sure cursor" @click="_sublimeAgree">提交申请</div>
+          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
+        </div>
+      </div>
+    </popup>
+  </div>
+</template>
+<script type="text/javascript" scoped>
+import sidebar from 'components/sidebar/sidebar'
+import { mapGetters, mapMutations } from 'vuex'
+import interlayer from 'base/interlayer/interlayer'
+import popup from 'base/popup/popup'
+import { addOrder, agency } from 'api/header'
+import { testToken } from 'common/js/util'
+import QrcodeVue from 'qrcode.vue'
+import { getUserInfo } from 'api/index'
+import { SUCCESS_CODE } from 'api/config'
 
-    export default {
-      data() {
-        return {
-          money: '',
-          sidebar: false,
-          popup: false,
-          payUrl: false,
-          size: 120,
-          code: false,
-          choseGoodId: -1,
-          inputFocus: true,
-          activePayType: false
+export default {
+  data() {
+    return {
+      money: '',
+      companyName: '',
+      applicant: '',
+      telephone: '',
+      mailBox: '',
+      demand: '',
+      sidebar: false,
+      popup: false,
+      agent: false,
+      payUrl: false,
+      size: 120,
+      code: false,
+      choseGoodId: -1,
+      inputFocus: true,
+      activePayType: false,
+      env: '主页',
+      time: false,
+      hadAgree: false
+    }
+  },
+  created() {
+    this.$root.eventHub.$on('user', () => {
+      this._updataUser()
+    })
+    this.$root.eventHub.$on('env', () => {
+      this.env = '测试环境'
+    })
+    this.$root.eventHub.$on('showPopup', () => {
+      this._showPopup()
+    })
+    this.$root.eventHub.$emit('canvas')
+    // this._getAppInfo(this)
+  },
+  computed: {
+    choseGood() {
+      if (this.choseGoodId > -1) {
+        let ret = false
+        for (let i = 0; i < this.app.goods.length; i++) {
+          if (this.app.goods[i].id === this.choseGoodId) {
+            ret = this.app.goods[i]
+            break
+          }
         }
-      },
-      created() {
-        this.$root.eventHub.$on('user', () => {
-          this._updataUser()
+        return ret
+      } else {
+        return false
+      }
+    },
+    payType() {
+      return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
+    },
+    ...mapGetters([
+      'user',
+      'token',
+      'scorerate',
+      'tokenTime',
+      'app'
+    ])
+  },
+  methods: {
+    _sublimeAgree() {
+      if (!this.companyName) {
+        this.$parent._open('请填写公司简称')
+        return false
+      }
+      if (!this.applicant) {
+        this.$parent._open('请填写申请人')
+        return false
+      }
+      if (!this.telephone) {
+        this.$parent._open('请填写联系电话')
+        return false
+      }
+      if (!this._checkPhone(this.telephone)) {
+        this.$parent._open('请正确填写联系电话')
+        return false
+      }
+      if (!this.mailBox) {
+        this.$parent._open('请填写您的电子邮箱')
+        return false
+      }
+      if (!this._checkMail(this.mailBox)) {
+        this.$parent._open('请正确填写您的电子邮箱')
+        return false
+      }
+      if (!testToken(this.tokenTime)) {
+        this.setUser(false)
+        this.setToken(false)
+        this.setTokenTime(false)
+        this.$parent._open('登录已失效')
+        this.$router.replace({
+          path: '/login'
         })
-        this.$root.eventHub.$on('showPopup', () => {
-          this._showPopup()
-        })
-        this.$root.eventHub.$emit('canvas')
-        this._getAppInfo(this)
-      },
-      computed: {
-        choseGood() {
-          if (this.choseGoodId > -1) {
-            let ret = false
-            for (let i = 0; i < this.app.goods.length; i++) {
-              if (this.app.goods[i].id === this.choseGoodId) {
-                ret = this.app.goods[i]
-                break
-              }
-            }
-            return ret
+        this._hiddenAgent()
+        return false
+      }
+      agency(this.token, this.companyName, this.applicant, this.telephone, this.mailBox, this.demand).then((res) => {
+        console.log(res.data)
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.companyName = ''
+          this.$root.eventHub.$emit('user')
+          this.$parent._open('代理申请成功，我们商务人员将会在1~2个工作内与你联系。')
+          this._hiddenAgent()
+        } else {
+          if (res.data.err_msg) {
+            this.telephone = ''
+            this.mailBox = ''
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
-            return false
+            this.telephone = ''
+            this.mailBox = ''
+            this.$parent._open('似乎出错了')
           }
-        },
-        payType() {
-          return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
-        },
-        ...mapGetters([
-          'user',
-          'token',
-          'scorerate',
-          'tokenTime',
-          'app'
-          ])
-      },
-      methods: {
-        _inputFocus() {
-          if (!this.inputFocus) {
-            this.inputFocus = true
-          }
-        },
-        _inputBlur() {
-          if (this.inputFocus) {
-            this.inputFocus = false
-          }
-        },
-        _chosePayType(key, value) {
-          if (value && this.activePayType !== key) {
-            this.activePayType = key
-          }
-        },
-        _choseGood(id) {
-          this.choseGoodId = id
-          this.money = ''
-        },
-        _rectifyMoney() {
-          if (isNaN(this.money)) {
-            this.money = ''
-          }
-          if (this.choseGoodId && this.money) {
-            this.choseGoodId = -1
-          }
-          if (this.money.indexOf('.') > -1) {
-            const end = this.money.indexOf('.')
-            this.money = this.money.slice(0, end + 3)
-          }
-        },
-        checkTock() {
-          if (!this.user) {
+        }
+      })
+    },
+    _checkMail(mail) {
+      let filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
+      if (filter.test(mail)) {
+        return true
+      } else {
+        return false
+      }
+    },
+    _checkPhone(phone) {
+      let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
+      if (myreg.test(phone)) {
+        return true
+      } else {
+        return false
+      }
+    },
+    _agree() {
+      // if (this.time > 0) {
+      //   this.$parent._open('请仔细阅读用户协议')
+      //   return false
+      // }
+      this.hadAgree = true
+    },
+    _countdown() {
+      if (!this.time) {
+        this.time = 0
+      }
+      this.timer = setInterval(() => {
+        if (this.time > 1) {
+          this.time = this.time - 1
+        } else {
+          this.time = '同意并继续'
+          clearInterval(this.timer)
+          this.timer = null
+        }
+      }, 1000)
+    },
+    _daili(e) {
+      if (e) {
+        e.stopPropagation()
+      }
+      this.$parent._open('近期将开放代理申请')
+    },
+    _inputFocus() {
+      if (!this.inputFocus) {
+        this.inputFocus = true
+      }
+    },
+    _inputBlur() {
+      if (this.inputFocus) {
+        this.inputFocus = false
+      }
+    },
+    _chosePayType(key, value) {
+      if (value && this.activePayType !== key) {
+        this.activePayType = key
+      }
+    },
+    _choseGood(id) {
+      this.choseGoodId = id
+      this.money = ''
+    },
+    _rectifyMoney() {
+      if (isNaN(this.money)) {
+        this.money = ''
+      }
+      if (this.choseGoodId && this.money) {
+        this.choseGoodId = -1
+      }
+      if (this.money.indexOf('.') > -1) {
+        const end = this.money.indexOf('.')
+        this.money = this.money.slice(0, end + 3)
+      }
+    },
+    checkTock() {
+      if (!this.user) {
 
-            this.$parent._open('请登录')
-            this.$router.replace({
-              path: '/login'
-            })
-            return false
-          }
-          if (!testToken(this.tokenTime)) {
+        this.$parent._open('请登录')
+        this.$router.replace({
+          path: '/login'
+        })
+        return false
+      }
+      if (!testToken(this.tokenTime)) {
         // console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
@@ -275,7 +446,7 @@
             return false
           }
           if (!this.scorerate) {
-            this._getAppInfo()
+            // this._getAppInfo()
             this.$parent._open('网络错误，请刷新后重试')
             this._hiddenSidebar()
             return
@@ -318,22 +489,23 @@
       })
       this.$root.eventHub.$emit('canvas', true)
     },
-    _getAppInfo(that) {
-      getAppInfo().then((res) => {
-        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
-          if (res.data.data.score_rate) {
-            this.setScorerate(res.data.data.score_rate)
-            this.setApp(res.data.data)
-          }
-        } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('似乎出错了')
-          }
-        }
-      })
-    },
+    // _getAppInfo(that) {
+    //   getAppInfo().then((res) => {
+    //     if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+    //       if (res.data.data.score_rate) {
+    //         this.setScorerate(res.data.data.score_rate)
+    //         this.setApp(res.data.data)
+    //         this.$root.eventHub.$emit('IndexInit')
+    //       }
+    //     } else {
+    //       if (res.data.err_msg) {
+    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
+    //       } else {
+    //         this.$parent._open('似乎出错了')
+    //       }
+    //     }
+    //   })
+    // },
     _logout(e) {
       e.stopPropagation()
       this.setUser(false)
@@ -377,6 +549,38 @@
         this.$refs.input.focus()
       })
     },
+    _showAgent(e) {
+      if (e) {
+        e.stopPropagation()
+      }
+      if (this.user.is_agency) {
+        this.$parent._open('代理已申请，无需重复申请，我们商务人员将会在1~2个工作内与你联系。')
+        return false
+      }
+      this.$nextTick(() => {
+        // this._countdown()
+        this.agent = true
+        this.$refs.agent._showPopup()
+        this.$refs.interlayer._setZIndex(9999)
+        this.$refs.interlayer._showLayer()
+      })
+    },
+    _hiddenAgent() {
+      clearInterval(this.timer)
+      this.timer = null
+      this.time = false
+      this.hadAgree = false
+      if (this.agent && !this.sidebar) {
+        this.agent = false
+        this.$refs.agent._hiddenPopup()
+        this.$refs.interlayer._hiddenLayer()
+      }
+      if (this.agent && this.sidebar) {
+        this.agent = false
+        this.$refs.agent._hiddenPopup()
+        this.$refs.interlayer._setZIndex(1500)
+      }
+    },
     _hiddenSidebar() {
       if (this.payUrl) {
         this.$root.eventHub.$emit('user')
@@ -411,6 +615,12 @@
       if (key.indexOf('/none') > -1) {
         return false
       }
+      if (this.sidebar) {
+        this._hiddenSidebar()
+      }
+      if (key === this.$route.path) {
+        return
+      }
       this.$router.replace({
         path: key
       })
@@ -420,14 +630,10 @@
       if (key === '/score-record') {
         this.$root.eventHub.$emit('updateScoreRecord')
       }
-      if (this.sidebar) {
-        this._hiddenSidebar()
-      }
     },
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
-      setApp: 'SET_APP',
       setScorerate: 'SET_SCORERATE',
       setTokenTime: 'SET_TOKENTIME'
     })
@@ -563,6 +769,20 @@
   border-bottom: 1px solid rgba(0, 0, 0, .2);
 }
 
+.agreement-content {
+  width: 82%;
+  height: auto;
+  min-height: 20px;
+  max-height: 500px;
+  margin: 20px auto 100px;
+  font-size: 15px;
+  text-indent: 20px;
+  line-height: 26px;
+  font-weight: normal;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
 .content-qr {
   width: 100%;
   height: auto;
@@ -615,204 +835,304 @@
   /*margin: 0 10% 0 5%;*/
 }
 
+.min-tips-text {
+  width: 100%;
+  height: 20px;
+  /*text-indent: 30px;*/
+  padding-left: 5%;
+  font-size: 13px;
+  color: #999;
+  justify-content: flex-start;
+}
 
+.course-btn {
+  color: #42A5F5;
+  text-indent: 0px;
+}
 
+.code-div {
+  width: 100%;
+  height: 40px;
+}
 
+.showWX {
+  background-color: #E8F8FF;
+  border: 1px solid #D9F3FF;
+  border-radius: 20px;
+  color: #55C2F5;
+  padding: 10px;
+  height: 10px;
+  min-width: 120px;
+  margin: 10px 0 0;
+}
 
+.sureBtn {
+  border: 1px solid #ff9430;
+  border-radius: 20px;
+  color: #ff9430;
+  padding: 10px;
+  height: 10px;
+  min-width: 120px;
+  margin: 0 15px 10px;
+}
 
+.colseBtn {
+  border: 1px solid #999;
+  border-radius: 20px;
+  color: #999;
+  padding: 10px;
+  height: 10px;
+  min-width: 120px;
+  margin: 0 15px 10px;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*.recharge-btn-sure:hover {
-  background: #eee;
-  color: #d94d37;
+.colseBtn:hover {
+  background: #666;
+  color: #fff;
   cursor: pointer;
-  }*/
+}
 
-  .min-tips-text {
-    width: 100%;
-    height: 20px;
-    /*text-indent: 30px;*/
-    padding-left: 5%;
-    font-size: 13px;
-    color: #999;
-    justify-content: flex-start;
-  }
+.sureBtn:hover {
+  background: #ff9430;
+  color: #fff;
+  cursor: pointer;
+}
 
-  .course-btn {
-    color: #42A5F5;
-    text-indent: 0px;
-  }
+.qrcode-box {
+  width: 100%;
+  flex-shrink: 0;
+  height: auto;
+}
 
-  .code-div {
-    width: 100%;
-    height: 40px;
-  }
+.logo-class {
+  width: 155px;
+  height: 47px;
+  /*  margin-left: -50px;*/
+}
 
-  .showWX {
-    background-color: #E8F8FF;
-    border: 1px solid #D9F3FF;
-    border-radius: 20px;
-    color: #55C2F5;
-    padding: 10px;
-    height: 10px;
-    min-width: 120px;
-    margin: 10px 0 0;
-  }
+.logo-class:hover {
+  cursor: pointer;
+}
 
-  .sureBtn {
-    border: 1px solid #ff9430;
-    border-radius: 20px;
-    color: #ff9430;
-    padding: 10px;
-    height: 10px;
-    min-width: 120px;
-    margin: 0 15px 10px;
-  }
+.pay-img {
+  width: 144px;
+  height: 44px;
+  margin: 0 30px;
+}
 
-  .colseBtn {
-    border: 1px solid #999;
-    border-radius: 20px;
-    color: #999;
-    padding: 10px;
-    height: 10px;
-    min-width: 120px;
-    margin: 0 15px 10px;
-  }
+.my-money {
+  color: #d94d37;
+  text-indent: 0px;
+}
 
-  .colseBtn:hover {
-    background: #666;
-    color: #fff;
-    cursor: pointer;
-  }
+.good-item {
+  box-sizing: border-box;
+  min-width: 75px;
+  max-width: 28.33%;
+  width: 75px;
+  height: 75px;
+  flex-shrink: 0;
+  flex-grow: 1;
+  background: #FFE8D2;
+  color: #D94D37;
+  margin: 5px 5% 0 0;
+  flex-wrap: wrap;
+  align-content: center;
+  border-radius: 8px;
+}
 
-  .sureBtn:hover {
-    background: #ff9430;
-    color: #fff;
-    cursor: pointer;
-  }
 
-  .qrcode-box {
-    width: 100%;
-    flex-shrink: 0;
-    height: auto;
-  }
 
-  .logo-class {
-    width: 155px;
-    height: 47px;
-    /*  margin-left: -50px;*/
-  }
 
-  .logo-class:hover {
-    cursor: pointer;
-  }
 
-  .pay-img {
-    width: 144px;
-    height: 44px;
-    margin: 0 30px;
-  }
 
-  .my-money {
-    color: #d94d37;
-    text-indent: 0px;
-  }
 
-  .good-item {
-    width: 18.6%;
-    height: 47px;
-    flex-shrink: 0;
-    flex-grow: 0;
-    background: #FFE8D2;
-    color: #D94D37;
-    margin-left: 5%;
-    /*  overflow-x: scroll;*/
-  }
 
-  .pay-item {
-    width: 26.3%;
-    height: 45px;
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin-left: 5%;
-    color: #353535;
-    font-size: 15px;
-    border: 1px solid rgba(0, 0, 0, .2);
-  }
 
-  .pay-icon {
-    max-width: 30px;
-    width: auto;
-    max-height: 26px;
-    height: auto;
-    margin-right: 2%;
-    flex-shrink: 1;
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*.good-item:nth-child(1){
+  margin: 10px 5% 0 5%;
+}*/
+
+.good-item-label {
+  width: 100%;
+  height: 40%;
+}
+
+.pay-item {
+  box-sizing: border-box;
+  max-width: 29.3%;
+  width: 29.3%;
+  min-width: 100px;
+  height: 45px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  /*margin-left: 5%;*/
+  margin-top: 5px;
+  margin-right: 3%;
+  color: #353535;
+  font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 8px;
+}
+
+.pay-icon {
+  max-width: 30px;
+  width: auto;
+  max-height: 26px;
+  height: auto;
+  margin-right: 2%;
+  flex-shrink: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*.i-ipnput {
   text-indent: 15px;
   }*/
 
-  .goods-box {
-    height: 50px;
-    width: 100%;
-    overflow: hidden;
-    justify-content: flex-start;
-    margin: 20px auto 5px;
-  }
+.goods-box {
+  min-height: 50px;
+  height: auto;
+  width: 95%;
+  padding-left: 5%;
+  overflow: hidden;
+  justify-content: flex-start;
+  margin: 20px auto 5px;
+  flex-wrap: wrap;
+}
 
-  .active-good {
-    /*color: red;*/
-    color: #fff;
-    background: #FF6B4E;
-  }
+.active-good {
+  /*color: red;*/
+  color: #fff;
+  background: #FF6B4E;
+}
 
-  .cancel {
-    box-sizing: border-box;
-    color: #353535;
-    background: rgba(223, 225, 229, 1);
-  }
+.cancel {
+  box-sizing: border-box;
+  color: #353535;
+  background: rgba(223, 225, 229, 1);
+}
 
-  .sure {
-    box-sizing: border-box;
-    color: #fff;
-    background: #FF6B4E;
-    /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
-  }
+.sure {
+  box-sizing: border-box;
+  color: #fff;
+  background: #FF6B4E;
+  /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
+}
 
-  .active-pay-type {
-    border: 1px solid #FF6B4E;
-    color: #FF6B4E;
-  }
+.active-pay-type {
+  border: 1px solid #FF6B4E;
+  color: #FF6B4E;
+}
 
-  .sure:hover {
-    box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
-  }
+.sure:hover {
+  box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
+}
 
-  .cancel:hover {
-    box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
-  }
+.cancel:hover {
+  box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
+}
 
-  .disable-pay-type {
-    color: rgba(0, 0, 0, .2);
-    cursor: not-allowed;
-  }
+.disable-pay-type {
+  color: rgba(0, 0, 0, .2);
+  cursor: not-allowed;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0;
+}
+
+
+/*.iconfont {
+  font-size: 20px;
+  margin: 0 10px;
+  color: #FF6B4E;
+}*/
+
+.marginbottom20 {
+  margin-bottom: 30px;
+}
+
+.agree-input-box {
+  margin: 0 auto 20px;
+  /*margin-bottom: 30px;*/
+  width: 100%;
+  height: 50px;
+  overflow: hidden;
+}
+
+.agree-label {
+  width: auto;
+  height: 100%;
+  min-width: 130px;
+  color: #666;
+  font-size: 15px;
+  margin: 0 10px;
+  /* justify-content: flex-start;*/
+}
+
+.input-defult {
+  width: auto !important;
+  flex-grow: 1;
+}
+
+.overHiden {
+  overflow: hidden;
+}
+
+.must {
+  font-weight: 600;
+  font-size: 13px;
+  color: red;
+}
+
+.not-must {
+  font-size: 12px;
+  color: #999;
+}
+
+.width90 {
+  width: 90% !important;
+}
 
 </style>

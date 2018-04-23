@@ -7,15 +7,15 @@
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="旧密码" class="i-ipnput" v-model="password">
+        <input type="text" placeholder="旧密码" class="i-ipnput" v-model="password" onfocus="this.type='password'">
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="设置新的密码" class="i-ipnput" v-model="newPassword">
+        <input type="text" placeholder="设置新的密码" class="i-ipnput" v-model="newPassword" onfocus="this.type='password'">
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="password" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword">
+        <input type="text" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword" onfocus="this.type='password'">
       </div>
       <div class="btn flex modifybtn" @click="_sublime">修改密码</div>
     </div>

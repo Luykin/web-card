@@ -94,16 +94,14 @@ export default {
       return list
     },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
     },
     handleCurrentChange(val) {
-      console.log(val - 1)
+      // console.log(val - 1)
       this.page = val - 1
       this._getOrders()
-      console.log(`当前页: ${val}`)
     },
     handleClick(row) {
-      console.log(row.pay_url)
+      // console.log(row.pay_url)
     },
     ...mapMutations({
       setToken: 'SET_TOKEN',
