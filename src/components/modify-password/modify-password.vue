@@ -7,15 +7,15 @@
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="text" placeholder="旧密码" class="i-ipnput" v-model="password" onfocus="this.type='password'">
+        <input type="password" placeholder="旧密码" class="i-ipnput" v-model="password" readonly onfocus="this.removeAttribute('readonly');" autocomplete='off' name='old-password'>
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="text" placeholder="设置新的密码" class="i-ipnput" v-model="newPassword" onfocus="this.type='password'">
+        <input type="password" placeholder="设置新的密码" class="i-ipnput" v-model="newPassword" readonly onfocus="this.removeAttribute('readonly');" autocomplete='off' name='new-password'>
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="text" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword" onfocus="this.type='password'">
+        <input type="password" placeholder="再次输入新的密码" class="i-ipnput" v-model="reNewPassword" readonly onfocus="this.removeAttribute('readonly');" autocomplete='off' name='new-repassword'>
       </div>
       <div class="btn flex modifybtn" @click="_sublime">修改密码</div>
     </div>
@@ -109,6 +109,14 @@ export default {
     })
   },
   components: {
+  },
+  watch:{
+    password(val, oldval) {
+      if (val.length >= oldval.length + 6) {
+        this.password = ''
+        this.$parent._open('请手动输入您的旧密码')
+      }
+    }
   }
 }
 

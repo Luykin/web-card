@@ -1,16 +1,90 @@
 <template>
-    <footer class="flex">
-      <div id="footer-item" class="footer-item font-max flex">联系我们</div>
-      <div id="footer-item" class="footer-item font-min flex">客服电话：13212399922</div>
-      <div id="footer-item" class="footer-item font-min flex">客服微信：fans10005</div>
-    </footer>
+  <footer class="flex new-footer">
+    <div class="footer-item flex shpc">
+      <div class="footer-item-title footer-item-item flex">商务合作</div>
+      <div class="footer-item-name footer-item-item flex">商务联系：张先生
+        <div class="interval flex">|</div>商务联系：张先生</div>
+      <div class="footer-item-name footer-item-item flex">联系邮箱：zhangheng@melon
+        <div class="interval flex">|</div>联系邮箱：zhangheng@melon</div>
+    </div>
+    <div class="footer-item flex shpc">
+      <div class="footer-item-title footer-item-item flex">商务合作</div>
+      <div class="footer-item-name footer-item-item flex">QQ联系: 42428852</div>
+    </div>
+    <div class="h-footer-title flex sh-phone">商务合作</div>
+    <div class="h-footer-box flex sh-phone">商务联系：张先生</div>
+    <div class="h-footer-box flex sh-phone">联系邮箱：zhangheng@melon</div>
+    <div class="border-f sh-phone"></div>
+    <div class="h-footer-box flex sh-phone">商务联系：钟先生</div>
+    <div class="h-footer-box flex sh-phone">联系邮箱：raynor@melonblo</div>
+    <div class="h-footer-title flex sh-phone">商务联系</div>
+    <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">42428852</span></div>
+  </footer>
 </template>
 <script type="text/javascript">
 export default {}
 
 </script>
 <style type="text/css" scoped>
-footer{
+.footer-item {
+  width: 50%;
+  height: 90%;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.footer-item-title {
+  font-size: 18px;
+}
+
+.footer-item-name {
+  font-size: 15px;
+}
+
+.footer-item-item {
+  height: 28%;
+  width: 100%;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+
+.interval {
+  height: 100%;
+  width: 100px;
+}
+
+.h-footer-title {
+  justify-content: flex-start;
+  height: 12%;
+  width: 100%;
+  color: #fff;
+  font-size: 16px;
+}
+
+.h-footer-title-q {
+  color: #999;
+}
+
+.h-footer-box {
+  justify-content: flex-start;
+  height: 12%;
+  width: 100%;
+  font-size: 13px;
+}
+
+.border-f {
+width: 100%;
+height: 1px;
+background-image: linear-gradient(to right, rgba(255,255,255,.2) 0%, rgba(255,255,255,.2) 50%, transparent 50%);
+background-size: 10px 1px;
+background-repeat: repeat-x;
+margin: 1% 0;
+}
+.c-y{
+  color: #F0C030;
+}
+
+/*footer{
   width: 100%;
   height: 125px;
   padding-top: 10px;
@@ -30,10 +104,9 @@ footer{
 }
 .font-max{
   font-size: 22px;
-  /*margin-top: 5px;*/
 }
 .font-min{
   font-size: 14px;
-/*  height: 25%;*/
-}
+}*/
+
 </style>

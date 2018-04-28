@@ -7,15 +7,15 @@
 			</div>
 			<div class="input-box flex">
 				<i class="iconfont icon-msnui-user"></i>
-				<input type="text" placeholder="手机号" class="i-ipnput" v-model="phone">
+				<input type="text" placeholder="手机号" class="i-ipnput" v-model="phone" autocomplete='off'>
 			</div>
 			<div class="input-box flex">
 				<i class="iconfont icon-mima"></i>
-				<input type="text" placeholder="设置新的密码" class="i-ipnput" v-model="password" onfocus="this.type='password'">
+				<input type="text" placeholder="设置新的密码" class="i-ipnput" v-model="password" onfocus="this.type='password'" autocomplete='off'>
 			</div>
 			<div class="input-box flex">
 				<i class="iconfont icon-mima"></i>
-				<input type="text" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" onfocus="this.type='password'">
+				<input type="text" placeholder="再次输入密码" class="i-ipnput" v-model="rePassword" onfocus="this.type='password'" autocomplete='off'>
 			</div>
 			<label class="input-box flex" foe='code-input'>
 				<i class="iconfont icon-fasongyoujian"></i>

@@ -40,6 +40,11 @@ export default new Router({
       component: () => import('components/score-record/score-record')
     },
     {
+      path: '/agent',
+      name: 'agent',
+      component: () => import('components/agent/agent')
+    },
+    {
       path: '/order',
       name: 'order',
       component: () => import('components/order/order'),

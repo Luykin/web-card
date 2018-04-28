@@ -43,6 +43,11 @@
   color: #d94d37 !important;
 }
 
+.is-active .agent-ul-li {
+  background: #FFD236 !important;
+  color: #333;
+}
+
 .el-submenu__title {
   font-size: 15px !important;
   font-family: 微软雅黑 !important;
@@ -196,15 +201,41 @@ button:hover {
 .el-pagination {
   background: #fff !important;
 }
-.el-date-editor.el-input, .el-date-editor.el-input__inner{
+
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner {
   width: 100% !important;
 }
-.time-select-item.selected:not(.disabled){
+
+.time-select-item.selected:not(.disabled) {
   color: #ff6b4e !important;
 }
-.el-date-table .el-date-table__row .current span{
+
+.el-date-table .el-date-table__row .current span {
   color: #fff !important;
 }
-.el-input--suffix .el-input__inner{
+
+.el-input--suffix .el-input__inner {
   padding-right: 0px !important;
+}
+
+.el-dialog__wrapper .el-dialog--center {
+  min-width: 290px !important;
+}
+
+.el-menu--horizontal .el-menu .el-menu-item,
+.el-menu--horizontal .el-menu .el-submenu__title {
+  padding: 0;
+  height: 40px;
+  /*justify-content: flex-end;*/
+}
+
+.el-menu--collapse .el-menu .el-submenu,
+.el-menu--popup {
+  min-width: 220px !important;
+}
+
+.el-menu-item.is-disabled {
+  cursor: pointer !important;
+  opacity: 1 !important;
 }

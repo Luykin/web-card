@@ -1,5 +1,5 @@
 <template>
-  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut, protocol:protocol}">
+  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut, protocol:protocol}" v-if="show">
     <slot></slot>
   </div>
 </template>
@@ -14,17 +14,23 @@ export default {
   data() {
     return {
       popupIn: false,
-      popupOut: false
+      popupOut: false,
+      show: false
     }
   },
   methods: {
     _showPopup() {
+      this.show = true
       this.popupIn = true
       this.popupOut = false
     },
     _hiddenPopup() {
       this.popupIn = false
       this.popupOut = true
+      let time = setTimeout(() => {
+        this.show = true
+        clearTimeout(time)
+      }, 500)
     }
   }
 }

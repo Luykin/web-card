@@ -34,7 +34,7 @@ export function debounce(func, delay) {
   }
 }
 export function getKey() {
-  const timestamp = parseInt(Date.parse(new Date()) / 10000) + ''
+  const timestamp = parseInt(Date.parse(new Date()) / 10000)
   const key = md5(timestamp + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', ''))
   return key
 }

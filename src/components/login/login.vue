@@ -7,17 +7,12 @@
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-msnui-user"></i>
-        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocomplete='on' @keyup.enter="_login" autofocus="autofocus">
+        <input type="text" placeholder="用户名" class="i-ipnput" v-model="phone" autocorrect="off" autocapitalize="off" @keyup.enter="_login" autofocus="autofocus" name="loginId">
       </div>
       <div class="input-box flex">
         <i class="iconfont icon-mima"></i>
-        <input type="text" placeholder="密码" class="i-ipnput" v-model="password" autocomplete='on' @keyup.enter="_login" onfocus="this.type='password'">
+        <input type="password" placeholder="密码" class="i-ipnput" v-model="password" autocorrect="off" autocapitalize="off" @keyup.enter="_login" name="password">
       </div>
-      <!--       <div class="input-box flex">
-        <i class="hover-out"></i>
-        <input type="text" placeholder="验证码" class="i-ipnput">
-        <i class="iconfont icon-duanxin"></i>
-      </div> -->
       <div class="btn flex modifybtn" @click="_login">登录</div>
       <div class="flex login-item">
         <router-link tag="span" class="forget cursor flex" to="/retrieve-password">忘记密码?</router-link>
@@ -37,32 +32,38 @@ import { SUCCESS_CODE } from 'api/config'
 export default {
   mixins: [normalMixin],
   data() {
-  return {
-    phone: this.$route.query.phone || '',
-    password: ''
-  }
-},
-created() {
-  this.$root.eventHub.$emit('canvas')
-},
-methods: {
-  _login() {
-    if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password)) {
-      return false
+    return {
+      phone: this.$route.query.phone || '',
+      password: ''
     }
-    const that = this
-    login(this.phone, this.password).then((res) => {
-      if (res.data.err_code === SUCCESS_CODE) {
-        if (res.data.data.user) {
-          that.setUser(res.data.data.user)
-          this.$parent._open('登录成功')
-          this.password = ''
-          that.$router.replace({
-            path: '/'
-          })
-        }
-        if (res.data.data.token) {
-          let tokenTime = +new Date() + 60 * 58 * 1000
+  },
+  created() {
+    this.$root.eventHub.$emit('canvas')
+  },
+  methods: {
+    _changePssword(str) {
+      return this._repeatStringNumTimes('*', str.length)
+    },
+    _repeatStringNumTimes(string, times) {
+      return times > 0 ? string.repeat(times) : ""
+    },
+    _login() {
+      if (!this._verifyPhone(this.phone) || !this._verifyPassword(this.password)) {
+        return false
+      }
+      const that = this
+      login(this.phone, this.password).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          if (res.data.data.user) {
+            that.setUser(res.data.data.user)
+            this.$parent._open('登录成功')
+            this.password = ''
+            that.$router.replace({
+              path: '/'
+            })
+          }
+          if (res.data.data.token) {
+            let tokenTime = +new Date() + 60 * 58 * 1000
             // localStorage.setItem('tokenTime', tokenTime)
             that.setTokenTime(tokenTime)
             that.setToken(res.data.data.token)
@@ -81,20 +82,19 @@ methods: {
           }
         }
       })
+    },
+    ...mapMutations({
+      setToken: 'SET_TOKEN',
+      setUser: 'SET_USER',
+      setTokenTime: 'SET_TOKENTIME'
+    })
   },
-  ...mapMutations({
-    setToken: 'SET_TOKEN',
-    setUser: 'SET_USER',
-    setTokenTime: 'SET_TOKENTIME'
-  })
-},
-components: {
-},
-watch: {
-  $route() {
-    this.phone = this.$route.query.phone
+  components: {},
+  watch: {
+    $route() {
+      this.phone = this.$route.query.phone
+    }
   }
-}
 }
 
 </script>

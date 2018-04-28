@@ -16,16 +16,44 @@
             <el-menu-item index="/none/1" v-show="user" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item>
-            <el-menu-item index="/none/2" v-show="user" class="disable">
+            <el-menu-item index="/agent" v-show="user" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
               <template slot="title">我的账户</template>
-              <el-menu-item index="/none" class='phone-item disable' v-show="user">{{user.phone}}</el-menu-item>
-              <el-menu-item index="/none" class='phone-item disable' v-show="user">我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
-              <el-menu-item index="/modify-password" v-show="user">修改密码</el-menu-item>
-              <el-menu-item index="/none" class='disable' v-show="user">
-                <div class="log-out-min log-out" @click="_logout($event)">注销</div>
+              <el-menu-item index="/none" class='phone-item disable flex agent-item' v-show="proxyRank && user" disabled>
+                <!-- {{proxyRank}} -->
+                <div class="agent-ul-warp flex cursor">
+                  代理等级: {{proxyRank}}
+                  <img :src="proxyIcon" v-if="proxyIcon" class="proxy-icon">
+                </div>
+                <div class="agent-border-bootom cursor"></div>
+              </el-menu-item>
+              <el-menu-item index="/none" class='phone-item flex' v-show="user" disabled>
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">我的账户</div>
+                  <div class="agent-ul-li-right flex ellipsis">{{userPhone}}</div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/none" class='phone-item flex' v-show="user" disabled>
+                <!-- 我的积分<span class="green-text">{{user.score}}</span> -->
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">我的积分</div>
+                  <div class="agent-ul-li-right flex ellipsis">{{user.score}}</div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/modify-password" v-show="user" class='flex'>
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">修改密码</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/none" class=' flex' v-show="user" disabled>
+                <!-- <div class="log-out-min log-out" @click="_logout($event)">注销</div> -->
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis" @click="_logout($event)">注销</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
               </el-menu-item>
             </el-submenu>
             <el-menu-item index="/login" v-show="!user">登录帐号</el-menu-item>
@@ -58,7 +86,7 @@
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item>
-            <el-menu-item index="/none/2" v-show="user" class='disable'>
+            <el-menu-item index="/agent" v-show="user" class='disable'>
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
@@ -66,7 +94,8 @@
               <template slot="title">
                 <i class="iconfont icon-zhanghu"></i> 我的账户
               </template>
-              <el-menu-item index="/none" class='phone-item disable'>{{user.phone}}</el-menu-item>
+              <el-menu-item index="/none" class='phone-item disable' v-show="proxyRank">{{proxyRank}}</el-menu-item>
+              <el-menu-item index="/none" class='phone-item disable'>{{userPhone}}</el-menu-item>
               <el-menu-item index="/none" class='phone-item disable'><i class="iconfont icon-jifen"></i>我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
               <el-menu-item index="/modify-password">修改密码</el-menu-item>
               <el-menu-item index="/none" class='disable'>
@@ -112,7 +141,7 @@
         <!-- <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img"> -->
         <div class="flex input-defult width90" v-show="!payUrl">
           <!-- onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" -->
-          <input type="text" :placeholder="'请输入充值金额（元）'" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder">
+          <input type="text" :placeholder="'请输入充值金额（元）'" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder" autocomplete='off' autofocus='on'>
         </div>
         <div class="min-tips-text flex" v-show="!payUrl&&((money&& money>=Math.ceil(app.min_recharge)) || choseGood)">充值<span class="my-money">{{money|| choseGood.price}}</span>元等于<span class="course-btn">{{Math.ceil(money*scorerate) || choseGood.score}}</span>积分</div>
         <div class="min-tips-text flex" v-show="!payUrl&&(!money || money<Math.ceil(app.min_recharge)) && !choseGood">最小充值金额为<span class="my-money">{{Math.ceil(app.min_recharge)}}</span>元。</div>
@@ -131,15 +160,61 @@
     <!-- 2018.04.21-申请代理 -->
     <popup ref='agent' :protocol='true'>
       <div v-show='!hadAgree'>
-        <div class="recharge-box-title flex">申请代理用户协议</div>
-        <div class="agreement-content">重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公重庆疾风科技有限公司成立于2016年2月，是一家专注移动互联网产品研发的科技型创新企业。我们以高科技技术为起点，技术为核心，以强大的技术团队为砥柱，致力于为用户创造更好的移动互联网产品。我们拥有战略投资伙伴、一流的技术实力和专业的人才，在开发传统互联网产品领域方面保持领先地位。疾风科技旗下产品服务数千万用户，成为西南地区为数不多的用户数跨越千万用户大关的移动互联网公</div>
+        <div class="recharge-box-title-agent flex">代理合作协议</div>
+        <div class="agreement-content">
+          <p>尊敬的用户您好，感谢您使用“星空网红助手平台”网站及相关服务！ 根据《中华人民共和国合同法》及相关法律法规的规定，用户和星空网红助手平台（以下简称我平台）双方本着自愿、平等、诚信的原则，就用户购买星空网红助手平台相关服务及有关事宜达成如下条款:</p>
+          <div class="agreement-content-title flex">第一条 代理服务内容</div>
+          <p>1、我平台同意该用户代理销售相关互联网在线服务，我平台将全力支持配合用户的销售行为。</p>
+          <p> 2、用户的具体可销售服务内容和产品价格，以网站当前实际报价为准。</p>
+          <div class="agreement-content-title flex">第二条 代理费用及支付</div>
+          <p>1、用户需缴纳代理费用方可成为我平台代理，获取代理服务销售价格和相关支持。代理费用为年费，仅为一年的使用费用。</p>
+          <p>2、我平台给用户提供的服务费用，采取预付费的形式进行结算，以用户使用服务等功能的实际价格进行收取。</p>
+          <p>3、用户的实际购买价格折扣，根据用户的代理等级有不同折扣，实际折扣以当前实际情况为准。</p>
+          <div class="agreement-content-title flex">第三条 用户的权利及义务</div>
+          <p>1、用户按本协议约定享有我平台产品服务的使用权、产品升级服务及客户服务。</p>
+          <p>2、用户购买我平台产品服务，应按本协议的约定按时向我平台支付相应的服务费用。</p>
+          <p>3、用户必须遵守国家有关法律、法规的规定，不得利用我平台服务从事国家法律法规所禁止的活动，并对利用我平台服务使用行为及数据内容的合法性承担完全责任。</p>
+          <p>4、如我平台服务与本协议约定及官方公布的条款或内容不符，用户有权单方提前终止我平台服务的使用，并可申请退还截至终止之日至尚未抵扣的费用。</p>
+          <div class="agreement-content-title flex">第四条 “星空网红助手平台”的权利及义务 </div>
+          <p>1、我平台按本协议约定向用户提供技术服务及本协议约定的产品升级服务。</p>
+          <p> 2、我平台将持续对我平台的服务平台提供升级服务，包括且不限于：功能优化、功能新增、第三方集成插件等功能和服务，相关升级服务将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效方式通知用户。 </p>
+          <p>3、我平台将基于我平台服务质量提升的考虑，可能调整或优化服务内容或服务方式，所有调整或优化的服务内容和服务方式将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效的方式通知用户。</p>
+          <p>4、我平台服务平台在协议约定版本内的我平台自行开发或拥有知识产权的功能优化、功能新增等升级服务将免费为用户提供。</p>
+          <p>5、我平台对用户使用我平台服务的数据实行 7*24 小时技术支持。如果发现用户出现非法行为，我平台有权冻结用户账号直至用户查清停止非法行为为止，同时用户应积极配合自查非法行为，将信息准确提供给我平台以备国家相关监管部门审查。 </p>
+          <div class="agreement-content-title flex">第五条 费用续费和协议延续</div>
+          <p>1、用户需在其已经确认的订单的服务期满前 30 日内确认是否续费，用户已支付的订单服务期满且未在 30 日内完成续费订单确认及费用支付的，我平台有权在用户确认的订单服务期满后中止向用户服务，但我平台产品服务平台会将用户账号中的数据自到期之日起保存30 天，此期间称为保留期。 </p>
+          <p>2、如用户在保留期内完成续费订单确认及费用支付的，我平台将恢复用户的服务及账号中的数据，在保留期内未及时完成续费订单确认及费用支付的，我平台将在保留期结束后不再保存用户账号中的数据，由此造成的一切后果由用户自行承担。 </p>
+          <p>3、保留期满后用户仍未完成续费订单确认及费用支付的，本协议自动终止。如用户仍有预付款未抵扣的，视为用户放弃上述预付款 </p>
+          <div class="agreement-content-title flex">第六条 保密条款 </div>
+          <p>1、保密信息指双方合作过程中由披露方向接收方披露的所有保密信息，包括但不限于商业计划、客户信息、服务协议、技术数据、产品构思、产品价格、职员名单、操作手册等。</p>
+          <p>2、保密信息还包括用户使用我平台产生的数据及相关内容，以及涉及我平台与本协议有关的所有信息，包括但不限于我平台的服务内容、优惠费率等。 </p>
+          <p>3、用户和我平台双方不得将保密信息向第三方或者公众透露，否则承担由此给保密信息所有方造成的一切损失。 </p>
+          <p>4、保密责任不因本协议的终止而终止。 </p>
+          <div class="agreement-content-title flex">第七条 知识产权 </div>
+          <p>1、 我平台完全拥有我平台服务及产品的全部知识产权（包括但不限于版权、商标权、专利权及商业秘密等），用户签署本协议后并未拥有产品的所有权。我平台的名字、标志、LOGO、产品名字等属于我平台，未经我平台授权，其他方不得使用。 </p>
+          <p>2、用户完全拥有在使用我平台服务过程中产生的数据及相关内容的所有权，除法律允许的情况下，我平台不得使用用户的文件数据及相关内容。 </p>
+          <div class="agreement-content-title flex">第八条 不可抗力 </div>
+          <p>1、因不可抗力事件，致使一方无法履行本协议，发生不可抗力的一方有权提前终止本协议，在不可抗力的影响范围内得以免除责任，但应在上述情况发生后 5 个工作日内书面通知并提供有效证明。</p>
+          <p>2、不可抗力事件包括但不限于：国家政策调整、机房中继线路调整、电信运营商机房维护检修、网络互联互通链接不通畅、电信运营商政策调整与影响。</p>
+          <p>3、鉴于我平台为基于互联网应用的产品服务平台的特殊性，因黑客、病毒、电信部门技术调整等引起的事件，用户亦认同不属于我平台违约。但我平台应尽最大努力保护用户权益并在事件结束后立即恢复服务。</p>
+          <div class="agreement-content-title flex">第九条 违约责任 </div>
+          <p> 1、违约金条款适用于正式的付费服务周期。</p>
+          <p> 2、除本协议另有约定外，任何一方违反本协议而使另一方发生任何费用或开支或额外责任或遭受损失的，违约方应在收到非违约方书面通知之日起十个工作日内就该费用、开支、责任或损失，给予非违约方赔偿。 </p>
+          <p>3、如用户违反本协议及附件相关约定，我平台有权提前解除服务协议，并不退还用户所支付的服务费用；如给我平台造成损失的，用户应当赔偿我平台实际发生的损失。</p>
+          <p>4、如我平台所提供的服务和本协议及附件相关约定不符，用户有权提前解除协议，我平台退还用户所支付的服务费用</p>
+          <div class="agreement-content-title flex">第十条 争议及解决 </div>
+          <p>用户及我平台就本协议的任何争议须友好协商。如协商不成，用户及我平台均可向被告方所在地人民法院起诉。本协议之签署、效力、解释和执行以及本协议项下争议之解决均应适用中国法律</p>
+          <div class="agreement-content-title flex">第十一条 其他 </div>
+          <p>1、对于以上《代理合作协议》的各项内容，用户已全文阅读并完全理解。</p>
+          <p>2、本协议的版权为我平台所有，我平台保留一切解释和修改的权利，并在修改后通知用户。</p>
+        </div>
         <div class="recharge-btn-box-after flex bottom">
-          <div class="recharge-btn-sure-after flex sure cursor" @click='_agree'>同意并继续</div>
+          <div class="recharge-btn-sure-after flex sure-agent cursor" @click='_agree'>同意并继续</div>
           <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
         </div>
       </div>
       <div v-show='hadAgree'>
-        <div class="recharge-box-title flex marginbottom20">提交代理申请</div>
+        <div class="recharge-box-title-agent flex">提交代理申请</div>
         <div class="agreement-content overHiden">
           <div class="flex agree-input-box">
             <div class="agree-label flex ellipsis">公司简称<span class="must">*</span></div>
@@ -173,11 +248,15 @@
           </div>
         </div>
         <div class="recharge-btn-box-after flex bottom">
-          <div class="recharge-btn-sure-after flex sure cursor" @click="_sublimeAgree">提交申请</div>
+          <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_sublimeAgree">提交申请</div>
           <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
         </div>
       </div>
     </popup>
+    <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
+      <div class="dialog-min-text flex">{{dialogText}}</div>
+      <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
+    </el-dialog>
   </div>
 </template>
 <script type="text/javascript" scoped>
@@ -211,12 +290,20 @@ export default {
       activePayType: false,
       env: '主页',
       time: false,
-      hadAgree: false
+      hadAgree: false,
+      centerDialogVisible: false,
+      dialogText: '',
+      dialogTitle: '',
+      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
+      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
   created() {
     this.$root.eventHub.$on('user', () => {
       this._updataUser()
+    })
+    this.$root.eventHub.$on('agent', () => {
+      this._toShowAgent()
     })
     this.$root.eventHub.$on('env', () => {
       this.env = '测试环境'
@@ -245,6 +332,27 @@ export default {
     payType() {
       return this.activePayType === 'wx' ? '微信' : this.activePayType === 'ali' ? '支付宝' : this.activePayType === 'qq' ? '腾讯' : this.activePayType
     },
+    proxyRank() {
+      if (this.user && this.user.agency && this.user.agency.level > 0) {
+        return this.rank[this.user.agency.level - 1]
+      } else {
+        return '普通用户'
+      }
+    },
+    proxyIcon() {
+      if (this.user && this.user.agency && this.user.agency.level > 0) {
+        return this.iconList[this.user.agency.level - 1]
+      } else {
+        return false
+      }
+    },
+    userPhone() {
+      if (this.user) {
+        return this._formatUserPhone(this.user.phone)
+      } else {
+        return '未登录'
+      }
+    },
     ...mapGetters([
       'user',
       'token',
@@ -254,6 +362,11 @@ export default {
     ])
   },
   methods: {
+    _formatUserPhone(phone) {
+      const start = phone.slice(0, 3)
+      const end = phone.slice(-4)
+      return start + '****' + end
+    },
     _sublimeAgree() {
       if (!this.companyName) {
         this.$parent._open('请填写公司简称')
@@ -295,7 +408,11 @@ export default {
         if (res.data.err_code === SUCCESS_CODE) {
           this.companyName = ''
           this.$root.eventHub.$emit('user')
-          this.$parent._open('代理申请成功，我们商务人员将会在1~2个工作内与你联系。')
+          // this.$parent._open('代理申请成功，我们商务人员将会在1~2个工作内与你联系。')
+          // 我们的商务人员将在24小时内进行联系您! 请您耐心等待!
+          this.dialogTitle = '你的代理申请已成功提交！'
+          this.dialogText = '我们的商务人员将在24小时内进行联系您! 请您耐心等待!'
+          this.centerDialogVisible = true
           this._hiddenAgent()
         } else {
           if (res.data.err_msg) {
@@ -410,6 +527,7 @@ export default {
       if (!this.checkTock()) {
         return false
       }
+      this.money = ''
       getUserInfo(this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(res.data.data)
@@ -546,19 +664,25 @@ export default {
         this.$refs.popup._showPopup()
         this.$refs.interlayer._setZIndex(9999)
         this.$refs.interlayer._showLayer()
-        this.$refs.input.focus()
+        if (this.$refs.input) {
+          this.$refs.input.focus()
+        }
       })
     },
     _showAgent(e) {
-      if (e) {
-        e.stopPropagation()
-      }
+      this.$router.replace({
+        path: '/agent'
+      })
+    },
+    _toShowAgent() {
       if (this.user.is_agency) {
-        this.$parent._open('代理已申请，无需重复申请，我们商务人员将会在1~2个工作内与你联系。')
+        this.dialogTitle = '您已提交过申请'
+        this.dialogText = '无需重复申请, 我们的商务人员将在24小时内进行联系您! 请您耐心等待!'
+        this.centerDialogVisible = true
+        // this.$parent._open('代理已申请，无需重复申请，我们商务人员将会在1~2个工作内与你联系。')
         return false
       }
       this.$nextTick(() => {
-        // this._countdown()
         this.agent = true
         this.$refs.agent._showPopup()
         this.$refs.interlayer._setZIndex(9999)
@@ -698,23 +822,96 @@ export default {
   flex-grow: 1;
 }
 
+.disable:hover {
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*start ---改写我的账户下拉窗 2018.04.27*/
+
 .phone-item {
-  color: #777 !important;
+  color: #000 !important;
   font-size: 13px;
+  height: 50px;
 }
 
 .phone-item:hover {
-  color: #777 !important;
+  color: #000 !important;
 }
+
+.agent-item {
+  height: 70px !important;
+  width: 100%;
+  flex-wrap: wrap;
+  /*border-bottom: 1px solid red;*/
+  position: relative;
+}
+
+.agent-ul-warp {
+  width: 86%;
+  height: 55%;
+  border-radius: 5px;
+  background: #FFD236;
+  color: #000;
+  font-size: 14px;
+  transform: translate(0, -15%);
+}
+
+.agent-border-bootom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  background: rgba(0, 0, 0, .1);
+}
+
+.agent-ul-li {
+  box-sizing: content-box;
+  min-width: 100%;
+  height: 100%;
+  font-size: 14px;
+}
+
+.agent-ul-li:hover {
+  background: #FFD236 !important;
+}
+
+.agent-ul-li-left {
+  width: 35%;
+  height: 100%;
+  justify-content: flex-start;
+  padding-left: 5%;
+}
+
+.agent-ul-li-right {
+  width: 55%;
+  height: 100%;
+  justify-content: flex-end;
+  padding-right: 5%;
+}
+
+
+
+/*end ---改写我的账户下拉窗*/
 
 .icon-jifen {
   color: #777 !important;
 }
 
-.disable {
-  cursor: default;
-  pointer-events: none;
-}
 
 .iconfont {
   color: #000;
@@ -769,14 +966,23 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, .2);
 }
 
+.recharge-box-title-agent {
+  width: 100%;
+  height: 70px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  background: #FFD236;
+}
+
 .agreement-content {
   width: 82%;
   height: auto;
   min-height: 20px;
-  max-height: 500px;
+  /*  max-height: 500px;*/
   margin: 20px auto 100px;
   font-size: 15px;
-  text-indent: 20px;
   line-height: 26px;
   font-weight: normal;
   overflow-y: scroll;
@@ -941,34 +1147,6 @@ export default {
   border-radius: 8px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*.good-item:nth-child(1){
-  margin: 10px 5% 0 5%;
-}*/
-
 .good-item-label {
   width: 100%;
   height: 40%;
@@ -1001,34 +1179,6 @@ export default {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*.i-ipnput {
-  text-indent: 15px;
-  }*/
-
 .goods-box {
   min-height: 50px;
   height: auto;
@@ -1059,6 +1209,12 @@ export default {
   /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
 }
 
+.sure-agent {
+  box-sizing: border-box;
+  color: #000;
+  background: #FFD236;
+}
+
 .active-pay-type {
   border: 1px solid #FF6B4E;
   color: #FF6B4E;
@@ -1081,6 +1237,35 @@ export default {
   position: absolute;
   bottom: 0;
 }
+
+.agreement-content-title {
+  width: 100%;
+  height: 40px;
+  font-size: 18px;
+  color: #000;
+  justify-content: flex-start;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*.iconfont {
@@ -1133,6 +1318,31 @@ export default {
 
 .width90 {
   width: 90% !important;
+}
+
+.dialog-min-text {
+  width: 100%;
+  height: auto;
+  line-height: 20px;
+  min-height: 20px;
+  font-size: 15px;
+  color: #999;
+}
+
+.dialog-min-btn {
+  width: 40%;
+  padding: 2% 0;
+  border-radius: 5px;
+  background: #FFD236;
+  color: #000;
+  font-size: 15px;
+  margin: 5% auto 0;
+}
+
+.proxy-icon {
+  max-width: 20px;
+  height: auto;
+  margin: 0 5px;
 }
 
 </style>

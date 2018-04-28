@@ -55,6 +55,7 @@
         </div>
         <div class="select-item">
           <div class="select-item-label flex ellipsis">数量</div>
+          <div class="num-limiit" v-if="nowServices">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
           <div class="flex input-defult">
             <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
           </div>
@@ -71,18 +72,23 @@
         <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
         <div class="rule-hints flex ellipsis">
           <span class="rh-title">所需积分:</span>
-          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}} <span v-if="user.discount!==1 && user">{{'* ' + (user.discount || 1)*10 + '折'}}</span> = {{consumeNum + '积分'}}</span>
+          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '积分'}}</span>
+          <!-- <span v-if="user.discount!==1 && user">{{'* ' + (user.discount || 1)*10 + '折'}}</span> -->
         </div>
         <div class="rule-hints flex ellipsis">
           <span class="rh-title">剩余积分:</span>
           <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
         </div>
-        <div class="rule-hints flex ellipsis">
-          <span class="rh-title">下单范围:</span>
-          <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span no-indent">-最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span>
+        <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level">
+          <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
+          <!-- <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span no-indent">-最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span> -->
         </div>
       </div>
       <div class="btn flex" @click="_sublime(nowServices.category)">提交订单</div>
+      <div class="agent-box" v-if="false">
+        <div class="main-box-header flex agent-box-title">
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -114,8 +120,10 @@ export default {
       pc: true,
       choseSay: false,
       sublimeTime: false,
+      // agencyPrice: null,
       position: 'right',
       closeName: '关闭',
+      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 86400000
@@ -160,6 +168,13 @@ export default {
       }
       return nowServer
     },
+    proxyRank() {
+      if (this.user && this.user.agency && this.user.agency.level) {
+        return this.rank[this.user.agency.level - 1]
+      } else {
+        return '普通用户'
+      }
+    },
     placeholder() {
       if (this.nowServices) {
         return this.nowServices.category > 0 && this.nowServices.category < 10 ? '请按教程输入QQ号' : this.nowServices.category === 24 || this.nowServices.category === 25 ? '请按教程粘贴快手ID' : '请按教程粘贴链接'
@@ -167,7 +182,15 @@ export default {
       return '请按教程粘贴链接'
     },
     consumeNum() {
-      return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.discount || 1))
+      return Math.ceil((this.quantity || 0) * this.nowServices.rate)
+      // * (this.user.discount || 1))
+    },
+    agencyPrice() {
+      if (this.user.agency_level) {
+        return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.agency_level.discount || 1))
+      } else {
+        return Math.ceil((this.quantity || 0) * this.nowServices.rate)
+      }
     },
     ...mapGetters([
       'user',
@@ -281,24 +304,36 @@ export default {
         this.sublimeTime = this.orderTimeD / 1000 + H + M
         // return false
       }
-      if (this.consumeNum > this.user.score) {
-        this.$parent._open('积分不足')
-        this.$root.eventHub.$emit('showPopup')
-        return false
+      let price
+      if (this.user.agency && this.user.agency_level.discount < 1) {
+        // agencyPrice
+        if (this.agencyPrice > this.user.score) {
+          this.$parent._open('积分不足')
+          this.$root.eventHub.$emit('showPopup')
+          return false
+        }
+        price = this.agencyPrice
+      } else {
+        if (this.consumeNum > this.user.score) {
+          this.$parent._open('积分不足')
+          this.$root.eventHub.$emit('showPopup')
+          return false
+        }
+        price = this.consumeNum
       }
       if (category === 2 || category === 4) {
-        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
           this._afterAddtask(res)
         })
         return true
       }
       if (category === 24 || category === 25) {
-        addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
+        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
           this._afterAddtask(res)
         })
         return true
       }
-      addTask(this.consumeNum, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
+      addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
         this._afterAddtask(res)
       })
     },
@@ -897,6 +932,24 @@ export default {
 
 .no-border:hover {
   animation: none !important;
+}
+
+.agent-box-title {
+  justify-content: center;
+}
+
+.agent-box-title-label {
+  width: 50%;
+  height: 40%;
+  border-radius: 1000px;
+  background: #ff6b4e;
+  color: #fff;
+}
+
+.num-limiit {
+  text-indent: 10px;
+  color: #999;
+  font-size: 13px;
 }
 
 </style>
