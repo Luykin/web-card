@@ -55,10 +55,11 @@
         </div>
         <div class="select-item">
           <div class="select-item-label flex ellipsis">数量</div>
-          <div class="num-limiit" v-if="nowServices">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-          <div class="flex input-defult">
+          <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+          <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
             <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
           </div>
+          <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
         </div>
         <div class="select-item">
           <div class="select-item-label flex ellipsis">业务</div>
@@ -77,7 +78,7 @@
         </div>
         <div class="rule-hints flex ellipsis">
           <span class="rh-title">剩余积分:</span>
-          <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
+          <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
         </div>
         <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level">
           <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
@@ -120,6 +121,7 @@ export default {
       pc: true,
       choseSay: false,
       sublimeTime: false,
+      netWorking: false,
       // agencyPrice: null,
       position: 'right',
       closeName: '关闭',
@@ -158,13 +160,18 @@ export default {
   },
   computed: {
     nowServices() {
-      let nowServer
+      let nowServer = {
+        submit_category: 1
+      }
       if (this.showService) {
         this.showService.forEach((item) => {
           if (item.id === this.choseServiceValue) {
             nowServer = item
           }
         })
+      }
+      if (nowServer.submit_category === 2) {
+        this.quantity = nowServer.min_num
       }
       return nowServer
     },
@@ -242,6 +249,10 @@ export default {
       }
     },
     _sublime(category) {
+      if (this.netWorking) {
+        this.$parent._open('提交中,请勿重复提交')
+        return false
+      }
       if (this.choseServiceValue === '' || !this.choseServiceValue) {
         this.$parent._open('未知错误')
         return false
@@ -305,7 +316,7 @@ export default {
         // return false
       }
       let price
-      if (this.user.agency && this.user.agency_level.discount < 1) {
+      if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
         // agencyPrice
         if (this.agencyPrice > this.user.score) {
           this.$parent._open('积分不足')
@@ -333,6 +344,7 @@ export default {
         })
         return true
       }
+      this.netWorking = true
       addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
         this._afterAddtask(res)
       })
@@ -342,6 +354,7 @@ export default {
       this.orderTimeS = ''
       this.link = ''
       this.quantity = ''
+      this.netWorking = false
       this.targetid = false
       this.sublimeTime = false
       if (res.data.err_code === SUCCESS_CODE) {
@@ -471,6 +484,7 @@ export default {
         this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
       }
       this.link = ''
+      this.quantity = ''
       this.suosuo = false
       this.activeCategory = id
       if (!this.pc) {
@@ -492,6 +506,7 @@ export default {
     },
     _clear() {
       this.link = ''
+      this.quantity = ''
       this.suosuo = false
       if (!this.pc) {
         return
@@ -902,6 +917,16 @@ export default {
 
 .i-ipnput {
   text-indent: 15px;
+}
+
+.i-input-disable {
+  width: 100%;
+  height: 45px;
+  justify-content: flex-start;
+  text-indent: 15px;
+  font-size: 15px;
+  color: rgba(0, 0, 0, .4);
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
 }
 
 .rh-title {

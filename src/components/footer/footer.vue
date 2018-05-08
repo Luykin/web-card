@@ -2,23 +2,26 @@
   <footer class="flex new-footer">
     <div class="footer-item flex shpc">
       <div class="footer-item-title footer-item-item flex">商务合作</div>
-      <div class="footer-item-name footer-item-item flex">商务联系：张先生
-        <div class="interval flex">|</div>商务联系：张先生</div>
-      <div class="footer-item-name footer-item-item flex">联系邮箱：zhangheng@melon
-        <div class="interval flex">|</div>联系邮箱：zhangheng@melon</div>
+      <div class="footer-item-name footer-item-item flex">商务联系：张先生</div>
+      <div class="footer-item-name footer-item-item flex">联系邮箱：zhangheng@melonblock.com</div>
+    </div>
+    <div class="footer-item flex shpc">
+      <div class="footer-item-title footer-item-item flex"></div>
+      <div class="footer-item-name footer-item-item flex">商务联系：钟先生</div>
+      <div class="footer-item-name footer-item-item flex">联系邮箱：raynor@melonblock.com</div>
     </div>
     <div class="footer-item flex shpc">
       <div class="footer-item-title footer-item-item flex">商务合作</div>
-      <div class="footer-item-name footer-item-item flex">QQ联系: 42428852</div>
+      <div class="footer-item-name footer-item-item flex">QQ联系: 42428851</div>
     </div>
     <div class="h-footer-title flex sh-phone">商务合作</div>
     <div class="h-footer-box flex sh-phone">商务联系：张先生</div>
-    <div class="h-footer-box flex sh-phone">联系邮箱：zhangheng@melon</div>
+    <div class="h-footer-box flex sh-phone">联系邮箱：zhangheng@melonblock.com</div>
     <div class="border-f sh-phone"></div>
     <div class="h-footer-box flex sh-phone">商务联系：钟先生</div>
-    <div class="h-footer-box flex sh-phone">联系邮箱：raynor@melonblo</div>
+    <div class="h-footer-box flex sh-phone">联系邮箱：raynor@melonblock.com</div>
     <div class="h-footer-title flex sh-phone">商务联系</div>
-    <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">42428852</span></div>
+    <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">42428851</span></div>
   </footer>
 </template>
 <script type="text/javascript">
@@ -27,7 +30,7 @@ export default {}
 </script>
 <style type="text/css" scoped>
 .footer-item {
-  width: 50%;
+  width: 30%;
   height: 90%;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -53,6 +56,11 @@ export default {}
   width: 100px;
 }
 
+
+/*.max-length{
+  width: 200px;
+}*/
+
 .h-footer-title {
   justify-content: flex-start;
   height: 12%;
@@ -73,16 +81,18 @@ export default {}
 }
 
 .border-f {
-width: 100%;
-height: 1px;
-background-image: linear-gradient(to right, rgba(255,255,255,.2) 0%, rgba(255,255,255,.2) 50%, transparent 50%);
-background-size: 10px 1px;
-background-repeat: repeat-x;
-margin: 1% 0;
+  width: 100%;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, .2) 0%, rgba(255, 255, 255, .2) 50%, transparent 50%);
+  background-size: 10px 1px;
+  background-repeat: repeat-x;
+  margin: 1% 0;
 }
-.c-y{
+
+.c-y {
   color: #F0C030;
 }
+
 
 /*footer{
   width: 100%;

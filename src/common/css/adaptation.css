@@ -28,13 +28,6 @@
   .agreement-content {
     max-height: 500px;
   }
-  .sh-phone {
-    height: 0 !important;
-    width: 0 !important;
-    opacity: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
   .btn-agent {
     min-width: 140px !important;
     min-height: 40px !important;
@@ -45,6 +38,14 @@
     max-width: 20%;
     flex-grow: 1;
     margin: 20px 0;
+  }
+  .sh-phone {
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: -999 !important;
   }
   .new-footer {
     height: 220px;
@@ -57,13 +58,13 @@
   .agent-body-privilege-warp {
     background: url('http://p70pqu6ys.bkt.clouddn.com/bg02.png') no-repeat;
   }
-  .title-img{
+  .title-img {
     max-height: 75px;
   }
 }
 
 @media screen and (max-width: 769px) {
-  .title-img{
+  .title-img {
     max-height: 50px;
   }
   .agent-body-privilege-warp {
@@ -124,14 +125,6 @@
   .ai-content-title {
     font-size: 12px !important;
   }
-  .sh-phone {}
-  .shpc {
-    height: 0 !important;
-    width: 0 !important;
-    opacity: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
   .btn-agent {
     bottom: 6% !important;
     font-size: 13px !important;
@@ -139,6 +132,15 @@
   .agree-label {
     font-size: 13px !important;
     justify-content: flex-end !important;
+  }
+  .sh-phone {}
+  .shpc {
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: -999 !important;
   }
   .business-item {
     width: 21%;

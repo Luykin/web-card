@@ -205,8 +205,8 @@
           <div class="agreement-content-title flex">第十条 争议及解决 </div>
           <p>用户及我平台就本协议的任何争议须友好协商。如协商不成，用户及我平台均可向被告方所在地人民法院起诉。本协议之签署、效力、解释和执行以及本协议项下争议之解决均应适用中国法律</p>
           <div class="agreement-content-title flex">第十一条 其他 </div>
-          <p>1、对于以上《代理合作协议》的各项内容，用户已全文阅读并完全理解。</p>
-          <p>2、本协议的版权为我平台所有，我平台保留一切解释和修改的权利，并在修改后通知用户。</p>
+          <p>本协议的版权为我平台所有，我平台保留一切解释和修改的权利，并在修改后通知用户。</p>
+          <p class="font-weight-agent">对于以上《代理合作协议》的各项内容，用户已全文阅读并完全理解。</p>
         </div>
         <div class="recharge-btn-box-after flex bottom">
           <div class="recharge-btn-sure-after flex sure-agent cursor" @click='_agree'>同意并继续</div>
@@ -313,6 +313,9 @@ export default {
     })
     this.$root.eventHub.$emit('canvas')
     // this._getAppInfo(this)
+    this.telephone = this.user.phone || ''
+    this.choseGoodId = this.app.goods[0].id || -1
+    this.activePayType = 'wx'
   },
   computed: {
     choseGood() {
@@ -762,6 +765,13 @@ export default {
       setTokenTime: 'SET_TOKENTIME'
     })
   },
+  watch: {
+    money(val, oldval) {
+      if (val.length >= oldval.length + 6 || isNaN(val)) {
+        this.money = ''
+      }
+    }
+  },
   components: {
     sidebar,
     interlayer,
@@ -840,6 +850,8 @@ export default {
 
 
 
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -903,6 +915,8 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
 
 
 
@@ -1247,33 +1261,6 @@ export default {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*.iconfont {
-  font-size: 20px;
-  margin: 0 10px;
-  color: #FF6B4E;
-}*/
-
 .marginbottom20 {
   margin-bottom: 30px;
 }
@@ -1343,6 +1330,16 @@ export default {
   max-width: 20px;
   height: auto;
   margin: 0 5px;
+}
+
+.font-weight-agent {
+  font-weight: 600;
+}
+
+.agreement-content {
+  /*border-bottom: 1px solid rgba(0,0,0,.1);
+*/
+  /*  box-shadow: 0 2px 1px rgba(0,0,0,.1);*/
 }
 
 </style>
