@@ -15,8 +15,8 @@
       <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
         <el-table-column prop="label" label="业务" width="140" fixed>
         </el-table-column>
-        <!--         <el-table-column prop="id" label="订单ID">
-        </el-table-column> -->
+        <el-table-column prop="id" label="订单ID">
+        </el-table-column>
         <el-table-column prop="addition" label="分享链接/用户ID">
         </el-table-column>
         <el-table-column prop="point" label="数量">

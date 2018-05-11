@@ -109,6 +109,7 @@ export default {
       quantity: '',
       shuoshuoPage: 0,
       choseServiceValue: '',
+      lodingChose: null,
       serviceCategory: false,
       services: [],
       sayList: false,
@@ -164,13 +165,16 @@ export default {
         submit_category: 1
       }
       if (this.showService) {
+        // console.log('you  showService')
         this.showService.forEach((item) => {
           if (item.id === this.choseServiceValue) {
             nowServer = item
+            // console.log('zhaodao l nowServer', item)
           }
         })
       }
       if (nowServer.submit_category === 2) {
+        // console.log('you  submit_category')
         this.quantity = nowServer.min_num
       }
       return nowServer
@@ -477,7 +481,12 @@ export default {
       }
     },
     _chose(e, id) {
+      if (this.lodingChose) {
+        this.$parent._open('加载中...')
+        return 0
+      }
       if (!this.services[id]) {
+        this.lodingChose = true
         this._getServices(this, id)
       } else {
         this.showService = this.services[id]
@@ -554,6 +563,7 @@ export default {
     _getServices(that, id) {
       // const that = this
       getServices(id).then((res) => {
+        that.lodingChose = false
         if (res.data.err_code === SUCCESS_CODE) {
           const services = this._normalServices(res.data.data)
           that.services[that.activeCategory] = services
