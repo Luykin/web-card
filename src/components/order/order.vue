@@ -19,6 +19,12 @@
         </el-table-column>
         <el-table-column prop="addition" label="分享链接/用户ID">
         </el-table-column>
+        <el-table-column
+        label="">
+        <template slot-scope="scope">
+          <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+        </template>
+        </el-table-column>
         <el-table-column prop="point" label="数量">
         </el-table-column>
         <!--  <el-table-column prop="start_point" label="起始数量">
@@ -99,6 +105,10 @@ export default {
     ])
   },
   methods: {
+    _viewLink(e) {
+      // console.log(e.hrefLink)
+      window.open(e.hrefLink)
+    },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
       this.choseItem.forEach((item) => {
@@ -212,10 +222,16 @@ export default {
     _normalTasks(list) {
       const that = this
       list.forEach((item) => {
+        item.hrefLink = item.addition
         item.status = that.state[item.status]
         item.createA = timeChange(item.create)
         item.currentNum = '-'
         item.time = '-'
+        if (item.hrefLink.indexOf('http')> -1) {
+          item.showLink = true
+        } else {
+          item.showLink = false
+        }
         if (item.appointment_time) {
           item.appointment_time = timeChange(item.appointment_time)
         } else {

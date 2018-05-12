@@ -1,6 +1,10 @@
 <template>
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box">
+      <div class="notice" v-show="showNotice">
+        <div class="notice-title flex">系统公告</div>
+        <div class="notice-content" v-html='app.announcement'></div>
+      </div>
       <div class="main-box-header flex">
         <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
           <img :src="item.icon" class="mbh-icon" v-if="item.icon">
@@ -94,7 +98,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getshowNotice } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
@@ -120,6 +124,7 @@ export default {
       lodingS: false,
       scorerate: false, // 一元购买多少积分
       pc: true,
+      showNotice: null,
       choseSay: false,
       sublimeTime: false,
       netWorking: false,
@@ -143,6 +148,7 @@ export default {
     this._setEnv()
     this._setPopoverWidth()
     this._getAppInfo(this)
+    this._getshowNotice(this)
     if (this.user) {
       this.$nextTick(() => {
         this.$root.eventHub.$emit('user')
@@ -237,6 +243,21 @@ export default {
             this.setScorerate(res.data.data.score_rate)
             this.setApp(res.data.data)
             this._initNet()
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _getshowNotice(that) {
+      getshowNotice().then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+          if (res.data.data && parseInt(JSON.parse(res.data.data[0].value)) === 1) {
+            that.showNotice = true
           }
         } else {
           if (res.data.err_msg) {
@@ -985,6 +1006,29 @@ export default {
   text-indent: 10px;
   color: #999;
   font-size: 13px;
+}
+.main-box{
+  position: relative;
+}
+.notice{
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(106%, 0);
+  min-height: 5%;
+  max-height: 50%;
+  width: 50%;
+  background: #fff;
+  padding: 50px 10px 10px;
+}
+.notice-title{
+  height: 40px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: #dfe1e5;
+  color: #666;
 }
 
 </style>
