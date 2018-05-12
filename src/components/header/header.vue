@@ -42,6 +42,12 @@
                   <div class="agent-ul-li-right flex ellipsis">{{user.score}}</div>
                 </div>
               </el-menu-item>
+              <el-menu-item index="/management" v-show="user.is_agency" class='flex'>
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">分站管理</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
               <el-menu-item index="/modify-password" v-show="user" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">修改密码</div>

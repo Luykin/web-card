@@ -52,6 +52,11 @@ export default new Router({
         path: ':id',
         component: () => import('components/order/order')
       }]
+    },
+    {
+      path: '/management',
+      name: 'management',
+      component: () => import('components/management/management')
     }
   ]
 })
