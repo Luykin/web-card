@@ -1,6 +1,7 @@
 <template>
 	<div id="main-body" ref='mainbody'>
   	<div class="main-box" id="main-box">
+      <!--  右侧边栏start -->
   		<div class="notice">
   			<div class="notice-heder flex">
   				<div class="mg-btn flex dengji-warp">代理等级</div>
@@ -19,6 +20,33 @@
   			</div>
   			<div class="mg-btn flex cursor notice-heder-btn">提现</div>
   		</div>
+      <!--  右侧边栏end -->
+      <div class="configure-box flex">
+        <div class="cb-left flex">
+          <div class="cb-left-logo"></div>
+        </div>
+        <div class="cb-right">
+          <div class="cr-item flex">
+            分站名称:
+            <div class="cr-box-min flex">12312</div>
+            <div class="cr-box-btn mg-btn flex cursor">分站编辑</div>
+          </div>
+          <div class="cr-item flex">
+            我的分站:
+            <div class="cr-box-min flex">12312</div>
+            <div class="cr-box-btn mg-btn flex cursor">复制链接</div>
+          </div>
+          <div class="cr-item flex">
+            首页公告:
+            <div class="cr-box-max flex">12312首页公告首页公告首页公告</div>
+          </div>
+          <div class="cr-item flex">
+            尾页信息:
+            <div class="cr-box-max flex">邮 箱： 1342343@qq.com</div>
+          </div>                   
+        </div>
+      </div>
+      <div class="partition"></div>
   		<div class="income-box flex">
   			<div class="income-box-item cursor"></div>
   			<div class="income-box-item cursor"></div>
@@ -105,5 +133,66 @@ export default {
 .notice-heder-btn{
 	width: 80%;
 	margin: 10px auto;
+}
+.configure-box{
+  width: 100%;
+  background: #fff;
+  height: 400px;
+}
+.cb-left{
+  width: 30%;
+  height: 100%;
+  align-items: flex-start;
+  overflow: hidden;
+}
+.cb-right{
+  width: 70%;
+  height: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+}
+.partition{
+  width: 100%;
+  background: #ddd;
+  height: 20px;
+}
+.cb-left-logo{
+  width: 80%;
+  padding-bottom: 80%;
+  background: #eee;
+  margin: 20px auto 0;
+}
+.cr-item{
+  width: 100%;
+  margin-top: 20px;
+}
+.cr-box-min{
+  width: 60%;
+  flex-grow: 1;
+  height: 40px;
+  margin: 0 10px;
+  border-radius: 5px;
+  background: #ddd;
+  text-indent: 10px;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+.cr-box-btn{
+  width: 100px;
+  margin-right: 20px;
+}
+.cr-box-max{
+  /*width: 60%;*/
+  height: 100px;
+  margin: 0 10px;
+  border-radius: 5px;
+  background: #ddd;
+  text-indent: 10px;
+  justify-content: flex-start;
+  flex-grow: 1;
+  margin-right: 10px;
+  align-items: flex-start;
+  line-height: 40px;
+  overflow: hidden;
 }
 </style>
