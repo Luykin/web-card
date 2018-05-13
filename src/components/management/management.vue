@@ -27,21 +27,21 @@
         </div>
         <div class="cb-right">
           <div class="cr-item flex">
-            分站名称:
+            <div class="cr-box-tit ellipsis flex">分站名称:</div>
             <div class="cr-box-min flex">12312</div>
-            <div class="cr-box-btn mg-btn flex cursor">分站编辑</div>
+            <div class="cr-box-btn mg-btn flex cursor" @click="toEdit">分站编辑</div>
           </div>
           <div class="cr-item flex">
-            我的分站:
+            <div class="cr-box-tit ellipsis flex">我的分站:</div>
             <div class="cr-box-min flex">12312</div>
             <div class="cr-box-btn mg-btn flex cursor">复制链接</div>
           </div>
           <div class="cr-item flex">
-            首页公告:
+            <div class="cr-box-tit ellipsis flex">首页公告:</div>
             <div class="cr-box-max flex">12312首页公告首页公告首页公告</div>
           </div>
           <div class="cr-item flex">
-            尾页信息:
+            <div class="cr-box-tit ellipsis flex">尾页信息:</div>
             <div class="cr-box-max flex">邮 箱： 1342343@qq.com</div>
           </div>                   
         </div>
@@ -68,6 +68,12 @@ export default {
   computed: {
   },
   methods: {
+    toEdit() {
+      this.$root.eventHub.$emit('updataEditInfo')
+      this.$router.push({
+        path: '/edit'
+      })
+    }
   },
   components: {
   },
@@ -182,7 +188,6 @@ export default {
   margin-right: 20px;
 }
 .cr-box-max{
-  /*width: 60%;*/
   height: 100px;
   margin: 0 10px;
   border-radius: 5px;
@@ -194,5 +199,9 @@ export default {
   align-items: flex-start;
   line-height: 40px;
   overflow: hidden;
+}
+.cr-box-tit{
+  width: 15%;
+  height: 100%;
 }
 </style>
