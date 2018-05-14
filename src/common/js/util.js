@@ -46,7 +46,7 @@ export function getSign(data) {
     const key = sortedKeys[item]
     signStr += key + '=' + data[key]
   }
-  signStr += 'time=' + timestamp + 'key=' + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', '')
+  signStr += 'key=' + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', '')
   const sign = md5(signStr)
   return sign
 }

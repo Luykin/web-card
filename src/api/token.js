@@ -1,15 +1,14 @@
 import axios from 'axios'
 // import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
-import { getKey } from 'common/js/util'
+// import { getKey } from 'common/js/util'
 
 export function getScoreRate() {
   const url = `${PREFIX_URL}/config`
   return axios.get(url, {
       params: {
         uaid: UAID,
-        k: 'score_rate',
-        key: getKey(),
+        k: 'score_rate'
       }
     })
     .then(function(res) {
