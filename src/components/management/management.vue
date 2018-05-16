@@ -18,7 +18,7 @@
         </div>
         <div class="notice-item flex" v-if="siteInfo">
           <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex">{{siteInfo.sum_price}}</div>
+          <div class="notice-item-right flex">{{user.agency.balance}}</div>
         </div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>

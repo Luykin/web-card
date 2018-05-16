@@ -296,9 +296,9 @@ export default {
   width: 100%;
   min-height: 950px !important;
   height: auto;
-  opacity: 1;
+  opacity: .95;
   padding-top: 85px;
-  background: #eee;
+ /* background: #eee;*/
 }
 
 .edit-content {

@@ -18,7 +18,7 @@
         </div>
         <div class="notice-item flex" v-if="siteInfo">
           <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex">{{siteInfo.sum_price}}</div>
+          <div class="notice-item-right flex">{{user.agency.balance}}</div>
         </div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
       </div>
@@ -34,7 +34,7 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">营业余额:</div>
           <div class="cbi-input-box flex disable-i">
-            {{siteInfo.sum_income}}
+            {{user.agency.balance}}
           </div>
           <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>
@@ -82,7 +82,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getPoundageConfig, getWithdrawlist } from 'api/site'
+import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'

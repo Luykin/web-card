@@ -24,7 +24,7 @@ export function setSiteinfo(token, icon, site_name, title_suffix, announcement, 
     announcement: announcement,
     footer: footer
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data)}, data)))
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     })
@@ -62,4 +62,16 @@ export function getWithdrawlist(token) {
   }).then(function(res) {
     return Promise.resolve(res)
   })
+}
+export function withdraw(token, money, account_id) {
+  const url = `${PREFIX_URL}/withdraw`
+  let data = {
+    token: token,
+    money: money,
+    account_id: account_id
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
 }
