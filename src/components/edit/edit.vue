@@ -303,8 +303,8 @@ export default {
 
 .edit-content {
   width: 90%;
-  max-width: 1100px;
-  min-height: 850px;
+  max-width: 950px;
+  min-height: 750px;
   height: auto;
   margin: 0 auto;
   /*transform: translate(0 , 10%);*/
@@ -382,8 +382,8 @@ export default {
   border-radius: 5px;
   background: rgba(255, 210, 54, 1);
   color: #333;
-  width: 35%;
-  margin: 0 7%;
+  width: 33%;
+  margin: 0 8%;
 }
 
 .cancle {

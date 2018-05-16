@@ -136,7 +136,6 @@ export default {
       })
     },
     _toReflect() {
-      console.log('1')
       this.$router.replace({
         path: '/reflect'
       })
@@ -347,6 +346,7 @@ export default {
 .cr-box-tit {
   width: 15%;
   height: 100%;
+  min-width: 60px;
 }
 
 .position-ibi-content {
@@ -367,6 +367,7 @@ export default {
 .pic-title {
   width: 100%;
   height: 15%;
+  color: #353535;
 }
 
 .proxy-icon {

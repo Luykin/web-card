@@ -1,7 +1,7 @@
 <template>
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box">
-      <div class="notice" v-show="showNotice">
+      <div class="notice" v-show="app.show_announcement">
         <div class="notice-title flex">系统公告</div>
         <div class="notice-content" v-html='app.announcement'></div>
       </div>
@@ -459,7 +459,6 @@ export default {
         return false
       }
       if (!testToken(this.tokenTime)) {
-        // console.log('登录已失效 checkTock')
         this.setUser(false)
         this.setToken(false)
         this.setTokenTime(false)

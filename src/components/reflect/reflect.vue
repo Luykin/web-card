@@ -29,7 +29,7 @@
           <div class="cbi-input-box flex disable-i">
             去绑定
           </div>
-          <div class="cbi-btn flex cursor">去绑定</div>
+          <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
         </div>
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">营业余额:</div>
@@ -43,23 +43,58 @@
           <div class="cbi-input-box flex disable-i">
             <input type="text" class="edit-input">
             <!-- {{siteInfo.sum_income}} -->
+            <div class="poundage flex" v-if="min_amount">注: 单笔最低提现金额为{{min_amount}}起，提现手续费为{{rate}}</div>
           </div>
           <div class="cbi-btn flex cursor">确认提现</div>
         </div>
       </div>
-      <!-- <div class="mg-btn flex mg-min-btnwidth cursor">查看明细</div> -->
+      <div class="goods-table">
+        <el-table :data="wdList" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+          <el-table-column prop="id" label="ID">
+          </el-table-column>
+          <el-table-column prop="money" label="提现金额">
+          </el-table-column>
+          <el-table-column prop="withdraw_account.account_type" label="提现方式">
+          </el-table-column>
+          <el-table-column prop="withdraw_account.account" label="提现帐号">
+          </el-table-column>
+          <el-table-column prop="withdraw_account.name" label="账户姓名">
+          </el-table-column>
+          <el-table-column prop="status" label="状态">
+          </el-table-column>
+          <el-table-column prop="create" label="申请时间">
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
+    <popup ref="popup">
+      <div class="recharge-box-title-agent flex">申请提现</div>
+      <div class="agreement-content overHiden">
+        <div class="flex agree-input-box">
+          <div class="agree-label flex ellipsis">商品名称</div>
+          <div class="flex input-defult">
+            <!-- <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName"> -->
+          </div>
+        </div>
+      </div>
+    </popup>
+    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo } from 'api/site'
+import { getSiteinfo, getPoundageConfig, getWithdrawlist } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import popup from 'base/popup/popup'
+import interlayer from 'base/interlayer/interlayer'
 export default {
   data() {
     return {
       siteInfo: false,
+      min_amount: false,
+      rate: false,
+      wdList: [],
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -97,6 +132,11 @@ export default {
     ])
   },
   methods: {
+    showPop() {
+      this.$refs.popup._showPopup()
+      this.$refs.interlayer._setZIndex(9999)
+      this.$refs.interlayer._showLayer()
+    },
     _back() {
       this.$router.replace({
         path: '/management'
@@ -115,12 +155,46 @@ export default {
         })
         return false
       }
-      this._getSiteinfo()
-    },
-    _getSiteinfo() {
       if (!this.checkTock()) {
         return false
       }
+      this._getSiteinfo()
+      this._getPoundageConfig()
+      this._getWithdrawlist()
+    },
+    _getWithdrawlist() {
+      getWithdrawlist(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          console.log(res.data.data)
+          this.wdList = res.data.data
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+
+      })
+    },
+    _getPoundageConfig() {
+      getPoundageConfig().then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data.data[0].value) {
+          console.log(res.data.data[0].value)
+          const reflectInfo = JSON.parse(res.data.data[0].value)
+          this.min_amount = reflectInfo.min_amount
+          this.rate = reflectInfo.rate
+          console.log(reflectInfo)
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _getSiteinfo() {
       getSiteinfo(this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           // console.log(res.data.data)
@@ -161,7 +235,10 @@ export default {
       })
     }
   },
-  components: {},
+  components: {
+    popup,
+    interlayer
+  },
 }
 
 </script>
@@ -244,7 +321,7 @@ export default {
 .configure-box {
   width: 98%;
   background: #fff;
-  height: 400px;
+  height: auto;
   padding: 10px 1%;
   align-items: flex-start;
   flex-wrap: wrap;
@@ -355,6 +432,7 @@ export default {
   width: 15%;
   height: 100%;
   justify-content: flex-start;
+  min-width: 80px;
 }
 
 .cbi-input-box {
@@ -364,6 +442,7 @@ export default {
   background: #f4f4f4;
   border-radius: 5px;
   border: 1px solid #eee;
+  position: relative;
 }
 
 .cbi-btn {
@@ -372,6 +451,7 @@ export default {
   background: #FFD236;
   color: #353535;
   border-radius: 5px;
+  min-width: 70px;
 }
 
 .edit-input {
@@ -387,6 +467,22 @@ export default {
   justify-content: flex-start;
   color: #999;
   text-indent: 20px;
+}
+
+.poundage {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  transform: translate(0, 100%);
+  color: #FF9100;
+  text-indent: 20px;
+  justify-content: flex-start;
+}
+
+.goods-table {
+  margin: 20px auto 0;
 }
 
 </style>

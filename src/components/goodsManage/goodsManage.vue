@@ -21,7 +21,7 @@
           <div class="notice-item-right flex">{{siteInfo.sum_price}}</div>
         </div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn">提现</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex">
@@ -123,6 +123,11 @@ export default {
     ])
   },
   methods: {
+    _toReflect() {
+      this.$router.replace({
+        path: '/reflect'
+      })
+    },
     showPop(e, s) {
       console.log(e)
       console.log(s)

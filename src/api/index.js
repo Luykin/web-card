@@ -26,18 +26,6 @@ export function getServices(id) {
     return Promise.resolve(res)
   })
 }
-export function getshowNotice(id) {
-  const url = `${PREFIX_URL}/config`
-  let data = {
-    uaid: UAID,
-    k: 'notice_key'
-  }
-  return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
-  }).then(function(res) {
-    return Promise.resolve(res)
-  })
-}
 export function getAppInfo() {
   const url = `${PREFIX_URL}/app_info`
   let data = {
