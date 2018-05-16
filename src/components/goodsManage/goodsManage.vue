@@ -20,79 +20,71 @@
           <div class="notice-item-left flex ellipsis">分站营业额</div>
           <div class="notice-item-right flex">{{siteInfo.sum_price}}</div>
         </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
+        <div class="mg-btn flex cursor notice-heder-btn">提现</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex">
-        <div class="cb-left flex">
-          <div class="cb-left-logo" :style="siteLogo"></div>
+        <div class="chose-box flex">
+          <el-select v-model="chose" placeholder="请选择" no-data-text="暂无商品">
+            <el-option v-for="item in choseItem" :key="item.choseTitle" :label="item.choseTitle" :value="item.id">
+            </el-option>
+          </el-select>
+          <div class="good-btn flex cursor margin20">筛选</div>
         </div>
-        <div class="cb-right">
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">分站名称:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_site.site_name}}</div>
-            <div class="cr-box-btn mg-btn flex cursor" @click="toEdit">分站编辑</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">我的分站:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_domain}}</div>
-            <div class="cr-box-btn mg-btn flex cursor">复制链接</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">首页公告:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.announcement}}</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">尾页信息:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.footer}}</div>
-          </div>
-        </div>
-      </div>
-      <div class="partition"></div>
-      <div class="income-box flex" v-if="siteInfo">
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_price_today}}</div>
-            <div class="pic-title flex">今日消费</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_income_today}}</div>
-            <div class="pic-title flex">今日收入</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_price}}</div>
-            <div class="pic-title flex">总消费</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_income}}</div>
-            <div class="pic-title flex">总收入</div>
-          </div>
+        <div class="goods-table">
+          <el-table :data="agencyService" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+            <el-table-column prop="label" label="商品类型">
+            </el-table-column>
+            <el-table-column prop="origin_price" label="成本">
+            </el-table-column>
+            <el-table-column prop="price" label="销售金额">
+            </el-table-column>
+            <el-table-column label="是否上架">
+              <template slot-scope="scope">
+                <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
+                <div class="chose_status cursor" v-show="!scope.row.status"></div>
+                <div class="chose_status chose_status-sj cursor" v-show="scope.row.status"></div>
+              </template>
+            </el-table-column>
+            <el-table-column label="">
+              <template slot-scope="scope">
+                <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
+                <div class="good-btn flex cursor" @click="showPop($event, scope)">调整价格</div>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </div>
-      <div class="mg-btn flex mg-min-btnwidth cursor">查看明细</div>
     </div>
+    <popup ref="popup">
+      <div class="recharge-box-title-agent flex">价格调整</div>
+      <div class="agreement-content overHiden">
+        <div class="flex agree-input-box">
+          <div class="agree-label flex ellipsis">商品名称</div>
+          <div class="flex input-defult">
+            <!-- <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName"> -->
+          </div>
+        </div>
+      </div>
+    </popup>
+    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo } from 'api/site'
+import { getSiteinfo, getAgencyservice } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import popup from 'base/popup/popup'
+import interlayer from 'base/interlayer/interlayer'
 export default {
   data() {
     return {
       siteInfo: false,
+      agencyService: [],
+      choseItem: [],
+      chose: '全部商品',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -100,6 +92,7 @@ export default {
   created() {
     this.$root.eventHub.$emit('user')
     this._siteInit()
+    this._orderInt()
   },
   computed: {
     proxyRank() {
@@ -130,15 +123,26 @@ export default {
     ])
   },
   methods: {
-    _toGoodsManage() {
-      this.$router.replace({
-        path: '/goodsManage'
+    showPop(e, s) {
+      console.log(e)
+      console.log(s)
+      this.$refs.popup._showPopup()
+      this.$refs.interlayer._setZIndex(9999)
+      this.$refs.interlayer._showLayer()
+    },
+    _orderInt() {
+      this.choseItem = this.app.service_categories.concat([])
+      this.choseItem.forEach((item) => {
+        item.choseTitle = item.label
+      })
+      this.choseItem.unshift({
+        choseTitle: '全部商品',
+        id: -1
       })
     },
-    _toReflect() {
-      console.log('1')
+    _back() {
       this.$router.replace({
-        path: '/reflect'
+        path: '/management'
       })
     },
     _siteInit() {
@@ -150,6 +154,25 @@ export default {
         return false
       }
       this._getSiteinfo()
+      this._getAgencyservice()
+    },
+    _getAgencyservice() {
+      if (!this.checkTock()) {
+        return false
+      }
+      getAgencyservice(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          console.log(res.data.data)
+          // this.siteInfo = res.data.data
+          this.agencyService = res.data.data
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
     },
     _getSiteinfo() {
       if (!this.checkTock()) {
@@ -166,7 +189,6 @@ export default {
             this.$parent._open('似乎出错了')
           }
         }
-
       })
     },
     checkTock() {
@@ -195,7 +217,10 @@ export default {
       })
     }
   },
-  components: {},
+  components: {
+    popup,
+    interlayer
+  },
 }
 
 </script>
@@ -276,9 +301,12 @@ export default {
 }
 
 .configure-box {
-  width: 100%;
+  width: 98%;
   background: #fff;
-  height: 400px;
+  height: auto;
+  padding: 10px 1%;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .cb-left {
@@ -373,6 +401,78 @@ export default {
   max-width: 25px;
   height: auto;
   margin: 0 5px;
+}
+
+.good-btn {
+  width: 80px;
+  height: 40px;
+  border-radius: 5px;
+  background: #FFD236;
+  color: #353535;
+}
+
+.goods-table {
+  width: 100%;
+  height: auto;
+}
+
+.chose-box {
+  width: 100%;
+  height: 100px;
+  justify-content: flex-start;
+}
+
+.margin20 {
+  margin: 0 20px;
+}
+
+.chose_status {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #353535;
+  /* margin: 0 auto;*/
+  transform: translate(100%, 0);
+}
+
+.chose_status-sj {
+  border: none;
+  background: url('http://p70pqu6ys.bkt.clouddn.com/%E9%80%89%E4%B8%AD.png') no-repeat;
+  background-size: contain;
+}
+
+.recharge-box-title-agent {
+  width: 100%;
+  height: 70px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  background: #FFD236;
+}
+
+.agreement-content {
+  width: 82%;
+  height: auto;
+  min-height: 20px;
+  /*  max-height: 500px;*/
+  margin: 20px auto 100px;
+  font-size: 15px;
+  line-height: 26px;
+  font-weight: normal;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.overHiden {
+  overflow: hidden;
+}
+
+.agree-input-box {
+  margin: 0 auto 20px;
+  /*margin-bottom: 30px;*/
+  width: 100%;
+  height: 50px;
+  overflow: hidden;
 }
 
 </style>

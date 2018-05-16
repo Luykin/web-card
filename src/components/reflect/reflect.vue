@@ -20,67 +20,34 @@
           <div class="notice-item-left flex ellipsis">分站营业额</div>
           <div class="notice-item-right flex">{{siteInfo.sum_price}}</div>
         </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex">
-        <div class="cb-left flex">
-          <div class="cb-left-logo" :style="siteLogo"></div>
+        <div class="configure-box-item flex">
+          <div class="cbi-name flex ellipsis">我的提现账户:</div>
+          <div class="cbi-input-box flex disable-i">
+            去绑定
+          </div>
+          <div class="cbi-btn flex cursor">去绑定</div>
         </div>
-        <div class="cb-right">
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">分站名称:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_site.site_name}}</div>
-            <div class="cr-box-btn mg-btn flex cursor" @click="toEdit">分站编辑</div>
+        <div class="configure-box-item flex">
+          <div class="cbi-name flex ellipsis">营业余额:</div>
+          <div class="cbi-input-box flex disable-i">
+            {{siteInfo.sum_income}}
           </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">我的分站:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_domain}}</div>
-            <div class="cr-box-btn mg-btn flex cursor">复制链接</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">首页公告:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.announcement}}</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">尾页信息:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.footer}}</div>
-          </div>
+          <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>
-      </div>
-      <div class="partition"></div>
-      <div class="income-box flex" v-if="siteInfo">
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_price_today}}</div>
-            <div class="pic-title flex">今日消费</div>
+        <div class="configure-box-item flex">
+          <div class="cbi-name flex ellipsis">提现金额:</div>
+          <div class="cbi-input-box flex disable-i">
+            <input type="text" class="edit-input">
+            <!-- {{siteInfo.sum_income}} -->
           </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_income_today}}</div>
-            <div class="pic-title flex">今日收入</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_price}}</div>
-            <div class="pic-title flex">总消费</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex">{{siteInfo.sum_income}}</div>
-            <div class="pic-title flex">总收入</div>
-          </div>
+          <div class="cbi-btn flex cursor">确认提现</div>
         </div>
       </div>
-      <div class="mg-btn flex mg-min-btnwidth cursor">查看明细</div>
+      <!-- <div class="mg-btn flex mg-min-btnwidth cursor">查看明细</div> -->
     </div>
   </div>
 </template>
@@ -130,15 +97,14 @@ export default {
     ])
   },
   methods: {
+    _back() {
+      this.$router.replace({
+        path: '/management'
+      })
+    },
     _toGoodsManage() {
       this.$router.replace({
         path: '/goodsManage'
-      })
-    },
-    _toReflect() {
-      console.log('1')
-      this.$router.replace({
-        path: '/reflect'
       })
     },
     _siteInit() {
@@ -276,9 +242,14 @@ export default {
 }
 
 .configure-box {
-  width: 100%;
+  width: 98%;
   background: #fff;
   height: 400px;
+  padding: 10px 1%;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  /*  align-items: flex-start;*/
 }
 
 .cb-left {
@@ -373,6 +344,49 @@ export default {
   max-width: 25px;
   height: auto;
   margin: 0 5px;
+}
+
+.configure-box-item {
+  width: 100%;
+  height: 80px;
+}
+
+.cbi-name {
+  width: 15%;
+  height: 100%;
+  justify-content: flex-start;
+}
+
+.cbi-input-box {
+  width: 65%;
+  margin: 0 2%;
+  height: 50%;
+  background: #f4f4f4;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+.cbi-btn {
+  width: 10%;
+  height: 50%;
+  background: #FFD236;
+  color: #353535;
+  border-radius: 5px;
+}
+
+.edit-input {
+  border: none;
+  outline: none;
+  background: #f4f4f4;
+  width: 98%;
+  height: 100%;
+  margin: 0 1%;
+}
+
+.disable-i {
+  justify-content: flex-start;
+  color: #999;
+  text-indent: 20px;
 }
 
 </style>

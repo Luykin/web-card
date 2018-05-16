@@ -62,6 +62,17 @@ export default new Router({
       path: '/edit',
       name: 'edit',
       component: () => import('components/edit/edit')
+    },
+    {
+      path: '/goodsManage',
+      name: 'goods-manage',
+      component: () => import('components/goodsManage/goodsManage')
+    },
+    {
+      path: '/reflect',
+      name: 'reflect',
+      component: () => import('components/reflect/reflect')
     }
+    // Reflect
   ]
 })

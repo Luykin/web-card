@@ -42,12 +42,18 @@
                   <div class="agent-ul-li-right flex ellipsis">{{user.score}}</div>
                 </div>
               </el-menu-item>
-              <!-- <el-menu-item index="/management" v-show="user.is_agency" class='flex'>
+              <el-menu-item index="/management" v-show="user.is_agency" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">分站管理</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
-              </el-menu-item> -->
+              </el-menu-item>
+              <el-menu-item index="/edit" v-show="false" class='flex'>
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">分站编辑</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
               <el-menu-item index="/modify-password" v-show="user" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">修改密码</div>
@@ -858,6 +864,7 @@ export default {
 
 
 
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -921,6 +928,7 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
 
 
 
