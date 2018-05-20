@@ -32,6 +32,14 @@
           <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
         </div>
         <div class="configure-box-item flex">
+          <div class="cbi-name flex ellipsis">体现方式:</div>
+          <div class="cbi-input-box flex disable-i">
+            <!-- {{user.agency.balance}} -->
+            支付宝
+          </div>
+          <div class="cbi-btn flex cursor" style="opacity:0;"></div>
+        </div>
+        <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">营业余额:</div>
           <div class="cbi-input-box flex disable-i">
             {{user.agency.balance}}
@@ -68,17 +76,42 @@
       </div>
     </div>
     <popup ref="popup">
-      <div class="recharge-box-title-agent flex">申请提现</div>
+      <div class="recharge-box-title-agent flex">绑定提现账户</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
-          <div class="agree-label flex ellipsis">商品名称</div>
-          <div class="flex input-defult">
-            <!-- <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName"> -->
+          <div class="aib-label flex ellipsis">体现账户：</div>
+          <div class="flex aib-input-warp">
+            <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
+            <input type="text" placeholder="输入账户" class="aib-ipnput">
           </div>
+        </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">账户姓名：</div>
+          <div class="flex aib-input-warp">
+            <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
+            <input type="text" placeholder="输入姓名" class="aib-ipnput">
+          </div>
+        </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">账户手机：</div>
+          <div class="flex aib-input-warp">
+            <span class="disable-phone">{{user.phone}}</span> <!-- v-model="" -->
+            <!-- <input type="text" placeholder="输入姓名" class="aib-ipnput"> -->
+          </div>
+        </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">手机验证：</div>
+          <div class="flex aib-input-warp">
+            <input type="text" placeholder="输入验证码" class="aib-ipnput">
+          </div>
+        </div>
+        <div class="recharge-btn-box flex">
+          <div class="recharge-btn-sure flex sure cursor" @click="">确认</div>
+          <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
         </div>
       </div>
     </popup>
-    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
+    <interlayer ref="interlayer"></interlayer>
   </div>
 </template>
 <script type="text/javascript">
@@ -132,6 +165,11 @@ export default {
     ])
   },
   methods: {
+    _interlayerHide() {
+      this.$refs.popup._hiddenPopup()
+      this.$refs.interlayer._setZIndex(-1000)
+      this.$refs.interlayer._hiddenLayer()
+    },
     showPop() {
       this.$refs.popup._showPopup()
       this.$refs.interlayer._setZIndex(9999)
@@ -482,7 +520,89 @@ export default {
 }
 
 .goods-table {
-  margin: 20px auto 0;
+  margin: 20px 1% 0;
+}
+.recharge-box-title-agent {
+  width: 100%;
+  height: 70px;
+  margin: 0 auto;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  background: #FFD236;
 }
 
+.agreement-content {
+  width: 82%;
+  height: auto;
+  min-height: 20px;
+  /*  max-height: 500px;*/
+  margin: 20px auto 20px;
+  font-size: 15px;
+  line-height: 26px;
+  font-weight: normal;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.overHiden {
+  overflow: hidden;
+}
+
+.agree-input-box {
+  margin: 0 auto 20px;
+  /*margin-bottom: 30px;*/
+  width: 100%;
+  height: 50px;
+  overflow: hidden;
+}
+.aib-label{
+  height: 100%;
+  width: 20%;
+}
+.aib-input-warp{
+  height: 70%;
+  width: 72%;
+  padding: 0 4%;
+  background: #f4f4f4;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  justify-content: flex-start;
+}
+.aib-ipnput{
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border: none;
+  background: #f4f4f4;
+  font-size: 15px;
+}
+.recharge-btn-box {
+  height: 70px;
+  justify-content: flex-start;
+}
+.recharge-btn-sure {
+  width: 35%;
+  height: 46px;
+  border-radius: 6px;
+}
+
+.recharge-btn-sure:nth-child(1) {
+  margin: 0 20% 0 5%;
+}
+.cancel {
+  box-sizing: border-box;
+  color: #fff;
+  background: rgba(166,166,166,1);
+}
+
+.sure {
+  box-sizing: border-box;
+  color: #353535;
+  background: #FFD236;
+  /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
+}
+.disable-phone{
+  color: #666;
+}
 </style>

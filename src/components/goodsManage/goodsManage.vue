@@ -50,7 +50,7 @@
             <el-table-column label="">
               <template slot-scope="scope">
                 <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
-                <div class="good-btn flex cursor" @click="showPop($event, scope)">调整价格</div>
+                <div class="good-btn flex cursor" @click="showPop(scope.row)">调整价格</div>
               </template>
             </el-table-column>
           </el-table>
@@ -61,14 +61,38 @@
       <div class="recharge-box-title-agent flex">价格调整</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
-          <div class="agree-label flex ellipsis">商品名称</div>
-          <div class="flex input-defult">
+          <div class="aib-label flex ellipsis">商品名称：</div>
+          <div class="flex aib-input-warp">
+            <span v-if="nowRow">{{nowRow.label}}</span>
             <!-- <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName"> -->
           </div>
         </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">成本价：</div>
+          <div class="flex aib-input-warp">
+            <span v-if="nowRow">{{nowRow.origin_price}}</span>
+          </div>
+        </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">销售价格：</div>
+          <div class="flex aib-input-warp">
+            <!-- <span v-if="nowRow">{{nowRow.price}}</span> -->
+            <input type="text" placeholder="请填写销售价格" class="aib-ipnput" @keyup="_rectifyMoney" v-model="money">
+          </div>
+        </div>
+        <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">是否上架：</div>
+          <div class="flex aib-input-warp">
+            <span v-if="nowRow">{{nowRow.status}}</span>
+          </div>
+        </div>
+        <div class="recharge-btn-box flex">
+          <div class="recharge-btn-sure flex sure cursor" @click="">确认</div>
+          <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
+        </div>
       </div>
     </popup>
-    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
+    <interlayer ref="interlayer"></interlayer>
   </div>
 </template>
 <script type="text/javascript">
@@ -84,7 +108,9 @@ export default {
       siteInfo: false,
       agencyService: [],
       choseItem: [],
+      money: '',
       chose: '全部商品',
+      nowRow: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -123,14 +149,28 @@ export default {
     ])
   },
   methods: {
+    _interlayerHide() {
+      this.$refs.popup._hiddenPopup()
+      this.$refs.interlayer._hiddenLayer()
+    },
     _toReflect() {
       this.$router.replace({
         path: '/reflect'
       })
     },
-    showPop(e, s) {
+    _rectifyMoney() {
+      if (isNaN(this.money)) {
+        this.money = ''
+      }
+      if (this.money.indexOf('.') > -1) {
+        const end = this.money.indexOf('.')
+        this.money = this.money.slice(0, end + 3)
+      }
+    },
+    showPop(e) {
       console.log(e)
-      console.log(s)
+      this.nowRow = e
+      this.money = e.price
       this.$refs.popup._showPopup()
       this.$refs.interlayer._setZIndex(9999)
       this.$refs.interlayer._showLayer()
@@ -460,7 +500,7 @@ export default {
   height: auto;
   min-height: 20px;
   /*  max-height: 500px;*/
-  margin: 20px auto 100px;
+  margin: 20px auto 20px;
   font-size: 15px;
   line-height: 26px;
   font-weight: normal;
@@ -479,5 +519,50 @@ export default {
   height: 50px;
   overflow: hidden;
 }
+.aib-label{
+  height: 100%;
+  width: 20%;
+}
+.aib-input-warp{
+  height: 70%;
+  width: 72%;
+  padding: 0 4%;
+  background: #f4f4f4;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  justify-content: flex-start;
+}
+.aib-ipnput{
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border: none;
+  background: #f4f4f4;
+  font-size: 15px;
+}
+.recharge-btn-box {
+  height: 70px;
+  justify-content: flex-start;
+}
+.recharge-btn-sure {
+  width: 35%;
+  height: 46px;
+  border-radius: 6px;
+}
 
+.recharge-btn-sure:nth-child(1) {
+  margin: 0 20% 0 5%;
+}
+.cancel {
+  box-sizing: border-box;
+  color: #fff;
+  background: rgba(166,166,166,1);
+}
+
+.sure {
+  box-sizing: border-box;
+  color: #353535;
+  background: #FFD236;
+  /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
+}
 </style>

@@ -25,6 +25,8 @@
           <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
         </template>
         </el-table-column>
+        <el-table-column prop="start_point" label="初始数量">
+        </el-table-column> 
         <el-table-column prop="point" label="数量">
         </el-table-column>
         <!--  <el-table-column prop="start_point" label="起始数量">

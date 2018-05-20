@@ -28,7 +28,7 @@ export default {
       this.popupIn = false
       this.popupOut = true
       let time = setTimeout(() => {
-        this.show = true
+        this.show = false
         clearTimeout(time)
       }, 500)
     }

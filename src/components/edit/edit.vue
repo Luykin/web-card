@@ -61,14 +61,10 @@ export default {
   },
   created() {
     const that = this
+    this._editInit()
     that.$root.eventHub.$on('updataEditInfo', (res) => {
       that._updataEditInfo(that)
     })
-    this.siteName = this.user.agency.sub_site.site_name
-    this.siteFix = this.user.agency.sub_site.title_suffix
-    this.siteAnnouncement = this.user.agency.sub_site.announcement
-    this.sitFooter = this.user.agency.sub_site.footer
-    this.logoUrl = this.user.agency.sub_site.icon || 'http://p8sxtcg6t.bkt.clouddn.com/defual.png'
   },
   computed: {
     siteLogo() {
@@ -90,6 +86,13 @@ export default {
     ])
   },
   methods: {
+    _editInit() {
+      this.siteName = this.user.agency.sub_site.site_name
+      this.siteFix = this.user.agency.sub_site.title_suffix
+      this.siteAnnouncement = this.user.agency.sub_site.announcement
+      this.sitFooter = this.user.agency.sub_site.footer
+      this.logoUrl = this.user.agency.sub_site.icon || 'http://p8sxtcg6t.bkt.clouddn.com/defual.png'
+    },
     _uplodeQiniu() {
       if (!this.$refs.fileInput.files[0]) {
         // this.$parent._open('请先上传文件')
@@ -153,6 +156,7 @@ export default {
     },
     _updataEditInfo() {
       this.$root.eventHub.$emit('user')
+      this._editInit()
     },
     base64encode(str) {
       let base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
