@@ -75,3 +75,16 @@ export function withdraw(token, money, account_id) {
       return Promise.resolve(res)
     })
 }
+export function setAgency(token, service_id, price, status) {
+  const url = `${PREFIX_URL}/set_agency_service`
+  let data = {
+    token: token,
+    service_id: service_id,
+    price: price,
+    status: status
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+}

@@ -43,8 +43,8 @@
             <el-table-column label="是否上架">
               <template slot-scope="scope">
                 <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
-                <div class="chose_status cursor" v-show="!scope.row.status"></div>
-                <div class="chose_status chose_status-sj cursor" v-show="scope.row.status"></div>
+                <div class="chose_status cursor" v-show="scope.row.status === 2" @click="_setAgency(scope.row)"></div>
+                <div class="chose_status chose_status-sj cursor" v-show="scope.row.status === 1" @click="_setAgency(scope.row)"></div>
               </template>
             </el-table-column>
             <el-table-column label="">
@@ -87,7 +87,7 @@
           </div>
         </div>
         <div class="recharge-btn-box flex">
-          <div class="recharge-btn-sure flex sure cursor" @click="">确认</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_setAgency">确认</div>
           <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
         </div>
       </div>
@@ -96,7 +96,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getAgencyservice } from 'api/site'
+import { getSiteinfo, getAgencyservice, setAgency } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
@@ -111,6 +111,7 @@ export default {
       money: '',
       chose: '全部商品',
       nowRow: null,
+      fastclike: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -149,6 +150,32 @@ export default {
     ])
   },
   methods: {
+    _setAgency(e) {
+      if (!this.checkTock()) {
+        return false
+      }
+      if (this.fastclike) {
+        this.$parent._open('请勿频繁设置')
+        return false
+      }
+      let status
+      const that = this
+      if (e.status === 1) {
+        status = 2
+      } else {
+        status = 1
+      }
+      setAgency(this.token, e.id, e.price, status).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data) {
+          that._getAgencyservice()
+          that.fastclike = true
+          that.time = setTimeout(() => {
+            that.fastclike = false
+            clearTimeout(that.time)
+          }, 2000)
+        }
+      })
+    },
     _interlayerHide() {
       this.$refs.popup._hiddenPopup()
       this.$refs.interlayer._hiddenLayer()
@@ -168,7 +195,7 @@ export default {
       }
     },
     showPop(e) {
-      console.log(e)
+      // console.log(e)
       this.nowRow = e
       this.money = e.price
       this.$refs.popup._showPopup()
@@ -472,17 +499,21 @@ export default {
 }
 
 .chose_status {
+  box-sizing: border-box;
   width: 15px;
   height: 15px;
-  border: 1px solid #353535;
+  border: 1px solid #999;
   /* margin: 0 auto;*/
   transform: translate(100%, 0);
 }
 
 .chose_status-sj {
   border: none;
+  width: 17px;
+  height: 17px;
   background: url('http://p70pqu6ys.bkt.clouddn.com/%E9%80%89%E4%B8%AD.png') no-repeat;
   background-size: contain;
+  transform: translate(80%, 0);
 }
 
 .recharge-box-title-agent {
