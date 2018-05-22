@@ -3,10 +3,13 @@ import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
 import { getSign } from 'common/js/util'
 
-export function getServiceCategory() {
+export function getServiceCategory(sub_domain) {
   const url = `${PREFIX_URL}/service_category`
   let data = {
     uaid: UAID
+  }
+  if (sub_domain) {
+    data = Object.assign({ sub_domain: sub_domain }, data)
   }
   return axios.get(url, {
     params: Object.assign({ sign: getSign(data) }, data)
@@ -142,4 +145,34 @@ export function getShuoshuoList(qq, token) {
         })
       }
     })
+}
+export function getsubsite(sub_domain) {
+  const url = `${PREFIX_URL}/sub_site`
+  let data = {
+    uaid: UAID,
+    sub_domain: sub_domain
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+    if (error.response) {
+      // console.log(error.response.data)
+      console.log(error.response.status)
+      // console.log(error.response.headers)
+      return Promise.resolve({
+        data: {
+          err_code: error.response.status,
+          err_msg: error.response.status
+        }
+      })
+    } else {
+      return Promise.resolve({
+        data: {
+          err_code: -1,
+          err_msg: -1
+        }
+      })
+    }
+  })
 }

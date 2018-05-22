@@ -1,9 +1,9 @@
 <template>
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box">
-      <div class="notice" v-show="app.show_announcement">
+      <div class="notice" v-show="announcement || app.show_announcement">
         <div class="notice-title flex">系统公告</div>
-        <div class="notice-content" v-html='app.announcement'></div>
+        <div class="notice-content" v-html='announcement || app.announcement'></div>
       </div>
       <div class="main-box-header flex">
         <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
@@ -98,7 +98,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getshowNotice } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getsubsite } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
@@ -124,7 +124,8 @@ export default {
       lodingS: false,
       scorerate: false, // 一元购买多少积分
       pc: true,
-      showNotice: null,
+      announcement: null,
+      // showNotice: null,
       choseSay: false,
       sublimeTime: false,
       netWorking: false,
@@ -145,15 +146,20 @@ export default {
   //   }
   // },
   created() {
+    // 2018.05.22
+    this._setFanZan()
     this._setEnv()
     this._setPopoverWidth()
     this._getAppInfo(this)
-    this._getshowNotice(this)
+    // this._getshowNotice(this)
     if (this.user) {
       this.$nextTick(() => {
         this.$root.eventHub.$emit('user')
       })
     }
+    this.$root.eventHub.$on('announcement', (announcement)=>{
+      this._setAnnouncement(announcement)
+    })
     this.$root.eventHub.$emit('canvas')
     // this.$root.eventHub.$emit('IndexInit')
   },
@@ -217,6 +223,33 @@ export default {
     ])
   },
   methods: {
+    _setAnnouncement(announcement) {
+      this.announcement = announcement
+    },
+    _setFanZan(){
+      if (window.location.href.indexOf('.xkfans.com') > -1) {
+        let start = window.location.href.indexOf('://')
+        let end = window.location.href.indexOf('.xkfans.com')
+        let domain = window.location.href.slice(start + 3, end)
+        domain = domain + '.xkfans.com'
+        const that = this
+        if (domain) {
+          getsubsite(domain).then((res)=>{
+            if (res.data.err_code === SUCCESS_CODE) {
+              if (res.data.data) {
+                this.$root.eventHub.$emit('logo', res.data.data.icon)
+                // this.$root.eventHub.$emit('logo', res.data.data.sub_site.icon)
+                this.$root.eventHub.$emit('footername', res.data.data.contact)
+                this.$root.eventHub.$emit('footeremail', res.data.data.email)
+                this.$root.eventHub.$emit('announcement', res.data.data.announcement)
+                this._getServiceCategory(that, domain)
+                document.title = res.data.data.site_name
+              }
+            }
+          })
+        }
+      }
+    },
     _setEnv() {
       const query = this.$route.query
       if (query.env === 'dev') {
@@ -253,21 +286,21 @@ export default {
         }
       })
     },
-    _getshowNotice(that) {
-      getshowNotice().then((res) => {
-        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
-          if (res.data.data && parseInt(JSON.parse(res.data.data[0].value)) === 1) {
-            that.showNotice = true
-          }
-        } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('似乎出错了')
-          }
-        }
-      })
-    },
+    // _getshowNotice(that) {
+    //   getshowNotice().then((res) => {
+    //     if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+    //       if (res.data.data && parseInt(JSON.parse(res.data.data[0].value)) === 1) {
+    //         that.showNotice = true
+    //       }
+    //     } else {
+    //       if (res.data.err_msg) {
+    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
+    //       } else {
+    //         this.$parent._open('似乎出错了')
+    //       }
+    //     }
+    //   })
+    // },
     _rectifyMoney() {
       if (isNaN(this.quantity) || this.quantity.indexOf('.') > -1 || this.quantity <= 0) {
         this.quantity = ''
@@ -565,12 +598,12 @@ export default {
       this.activeCategory = this.app.service_categories[0].id
       this._getServices(this, this.app.service_categories[0].id) // 服务
     },
-    _getServiceCategory(that) {
-      getServiceCategory().then((res) => {
+    _getServiceCategory(that, domain) {
+      getServiceCategory(domain).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          that.serviceCategory = res.data.data
-          that.activeCategory = res.data.data[0].id
-          that._getServices(that, res.data.data[0].id) // 服务
+          // that.serviceCategory = res.data.data
+          // that.activeCategory = res.data.data[0].id
+          // that._getServices(that, res.data.data[0].id)
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])

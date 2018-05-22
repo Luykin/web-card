@@ -5,7 +5,7 @@
         <i class="iconfont icon-gengduo"></i>
       </nav>
       <div class="logo flex">
-        <img src="../../assets/logo.png" class="logo-class" @click="_toIndex">
+        <img src="../../assets/logo.png" class="logo-class" @click="_toIndex" ref='logo'>
       </div>
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
@@ -13,10 +13,10 @@
             <el-menu-item index="/index">{{env}}</el-menu-item>
             <el-menu-item index="/order" v-show="user">我的订单</el-menu-item>
             <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item>
-            <el-menu-item index="/none/1" v-show="user" class="disable">
+            <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item>
-            <el-menu-item index="/agent" v-show="user" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
@@ -35,14 +35,20 @@
                   <div class="agent-ul-li-right flex ellipsis">{{userPhone}}</div>
                 </div>
               </el-menu-item>
-              <el-menu-item index="/none" class='phone-item flex' v-show="user" disabled>
+              <el-menu-item index="/none" class='phone-item flex' v-show="user && !FENZAN" disabled>
                 <!-- 我的积分<span class="green-text">{{user.score}}</span> -->
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">我的积分</div>
                   <div class="agent-ul-li-right flex ellipsis">{{user.score}}</div>
                 </div>
               </el-menu-item>
-              <el-menu-item index="/management" v-show="user.is_agency" class='flex'>
+              <el-menu-item index="/none" v-show="user.is_agency&&!user.agency.sub_domain && !FENZAN" class='flex' disabled>
+                <div class="agent-ul-li flex cursor" @click="_setDomain($event)">
+                  <div class="agent-ul-li-left flex ellipsis">创建分站</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/management" v-show="user.is_agency&&user.agency.sub_domain && !FENZAN" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">分站管理</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
@@ -62,8 +68,8 @@
               </el-menu-item>
               <el-menu-item index="/none" class=' flex' v-show="user" disabled>
                 <!-- <div class="log-out-min log-out" @click="_logout($event)">注销</div> -->
-                <div class="agent-ul-li flex cursor">
-                  <div class="agent-ul-li-left flex ellipsis" @click="_logout($event)">注销</div>
+                <div class="agent-ul-li flex cursor" @click="_logout($event)">
+                  <div class="agent-ul-li-left flex ellipsis">注销</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
               </el-menu-item>
@@ -269,9 +275,24 @@
       <div class="dialog-min-text flex">{{dialogText}}</div>
       <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
     </el-dialog>
+    <popup ref='domain'>
+      <div>
+        <div class="recharge-box-title-agent flex">设置您分站域名</div>
+        <div class="rbta-input-warp flex">
+          <input type="text" name="domain" class="rbata-iw-left flex" placeholder="填写您的域名" v-model="domainText" >
+          <div class="rbata-iw-right flex">.xkfans.com</div>
+        </div>
+        <div class="titps-domain flex">温馨提示:设置完成后您可以通过{{domainText}}.xkfans.com访问您的分站</div><!-- #FF9100 -->
+        <div class="recharge-btn-box-after flex bottom">
+          <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_setDomainSure">确定</div>
+          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenDomain">取消</div>
+        </div>
+      </div>
+    </popup>
   </div>
 </template>
 <script type="text/javascript" scoped>
+import {setDomain} from 'api/site'
 import sidebar from 'components/sidebar/sidebar'
 import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
@@ -291,12 +312,14 @@ export default {
       telephone: '',
       mailBox: '',
       demand: '',
+      domainText: '',
       sidebar: false,
       popup: false,
       agent: false,
       payUrl: false,
       size: 120,
       code: false,
+      FENZAN: null,
       choseGoodId: -1,
       inputFocus: true,
       activePayType: false,
@@ -322,6 +345,13 @@ export default {
     })
     this.$root.eventHub.$on('showPopup', () => {
       this._showPopup()
+    })
+    this.$root.eventHub.$on('domain', () => {
+      this._setDomain()
+    })
+    this.$root.eventHub.$on('logo', (src) => {
+      this._setLogo(src)
+      this._FENZAN()
     })
     this.$root.eventHub.$emit('canvas')
     // this._getAppInfo(this)
@@ -377,6 +407,61 @@ export default {
     ])
   },
   methods: {
+    _FENZAN() {
+      this.FENZAN = true
+    },
+    _setLogo(src) {
+      console.log(src)
+      this.$refs.logo.src = src
+    },
+    _setDomainSure() {
+      if (!this.domainText) {
+        this.$parent._open('请填写域名')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      setDomain(this.token, this.domainText).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$parent._open('设置成功')
+          this.$root.eventHub.$emit('user')
+          this._hiddenDomain()
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _setDomain(e) {
+      if (e) {
+        e.stopPropagation()
+      }
+      this.$nextTick(() => {
+        this.domain = true
+        this.$refs.domain._showPopup()
+        this.$refs.interlayer._setZIndex(9999)
+        this.$refs.interlayer._showLayer()
+        // if (this.$refs.input) {
+        //   this.$refs.input.focus()
+        // }
+      })
+    },
+    _hiddenDomain() {
+      if (this.domain && !this.sidebar) {
+        this.domain = false
+        this.$refs.domain._hiddenPopup()
+        this.$refs.interlayer._hiddenLayer()
+      }
+      if (this.domain && this.sidebar) {
+        this.domain = false
+        this.$refs.domain._hiddenPopup()
+        this.$refs.interlayer._setZIndex(1500)
+      }
+    },
     _formatUserPhone(phone) {
       const start = phone.slice(0, 3)
       const end = phone.slice(-4)
@@ -419,12 +504,9 @@ export default {
         return false
       }
       agency(this.token, this.companyName, this.applicant, this.telephone, this.mailBox, this.demand).then((res) => {
-        console.log(res.data)
         if (res.data.err_code === SUCCESS_CODE) {
           this.companyName = ''
           this.$root.eventHub.$emit('user')
-          // this.$parent._open('代理申请成功，我们商务人员将会在1~2个工作内与你联系。')
-          // 我们的商务人员将在24小时内进行联系您! 请您耐心等待!
           this.dialogTitle = '你的代理申请已成功提交！'
           this.dialogText = '我们的商务人员将在24小时内进行联系您! 请您耐心等待!'
           this.centerDialogVisible = true
@@ -920,6 +1002,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   padding-left: 5%;
+  /*flex-grow: 1;*/
 }
 
 .agent-ul-li-right {
@@ -1355,5 +1438,31 @@ export default {
 */
   /*  box-shadow: 0 2px 1px rgba(0,0,0,.1);*/
 }
-
+.rbta-input-warp{
+  width: 80%;
+  height: 50px;
+  border-radius: 10px;
+  background: #f4f4f4;
+  color: #353535;
+  border:1px solid #eee;
+  font-size: 16px;
+  margin: 50px auto 10px;
+}
+.rbata-iw-right{
+  width: 60%;
+  height: 100%;
+}
+.rbata-iw-left{
+  width: 30%;
+  height: 80%;
+  outline: none;
+  border:none;
+  margin: 0 5%;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+}
+.titps-domain{
+  color: #FF9100;
+}
 </style>

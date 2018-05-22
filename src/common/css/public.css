@@ -268,3 +268,6 @@
 .el-table .success-row:hover .cell {
   color: #666 !important;
 }
+.position-ibi-content:hover .height-light{
+  color: #FFD236;
+}

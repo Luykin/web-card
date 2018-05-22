@@ -26,8 +26,13 @@
       <div class="configure-box flex">
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">我的提现账户:</div>
-          <div class="cbi-input-box flex disable-i">
-            去绑定
+          <div class="cbi-input-box flex disable-i cursor" @click="_showList">
+            <div class="cbi-show-list" v-if="showListAccount">
+              <div class="cbi-show-list-item flex" v-for="item in accountList" @click="_choseAccount(item)">
+                {{item.name + item.account}}
+              </div>
+            </div>
+            {{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}
           </div>
           <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
         </div>
@@ -42,18 +47,17 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">营业余额:</div>
           <div class="cbi-input-box flex disable-i">
-            {{user.agency.balance}}
+            {{user.agency.turnover}}
           </div>
           <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">提现金额:</div>
           <div class="cbi-input-box flex disable-i">
-            <input type="text" class="edit-input">
-            <!-- {{siteInfo.sum_income}} -->
+            <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
             <div class="poundage flex" v-if="min_amount">注: 单笔最低提现金额为{{min_amount}}起，提现手续费为{{rate}}</div>
           </div>
-          <div class="cbi-btn flex cursor">确认提现</div>
+          <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
         </div>
       </div>
       <div class="goods-table">
@@ -73,23 +77,27 @@
           <el-table-column prop="create" label="申请时间">
           </el-table-column>
         </el-table>
+        <div id="i-page" class="i-page flex">
+          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
+          </el-pagination>
+        </div>
       </div>
     </div>
     <popup ref="popup">
       <div class="recharge-box-title-agent flex">绑定提现账户</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">体现账户：</div>
+          <div class="aib-label flex ellipsis">提现账户：</div>
           <div class="flex aib-input-warp">
             <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
-            <input type="text" placeholder="输入账户" class="aib-ipnput">
+            <input type="text" placeholder="输入账户" class="aib-ipnput" v-model="raccount">
           </div>
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">账户姓名：</div>
           <div class="flex aib-input-warp">
             <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
-            <input type="text" placeholder="输入姓名" class="aib-ipnput">
+            <input type="text" placeholder="输入姓名" class="aib-ipnput" v-model="rname">
           </div>
         </div>
         <div class="flex agree-input-box">
@@ -101,33 +109,53 @@
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">手机验证：</div>
-          <div class="flex aib-input-warp">
-            <input type="text" placeholder="输入验证码" class="aib-ipnput">
+          <div class="flex aib-input-warp min-warp">
+            <input type="text" placeholder="输入验证码" class="aib-ipnput" v-model="ryan">
           </div>
+          <div class="btn-yan flex ellipsis cursor" @click="_getcode">{{time}}
+            <span v-if="time > 0">s后重新获取</span></div>
         </div>
         <div class="recharge-btn-box flex">
-          <div class="recharge-btn-sure flex sure cursor" @click="">确认</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
           <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
         </div>
       </div>
     </popup>
     <interlayer ref="interlayer"></interlayer>
+    <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
+      <div class="dialog-min-text flex">{{dialogText}}</div>
+      <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
+    </el-dialog>
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw } from 'api/site'
+import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
 import popup from 'base/popup/popup'
 import interlayer from 'base/interlayer/interlayer'
+import { sendVerify } from 'api/login'
 export default {
   data() {
     return {
       siteInfo: false,
       min_amount: false,
       rate: false,
+      showListAccount: false,
+      nowAccount: false,
+      raccount: '',
+      rname: '',
+      ryan: '',
+      rmoney: '0.00',
+      dialogTitle: '',
+      dialogText: '',
+      total:null,
+      account_type: 3,
       wdList: [],
+      accountList: [],
+      centerDialogVisible: false,
+      time: '获取验证码',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -165,9 +193,142 @@ export default {
     ])
   },
   methods: {
+    handleCurrentChange(val) {
+      this.page = val - 1
+      this._getOrders()
+    },    
+    _rectifyMoney() {
+      if (isNaN(this.rmoney)) {
+        this.rmoney = ''
+      }
+      if (this.rmoney.indexOf('.') > -1) {
+        const end = this.rmoney.indexOf('.')
+        this.rmoney = this.rmoney.slice(0, end + 3)
+      }
+    },
+    _withdraw() {
+      if (!this.nowAccount) {
+        this.$parent._open('请选择提现账户')
+        return false
+      }
+      if (!this.rmoney || this.rmoney <= 0) {
+        this.$parent._open('请填写提现金额')
+        return false
+      }
+      if (this.rmoney > this.user.agency.turnover) {
+        console.log(this.user.agency.turnover)
+        console.log(this.rmoney)
+        this.$parent._open('提现金额应小于营业余额')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      const that = this
+      withdraw(this.token, this.rmoney, this.nowAccount.id).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          // console.log(res.data)
+          this.$parent._open('申请提交成功')
+          this.dialogTitle = '温馨提示'
+          this.dialogText = '申请提现后，我们将在每周二进行统一打款'
+          this.centerDialogVisible = true
+          this.$root.eventHub.$emit('user')
+          that._getWithdrawlist()
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _sureAddAccount() {
+      if (!this.raccount) {
+        this.$parent._open('请填写账户')
+        return false
+      }
+      if (!this.rname) {
+        this.$parent._open('请填写姓名')
+        return false
+      }
+      if (!this.ryan) {
+        this.$parent._open('请填写验证码')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      const that = this
+      addAccount(this.token, this.account_type, this.raccount, this.rname, this.ryan).then((res) => {
+        this.ryan = ''
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$parent._open('绑定成功')
+          that._getAccount()
+          that._interlayerHide()
+          that.raccount = ''
+          that.rname = ''
+          // console.log(res.data)
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }        
+      })    
+    },
+    _getcode() {
+      if (typeof this.time === 'string') {
+        let lastTime = +new Date() + 60 * 1000
+        localStorage.setItem('codeTime', lastTime)
+        this._countdown(60)
+        this.netSendCode()
+      } else {
+        this.$parent._open('请稍后再试哦')
+      }
+    },
+    _setTime() {
+      let nowTime = +new Date()
+      let lastTime = localStorage.getItem('codeTime') || 0
+      if (nowTime < lastTime) {
+        this._countdown(parseInt((lastTime - nowTime) / 1000))
+      }
+    },
+    _countdown(time) {
+      this.time = time
+      let timer = setInterval(() => {
+        if (this.time > 1) {
+          this.time = this.time - 1
+        } else {
+          this.time = '获取验证码'
+          clearInterval(timer)
+          timer = null
+        }
+      }, 1000)
+    },
+    netSendCode() {
+      sendVerify(this.user.phone).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$parent._open('验证码已发送')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _choseAccount(e) {
+      this.nowAccount = e
+    },
+    _showList() {
+      this.showListAccount = !this.showListAccount
+    },
     _interlayerHide() {
       this.$refs.popup._hiddenPopup()
-      this.$refs.interlayer._setZIndex(-1000)
+      // this.$refs.interlayer._setZIndex(-1000)
       this.$refs.interlayer._hiddenLayer()
     },
     showPop() {
@@ -198,12 +359,31 @@ export default {
       }
       this._getSiteinfo()
       this._getPoundageConfig()
-      this._getWithdrawlist()
+      this._getWithdrawlist(10, 0)
+      this._getAccount()
+      this._setTime()
     },
-    _getWithdrawlist() {
-      getWithdrawlist(this.token).then((res) => {
+    _getAccount() {
+      getAccount(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+          this.accountList = res.data.data
+          if (res.data.data && res.data.data.length > 0){
+            this.nowAccount = res.data.data[0] || false
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _getWithdrawlist(num, page) {
+      getWithdrawlist(this.token, num, page).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           console.log(res.data.data)
+          this.total = res.data.count
           this.wdList = res.data.data
         } else {
           if (res.data.err_msg) {
@@ -212,7 +392,6 @@ export default {
             this.$parent._open('似乎出错了')
           }
         }
-
       })
     },
     _getPoundageConfig() {
@@ -336,7 +515,7 @@ export default {
 }
 
 .notice-item-left {
-  width: 25%;
+  width: 28%;
   justify-content: flex-start;
   text-indent: 10px;
 }
@@ -482,7 +661,32 @@ export default {
   border: 1px solid #eee;
   position: relative;
 }
-
+.cbi-show-list{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  background: #eee;
+  border-radius: 5px;
+  transform: translate(0, 100%);
+  z-index: 999;
+}
+.cbi-show-list-item{
+  height: 40px;
+  width: 100%;
+  background: rgba(0,0,0,.2);
+  color: #f8f8f8;
+  border-bottom: 1px solid #eee;
+  border-radius: 5px;
+}
+.cbi-show-list-item:last-child{
+  border-bottom: none;
+}
+.cbi-show-list-item:hover{
+  background: #FFD236;
+  color: #353535;
+}
 .cbi-btn {
   width: 10%;
   height: 50%;
@@ -499,6 +703,8 @@ export default {
   width: 98%;
   height: 100%;
   margin: 0 1%;
+  text-indent: 20px;
+  color: #444;
 }
 
 .disable-i {
@@ -568,6 +774,10 @@ export default {
   border: 1px solid #eee;
   border-radius: 5px;
   justify-content: flex-start;
+  flex-shrink: 1;
+}
+.min-warp{
+  width: 45%;
 }
 .aib-ipnput{
   width: 100%;
@@ -604,5 +814,31 @@ export default {
 }
 .disable-phone{
   color: #666;
+}
+.btn-yan{
+  width: 25%;
+  height: 70%;
+  background: #FFD236;
+  color: #353535;
+  border-radius: 5px;
+  margin-left: 2%;
+}
+.dialog-min-text {
+  width: 100%;
+  height: auto;
+  line-height: 20px;
+  min-height: 20px;
+  font-size: 15px;
+  color: #999;
+}
+
+.dialog-min-btn {
+  width: 40%;
+  padding: 2% 0;
+  border-radius: 5px;
+  background: #FFD236;
+  color: #000;
+  font-size: 15px;
+  margin: 5% auto 0;
 }
 </style>

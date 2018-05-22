@@ -30,7 +30,7 @@
             <el-option v-for="item in choseItem" :key="item.choseTitle" :label="item.choseTitle" :value="item.id">
             </el-option>
           </el-select>
-          <div class="good-btn flex cursor margin20">筛选</div>
+          <div class="good-btn flex cursor margin20" @click="_chose">筛选</div>
         </div>
         <div class="goods-table">
           <el-table :data="agencyService" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
@@ -77,17 +77,17 @@
           <div class="aib-label flex ellipsis">销售价格：</div>
           <div class="flex aib-input-warp">
             <!-- <span v-if="nowRow">{{nowRow.price}}</span> -->
-            <input type="text" placeholder="请填写销售价格" class="aib-ipnput" @keyup="_rectifyMoney" v-model="money">
+            <input type="text" placeholder="请填写销售价格" class="aib-ipnput" @keyup="_rectifyMoney" v-model="money" ref='aibinput'>
           </div>
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">是否上架：</div>
-          <div class="flex aib-input-warp">
-            <span v-if="nowRow">{{nowRow.status}}</span>
+          <div class="flex aib-input-warp cursor" v-if='nowRow' @click="_chekStaus">
+              <span v-if="nowRow" class="abi-span">{{nowStatus}}</span>
           </div>
         </div>
         <div class="recharge-btn-box flex">
-          <div class="recharge-btn-sure flex sure cursor" @click="_setAgency">确认</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_setAgencySure">确认</div>
           <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
         </div>
       </div>
@@ -112,6 +112,15 @@ export default {
       chose: '全部商品',
       nowRow: null,
       fastclike: null,
+      timeChose:null,
+      statusList:[{
+        title:'是',
+        value: 1
+      },{
+        title:'否',
+        value: 2
+      }],
+      nowStatusValue: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -122,6 +131,12 @@ export default {
     this._orderInt()
   },
   computed: {
+    nowStatus(){
+      if (!this.nowStatusValue) {
+        this.nowStatusValue = this.nowRow.status
+      }
+      return this.nowStatusValue === 1 ? '是' : '否'
+    },
     proxyRank() {
       if (this.user && this.user.agency && this.user.agency.level > 0) {
         return this.rank[this.user.agency.level - 1]
@@ -150,6 +165,66 @@ export default {
     ])
   },
   methods: {
+    _chose() {
+      if (this.timeChose) {
+        this.$parent._open('请勿频繁筛选')
+        return false
+      }
+      if (!this.chose) {
+        this.$parent._open('请选择一个类别筛选')
+        return false
+      }
+      if (this.chose < 0 || isNaN(this.chose)) {
+        this._reset()
+        return false
+      }
+      this._getAgencyservice(false, this.chose)
+      const that = this
+      this.timeChose = setTimeout(() => {
+        clearTimeout(that.timeChose)
+        that.timeChose = false
+      }, 1200)
+    },
+    _reset() {
+      this.chose = '全部商品'
+      this._getAgencyservice()
+    },
+    _chekStaus() {
+      if (this.nowStatusValue === 1) {
+        this.nowStatusValue = 2
+      } else {
+        this.nowStatusValue = 1
+      }
+    },
+    _setAgencySure() {
+      // this.nowRow = e
+      if (!this.money || this.money < this.nowRow.origin_price) {
+        this.$parent._open('销售价需大于成本价')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      const that = this
+      setAgency(this.token, this.nowRow.id, this.money, this.nowStatusValue).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data) {
+          let chose
+          if (this.chose < 0 || isNaN(this.chose)) {
+            chose = false
+          } else {
+            chose = this.chose
+          }
+          that._getAgencyservice(false, chose)
+          that._interlayerHide()
+        }  else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
     _setAgency(e) {
       if (!this.checkTock()) {
         return false
@@ -167,12 +242,24 @@ export default {
       }
       setAgency(this.token, e.id, e.price, status).then((res) => {
         if (res.data.err_code === SUCCESS_CODE && res.data) {
-          that._getAgencyservice()
+          let chose
+          if (this.chose < 0 || isNaN(this.chose)) {
+            chose = false
+          } else {
+            chose = this.chose
+          }
+          that._getAgencyservice(false, chose)
           that.fastclike = true
           that.time = setTimeout(() => {
             that.fastclike = false
             clearTimeout(that.time)
-          }, 2000)
+          }, 1200)
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
         }
       })
     },
@@ -196,11 +283,17 @@ export default {
     },
     showPop(e) {
       // console.log(e)
+      this.nowStatusValue = null
       this.nowRow = e
       this.money = e.price
       this.$refs.popup._showPopup()
       this.$refs.interlayer._setZIndex(9999)
       this.$refs.interlayer._showLayer()
+      this.$nextTick(() => {
+        if (this.$refs.aibinput) {
+          this.$refs.aibinput.focus()
+        }
+      })
     },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
@@ -228,11 +321,11 @@ export default {
       this._getSiteinfo()
       this._getAgencyservice()
     },
-    _getAgencyservice() {
+    _getAgencyservice(status, id) {
       if (!this.checkTock()) {
         return false
       }
-      getAgencyservice(this.token).then((res) => {
+      getAgencyservice(this.token, status, id).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           console.log(res.data.data)
           // this.siteInfo = res.data.data
@@ -352,7 +445,7 @@ export default {
 }
 
 .notice-item-left {
-  width: 25%;
+  width: 28%;
   justify-content: flex-start;
   text-indent: 10px;
 }
@@ -570,6 +663,7 @@ export default {
   border: none;
   background: #f4f4f4;
   font-size: 15px;
+  color: #666;
 }
 .recharge-btn-box {
   height: 70px;
@@ -595,5 +689,8 @@ export default {
   color: #353535;
   background: #FFD236;
   /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
+}
+.abi-span{
+  color: #666;
 }
 </style>
