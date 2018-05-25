@@ -239,3 +239,7 @@ button:hover {
   cursor: pointer !important;
   opacity: 1 !important;
 }
+.has-gutter .cell{
+  font-size: 16px;
+  color: #000;
+}

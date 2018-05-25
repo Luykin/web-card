@@ -271,3 +271,41 @@
 .position-ibi-content:hover .height-light{
   color: #FFD236;
 }
+.add_bg{
+  background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
+}
+.notice-heder {
+  height: 100px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notice-item {
+  height: 45px;
+  width: 100%;
+}
+
+.notice-item-left {
+  width: 40%;
+  justify-content: flex-start;
+  text-indent: 20px;
+  font-size: 16px;
+}
+
+.notice-item-right {
+  justify-content: flex-end;
+  padding-right: 5%;
+  width: 60%;
+  font-size: 16px;
+}
+
+.dengji-warp {
+  width: 90%;
+  font-size: 18px;
+  height: 45px;
+}
+
+.notice-heder-btn {
+  width: 80%;
+  margin: 20px auto;
+  font-size: 16px;
+}

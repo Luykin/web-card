@@ -1,6 +1,7 @@
 <template>
+<!--   http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png -->
   <div id="main-body" ref='mainbody'>
-    <div class="main-box" id="main-box">
+    <div class="main-box" id="main-box" v-if="user">
       <!--  右侧边栏start -->
       <div class="notice" v-if="user.agency">
         <div class="notice-heder flex">
@@ -131,13 +132,14 @@ export default {
       MXList: false,
       page: 0,
       total: 0,
+      bgPath: null,
       code: '',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
   created() {
-    // this.$root.eventHub.$emit('user')
+    this.$root.eventHub.$emit('user')
     this._siteInit()
   },
   computed: {
@@ -157,7 +159,7 @@ export default {
     },
     siteLogo() {
       // console.log(this.user.agency.sub_site.icon)
-      return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat; background-size: contain;`
+      return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat;`
     },
     //   background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
     // background-size: cover;
@@ -282,11 +284,16 @@ export default {
       })
     }
   },
-  components: {},
+  beforeCreate: function() {
+    document.getElementsByTagName("body")[0].className = "add_bg"
+  }
 }
 
 </script>
 <style type="text/css" scoped>
+/*#body{
+  background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
+}*/
 #main-box {
   opacity: .95 !important;
 }
@@ -305,15 +312,15 @@ export default {
 
 .income-box {
   width: 100%;
-  height: 160px;
-  margin: 20px auto;
+  height: 180px;
+  margin: 40px auto;
   overflow: hidden;
 }
 
 .income-box-item {
-  width: 18%;
-  margin: 3%;
-  padding-bottom: 18%;
+  width: 20%;
+  margin: 2%;
+  padding-bottom: 21%;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, .2);
   position: relative;
@@ -325,48 +332,18 @@ export default {
   border-radius: 5px;
   background: rgba(255, 210, 54, 1);
   color: #333;
+  font-size: 16px;
 }
 
 .mg-min-btnwidth {
-  margin: 0 auto;
+  margin: -20px auto 0;
   width: 30%;
-}
-
-.notice-heder {
-  height: 100px;
-  border-bottom: 1px solid #ddd;
-}
-
-.notice-item {
-  height: 45px;
-  width: 100%;
-}
-
-.notice-item-left {
-  width: 28%;
-  justify-content: flex-start;
-  text-indent: 10px;
-}
-
-.notice-item-right {
-  justify-content: flex-end;
-  padding-right: 5%;
-  width: 70%;
-}
-
-.dengji-warp {
-  width: 90%;
-}
-
-.notice-heder-btn {
-  width: 80%;
-  margin: 10px auto;
 }
 
 .configure-box {
   width: 100%;
   background: #fff;
-  height: 400px;
+  height: 520px;
 }
 
 .cb-left {
@@ -392,19 +369,20 @@ export default {
 .cb-left-logo {
   width: 85%;
   padding-bottom: 30%;
-  background: #f4f4f4;
-  margin: 20px auto 0;
+  margin: 40px auto 0;
+  background-size: 100% 100% !important;
 }
 
 .cr-item {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .cr-box-min {
   width: 60%;
   flex-grow: 1;
-  height: 40px;
+  height: 44px;
+  font-size: 16px;
   margin: 0 10px;
   border-radius: 5px;
   background: #f4f4f4;
@@ -416,6 +394,8 @@ export default {
 .cr-box-btn {
   width: 100px;
   margin-right: 20px;
+  font-size: 16px;
+  height: 44px;
 }
 
 .cr-box-max {
@@ -424,6 +404,7 @@ export default {
   border-radius: 5px;
   background: #f4f4f4;
   text-indent: 10px;
+  font-size: 16px;
   justify-content: flex-start;
   flex-grow: 1;
   margin-right: 10px;
@@ -436,6 +417,7 @@ export default {
   width: 15%;
   height: 100%;
   min-width: 60px;
+  font-size: 16px;
 }
 
 .position-ibi-content {
@@ -449,14 +431,17 @@ export default {
 }
 
 .pic-img {
-  width: 45%;
-  height: 45%;
+  width: 38%;
+  height: 36%;
+  margin-top: 15%;
+  overflow: hidden;
 }
 
 .pic-title {
   width: 100%;
-  height: 15%;
+  margin-top: -15%;
   color: #353535;
+  font-size: 16px;
 }
 
 .proxy-icon {

@@ -1,9 +1,10 @@
 <template>
   <div class="edit-box">
-    <div class="edit-content">
+    <div class="edit-content" v-if="user">
       <div class="edit-logo" :style="siteLogo">
         <input type="file" name="selectLogo" class="file-input" ref="fileInput" @change='_uplodeQiniu'>
         <div class="jindu flex">{{Process}}</div>
+        <div class="zushi">注：推荐尺寸150*45图片，不能超过1M。</div>
       </div>
       <div class="cr-item flex">
         <div class="cr-box-tit ellipsis flex">分站名称:</div>
@@ -39,10 +40,17 @@
           <input type="text" v-model="sitFooterEmail" class="edit-input" min="0" max="20">
         </div>
       </div>
-      <div class="btn-box flex">
+      <div class="cr-item flex">
+        <div class="cr-box-tit ellipsis flex"></div>
+        <div class="btn-box flex">
+           <div class="mg-btn flex cursor" @click="_submit">确认修改</div>
+           <div class="mg-btn flex cancle cursor" @click="_cancle">取消</div>
+        </div>
+      </div>
+<!--       <div class="btn-box flex">
         <div class="mg-btn flex cursor" @click="_submit">确认修改</div>
         <div class="mg-btn flex cancle cursor" @click="_cancle">取消</div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -58,6 +66,7 @@ export default {
       siteInfo: false,
       uploding: false,
       logoUrl: false,
+      bgPath: null,
       siteName: "",
       siteFix: '',
       siteAnnouncement: '',
@@ -76,12 +85,12 @@ export default {
   computed: {
     siteLogo() {
       if (this.logoUrl) {
-        return `background: url(${this.logoUrl}) no-repeat; background-size: contain;`
+        return `background: url(${this.logoUrl}) no-repeat;`
       } else {
         if (this.user.agency.sub_site && this.user.agency.sub_site.icon) {
-          return `background: url(${this.user.agency.sub_site.icon}) no-repeat; background-size: contain;`
+          return `background: url(${this.user.agency.sub_site.icon}) no-repeat;`
         } else {
-          return `background: url(${require('../../assets/logo.png')}) no-repeat; background-size: contain;`
+          return `background: url(${require('../../assets/logo.png')}) no-repeat;`
         }
       }
     },
@@ -111,8 +120,8 @@ export default {
         this.$parent._open('文件格式不支持')
         return false
       }
-      if (this.$refs.fileInput.files[0].size > 700000) {
-        this.$parent._open('请上传小于700kb的图片')
+      if (this.$refs.fileInput.files[0].size > 900000) {
+        this.$parent._open('请上传小于900kb的图片')
         return false
       }
       this.uploding = true
@@ -265,7 +274,6 @@ export default {
             })
           }
         }
-
       })
     },
     _cancle() {
@@ -291,14 +299,11 @@ export default {
         return false
       }
       return true
-    },
+    }
   },
-  components: {},
-  watch: {
-    // logoUrl(val, oldval) {
-    //   console.log(val)
-    // }
-  },
+  beforeCreate: function() {
+    document.getElementsByTagName("body")[0].className = "add_bg"
+  }
 }
 
 </script>
@@ -307,9 +312,21 @@ export default {
   width: 25%;
   padding-top: 10%;
   background: #eee;
-  margin: 30px auto;
+  margin: 40px auto 60px;
   position: relative;
-  overflow: hidden;
+  background-size: 100% 100% !important;
+}
+.zushi{
+  position: absolute;
+  bottom: 0;
+  left: -40px;
+  right: -40px;
+  height: 50px;
+  line-height: 50px;
+  transform:translate(0,100%); 
+  text-align: center;
+  font-size: 14px;
+  color: #ff9100;
 }
 
 .edit-box {
@@ -323,8 +340,8 @@ export default {
 
 .edit-content {
   width: 90%;
-  max-width: 950px;
-  min-height: 750px;
+  max-width: 850px;
+  min-height: 800px;
   height: auto;
   margin: 0 auto;
   /*transform: translate(0 , 10%);*/
@@ -334,7 +351,7 @@ export default {
 
 .cr-item {
   width: 100%;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
 .cr-box-min {
@@ -349,6 +366,7 @@ export default {
   justify-content: flex-start;
   overflow: hidden;
   border: 1px solid #eee;
+  font-size: 16px;
 }
 
 .cr-box-btn {
@@ -376,6 +394,7 @@ export default {
   max-width: 80px;
   height: 100%;
   margin: 0 3%;
+  font-size: 16px;
 }
 
 .file-input {
@@ -391,9 +410,8 @@ export default {
 
 .btn-box {
   width: 100%;
-  margin-top: 40px;
   height: 100px;
-  /* background: #000;*/
+  justify-content: flex-start;
 }
 
 .mg-btn {
@@ -403,7 +421,7 @@ export default {
   background: rgba(255, 210, 54, 1);
   color: #333;
   width: 33%;
-  margin: 0 8%;
+  margin: 0 40px 40px 1%;
 }
 
 .cancle {
@@ -430,6 +448,7 @@ export default {
   width: 98%;
   height: 100%;
   margin: 0 1%;
+  font-size: 16px;
 }
 
 .edit-textarea {
@@ -442,6 +461,7 @@ export default {
   font-family: '微软雅黑';
   color: #000;
   resize: none;
+  font-size: 16px;
 }
 
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div id="main-body" ref='mainbody'>
-    <div class="main-box" id="main-box">
+    <div class="main-box" id="main-box" v-if="user">
       <!--  右侧边栏start -->
       <div class="notice">
         <div class="notice-heder flex">
@@ -60,6 +60,7 @@
           <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
         </div>
       </div>
+      <div class="show-line"></div>
       <div class="goods-table">
         <el-table :data="wdList" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
           <el-table-column prop="id" label="ID">
@@ -77,7 +78,7 @@
           <el-table-column prop="create" label="申请时间">
           </el-table-column>
         </el-table>
-        <div id="i-page" class="i-page flex">
+        <div id="i-page" class="i-page flex" v-show='total'>
           <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange" :page-size="page_size">
           </el-pagination>
         </div>
@@ -153,6 +154,7 @@ export default {
       dialogTitle: '',
       dialogText: '',
       total:null,
+      bgPath: null,
       account_type: 3,
       wdList: [],
       accountList: [],
@@ -368,7 +370,7 @@ export default {
     },
     _getAccount() {
       getAccount(this.token).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+        if (res.data.err_code === SUCCESS_CODE) {
           this.accountList = res.data.data
           if (res.data.data && res.data.data.length > 0){
             this.nowAccount = res.data.data[0] || false
@@ -459,6 +461,9 @@ export default {
     popup,
     interlayer
   },
+  beforeCreate: function() {
+    document.getElementsByTagName("body")[0].className = "add_bg"
+  }
 }
 
 </script>
@@ -505,37 +510,6 @@ export default {
 .mg-min-btnwidth {
   margin: 0 auto;
   width: 30%;
-}
-
-.notice-heder {
-  height: 100px;
-  border-bottom: 1px solid #ddd;
-}
-
-.notice-item {
-  height: 45px;
-  width: 100%;
-}
-
-.notice-item-left {
-  width: 28%;
-  justify-content: flex-start;
-  text-indent: 10px;
-}
-
-.notice-item-right {
-  justify-content: flex-end;
-  padding-right: 5%;
-  width: 70%;
-}
-
-.dengji-warp {
-  width: 90%;
-}
-
-.notice-heder-btn {
-  width: 80%;
-  margin: 10px auto;
 }
 
 .configure-box {
@@ -591,11 +565,13 @@ export default {
   text-indent: 10px;
   justify-content: flex-start;
   overflow: hidden;
+  font-size: 16px;
 }
 
 .cr-box-btn {
   width: 100px;
   margin-right: 20px;
+  font-size: 16px;
 }
 
 .cr-box-max {
@@ -610,6 +586,7 @@ export default {
   align-items: flex-start;
   line-height: 40px;
   overflow: hidden;
+  font-size: 16px;
 }
 
 .cr-box-tit {
@@ -653,6 +630,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   min-width: 80px;
+  font-size: 16px;
 }
 
 .cbi-input-box {
@@ -691,12 +669,13 @@ export default {
   color: #353535;
 }
 .cbi-btn {
-  width: 10%;
+  width: 12%;
   height: 50%;
   background: #FFD236;
   color: #353535;
   border-radius: 5px;
   min-width: 70px;
+  font-size: 16px;
 }
 
 .edit-input {
@@ -729,7 +708,7 @@ export default {
 }
 
 .goods-table {
-  margin: 20px 1% 0;
+  margin: 20px 20px 0;
 }
 .recharge-box-title-agent {
   width: 100%;
@@ -843,5 +822,11 @@ export default {
   color: #000;
   font-size: 15px;
   margin: 5% auto 0;
+}
+.show-line{
+  width: 100%;
+  height: 1px;
+  background: #ddd;
+  margin: 20px auto;
 }
 </style>

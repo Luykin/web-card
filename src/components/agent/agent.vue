@@ -84,7 +84,7 @@ export default {
     }
   },
   created() {
-
+    this.$root.eventHub.$emit('user')
   },
   methods: {
     _emitAgent() {

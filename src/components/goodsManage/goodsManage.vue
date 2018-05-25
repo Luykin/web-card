@@ -1,6 +1,6 @@
 <template>
   <div id="main-body" ref='mainbody'>
-    <div class="main-box" id="main-box">
+    <div class="main-box" id="main-box" v-if="user">
       <!--  右侧边栏start -->
       <div class="notice">
         <div class="notice-heder flex">
@@ -30,7 +30,7 @@
             <el-option v-for="item in choseItem" :key="item.choseTitle" :label="item.choseTitle" :value="item.id">
             </el-option>
           </el-select>
-          <div class="good-btn flex cursor margin20" @click="_chose">筛选</div>
+          <div class="good-btn flex cursor margin20" @click="_chose">查询</div>
         </div>
         <div class="goods-table">
           <el-table :data="agencyService" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
@@ -327,9 +327,7 @@ export default {
       }
       getAgencyservice(this.token, status, id).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          console.log(res.data.data)
-          // this.siteInfo = res.data.data
-          this.agencyService = res.data.data
+          this.agencyService = res.data.data || []
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -386,6 +384,9 @@ export default {
     popup,
     interlayer
   },
+  beforeCreate: function() {
+    document.getElementsByTagName("body")[0].className = "add_bg"
+  } 
 }
 
 </script>
@@ -427,6 +428,7 @@ export default {
   border-radius: 5px;
   background: rgba(255, 210, 54, 1);
   color: #333;
+  font-size: 16px;
 }
 
 .mg-min-btnwidth {
@@ -434,36 +436,6 @@ export default {
   width: 30%;
 }
 
-.notice-heder {
-  height: 100px;
-  border-bottom: 1px solid #ddd;
-}
-
-.notice-item {
-  height: 45px;
-  width: 100%;
-}
-
-.notice-item-left {
-  width: 28%;
-  justify-content: flex-start;
-  text-indent: 10px;
-}
-
-.notice-item-right {
-  justify-content: flex-end;
-  padding-right: 5%;
-  width: 70%;
-}
-
-.dengji-warp {
-  width: 90%;
-}
-
-.notice-heder-btn {
-  width: 80%;
-  margin: 10px auto;
-}
 
 .configure-box {
   width: 98%;

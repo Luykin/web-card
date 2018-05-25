@@ -225,35 +225,6 @@ export default {
     _setAnnouncement(announcement) {
       this.announcement = announcement
     },
-    // _setFanZan() {
-    //   if (window.location.href.indexOf('.xkfans.com') > -10) {
-    //     let start = window.location.href.indexOf('://')
-    //     let end = window.location.href.indexOf('.xkfans.com')
-    //     let domain = window.location.href.slice(start + 3, end)
-    //     domain = 'abv' + '.xkfans.com'
-    //     const that = this
-    //     if (domain) {
-    //       getsubsite(domain).then((res) => {
-    //         if (res.data.err_code === SUCCESS_CODE) {
-    //           if (res.data.data) {
-    //             document.title = res.data.data.site_name + res.data.data.title_suffix
-    //             // document.getElementsByTagName('meta').description.content = res.data.data.title_suffix
-    //             this.$root.eventHub.$emit('logo', res.data.data.icon)
-    //             this.$root.eventHub.$emit('footername', res.data.data.contact)
-    //             this.$root.eventHub.$emit('footeremail', res.data.data.email)
-    //             this.$root.eventHub.$emit('announcement', res.data.data.announcement)
-    //             this.Gdomain = domain
-    //             this._getAppInfo(this)
-    //           }
-    //         }
-    //       })
-    //     } else {
-    //       this._getAppInfo(this)
-    //     }
-    //   } else {
-    //     this._getAppInfo(this)
-    //   }
-    // },
     _setEnv() {
       const query = this.$route.query
       if (query.env === 'dev') {

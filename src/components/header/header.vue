@@ -306,7 +306,7 @@
   </div>
 </template>
 <script type="text/javascript" scoped>
-import { setDomain } from 'api/site'
+import { setDomain, setSiteinfo } from 'api/site'
 import sidebar from 'components/sidebar/sidebar'
 import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
@@ -455,6 +455,26 @@ export default {
           this.$parent._open('设置成功')
           this.$root.eventHub.$emit('user')
           this._hiddenDomain()
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+      const logoUrl = 'http://p8sxtcg6t.bkt.clouddn.com/defual.png'
+      const siteName = '分站名称'
+      const siteFix = '分站名称后缀'
+      const siteAnnouncement = '分站公告，请到分站管理后台编辑'
+      const sitFooter = '分站联系人'
+      const sitFooterEmail = '分站联系邮箱'
+      setSiteinfo(this.token, logoUrl, siteName, siteFix, siteAnnouncement, sitFooter, sitFooterEmail).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$root.eventHub.$emit('user')
+          this.$router.replace({
+            path: '/management'
+          })
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
