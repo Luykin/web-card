@@ -33,7 +33,7 @@ export function getSiteinfo(token) {
     }
   })
 }
-export function setSiteinfo(token, icon, site_name, title_suffix, announcement, footer) {
+export function setSiteinfo(token, icon, site_name, title_suffix, announcement, email, contact) {
   const url = `${PREFIX_URL}/set_sub_site`
   let data = {
     token: token,
@@ -41,7 +41,8 @@ export function setSiteinfo(token, icon, site_name, title_suffix, announcement, 
     site_name: site_name,
     title_suffix: title_suffix,
     announcement: announcement,
-    footer: footer
+    email: email,
+    contact: contact
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

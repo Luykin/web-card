@@ -37,8 +37,9 @@
 import { sendVerify, findPassword } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { SUCCESS_CODE } from 'api/config'
+import { Judge } from 'common/js/judge'
 export default {
-	mixins: [normalMixin],
+	mixins: [normalMixin, Judge],
 	data() {
 	return {
 		time: '获取验证码',

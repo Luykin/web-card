@@ -19,6 +19,7 @@ new Vue({
   template: '<App/>',
   data: {
     eventHub: new Vue(),
+    judge: null,
     errorCode: {
       '404': '资源不存在',
       '405': '系统繁忙',

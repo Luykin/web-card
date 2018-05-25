@@ -28,9 +28,15 @@
         </div>
       </div>
       <div class="cr-item flex">
-        <div class="cr-box-tit ellipsis flex">尾页信息:</div>
-        <div class="cr-box-max flex">
-          <textarea type="text" v-model="sitFooter" class="edit-textarea" min="0" max="40"></textarea>
+        <div class="cr-box-tit ellipsis flex">尾页联系人:</div>
+        <div class="cr-box-min flex">
+          <input type="text" v-model="sitFooter" class="edit-input" min="0" max="12">
+        </div>
+      </div>
+      <div class="cr-item flex">
+        <div class="cr-box-tit ellipsis flex">联系邮箱:</div>
+        <div class="cr-box-min flex">
+          <input type="text" v-model="sitFooterEmail" class="edit-input" min="0" max="20">
         </div>
       </div>
       <div class="btn-box flex">
@@ -56,6 +62,7 @@ export default {
       siteFix: '',
       siteAnnouncement: '',
       sitFooter: '',
+      sitFooterEmail: '',
       Process: '点击上传Logo'
     }
   },
@@ -90,7 +97,8 @@ export default {
       this.siteName = this.user.agency.sub_site.site_name
       this.siteFix = this.user.agency.sub_site.title_suffix
       this.siteAnnouncement = this.user.agency.sub_site.announcement
-      this.sitFooter = this.user.agency.sub_site.footer
+      this.sitFooter = this.user.agency.sub_site.contact
+      this.sitFooterEmail = this.user.agency.sub_site.email
       this.logoUrl = this.user.agency.sub_site.icon || 'http://p8sxtcg6t.bkt.clouddn.com/defual.png'
     },
     _uplodeQiniu() {
@@ -214,7 +222,7 @@ export default {
       return base64
     },
     _submit() {
-      if (!this.$refs.fileInput.files[0]) {
+      if (!this.$refs.fileInput.files[0] && !this.user.agency.sub_site.icon) {
         this.$parent._open('请先上传文件')
         return false
       }
@@ -226,10 +234,18 @@ export default {
         this.$parent._open('请填写网站名称')
         return false
       }
+      if (!this.sitFooter) {
+        this.$parent._open('请填写尾页联系人')
+        return false
+      }
+      if (!this.sitFooterEmail) {
+        this.$parent._open('请填写尾页邮箱')
+        return false
+      }
       if (!this.checkTock()) {
         return false
       }
-      setSiteinfo(this.token, this.logoUrl, this.siteName, this.siteFix, this.siteAnnouncement, this.sitFooter).then((res) => {
+      setSiteinfo(this.token, this.logoUrl, this.siteName, this.siteFix, this.siteAnnouncement, this.sitFooter, this.sitFooterEmail).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           this.$root.eventHub.$emit('user')
           this.$parent._open('设置成功')

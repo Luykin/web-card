@@ -45,9 +45,14 @@
             <div class="cr-box-max flex">{{user.agency.sub_site.announcement}}</div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">尾页信息:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.footer}}</div>
+            <div class="cr-box-tit ellipsis flex">商户联系:</div>
+            <div class="cr-box-min flex">{{user.agency.sub_site.contact}}</div>
           </div>
+          <div class="cr-item flex">
+            <div class="cr-box-tit ellipsis flex">联系邮箱:</div>
+            <div class="cr-box-min flex">{{user.agency.sub_site.email}}</div>
+          </div>
+          <!-- ,联系邮箱：{{user.agency.sub_site.email}} -->
         </div>
       </div>
       <div class="partition" v-show="!showMingXi"></div>
@@ -98,9 +103,9 @@
           </el-table-column>
           <el-table-column prop="price" label="充值金额">
           </el-table-column>
-          <el-table-column prop="status" label="状态">
+          <el-table-column prop="statusShow" label="状态">
           </el-table-column>
-          <el-table-column prop="create" label="时间">
+          <el-table-column prop="timeA" label="时间">
           </el-table-column>
         </el-table>
         <div id="i-page" class="i-page flex">
@@ -117,6 +122,7 @@ import { getSiteinfo, getOrders } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import { timeChange } from 'common/js/util'
 export default {
   data() {
     return {
@@ -165,14 +171,12 @@ export default {
   methods: {
     _copyDomain() {
       if (this.user.agency.sub_domain) {
-        window.open(this.user.agency.sub_domain)
+        window.open(`http://${this.user.agency.sub_domain}`)
       } else {
         this.$root.eventHub.$emit('domain')
       }
-      // window.open(this.user.agency.sub_domain)
     },
     _chose(e) {
-      console.log(e)
       this.page = 0
       const that = this
       if (e) {
@@ -187,7 +191,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.page = val - 1
-      this._getOrders()
+      this._getOrders(that)
     },
     _checkMX() {
       this.showMingXi = !this.showMingXi
@@ -217,10 +221,10 @@ export default {
       this._getSiteinfo(that)
       this._getOrders(that)
     },
-    _getOrders(that, code){
+    _getOrders(that, code) {
       getOrders(this.token, 10, this.page, 1, code).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          that.MXList = res.data.data.data
+          that.MXList = this._formatMXlist(res.data.data.data)
           that.total = res.data.data.count
         } else {
           if (res.data.err_msg) {
@@ -230,6 +234,13 @@ export default {
           }
         }
       })
+    },
+    _formatMXlist(list) {
+      list.forEach((item) => {
+        item.statusShow = item.status === 1 ? '未支付' : '已支付'
+        item.timeA = timeChange(item.create)
+      })
+      return list
     },
     _getSiteinfo(that) {
       getSiteinfo(this.token).then((res) => {
@@ -453,10 +464,12 @@ export default {
   height: auto;
   margin: 0 5px;
 }
-.goods-table{
+
+.goods-table {
   width: 96%;
   margin: 0 auto;
 }
+
 .good-btn {
   width: 80px;
   height: 40px;
@@ -464,21 +477,24 @@ export default {
   background: #FFD236;
   color: #353535;
 }
-.input-btn-box{
+
+.input-btn-box {
   justify-content: flex-start;
   height: auto;
   width: 100%;
   margin: 20px 0;
 }
-.ibb-input-warp{
+
+.ibb-input-warp {
   height: 40px;
   width: 35%;
   background: #f4f4f4;
   border-radius: 5px;
   border: 1px solid #eee;
-/*  margin-right: 2%;*/
+  /*  margin-right: 2%;*/
 }
-.aib-ipnput{
+
+.aib-ipnput {
   width: 100%;
   height: 100%;
   outline: none;
@@ -488,11 +504,14 @@ export default {
   color: #777;
   text-indent: 20px;
 }
-.margin20{
+
+.margin20 {
   margin-left: 2%;
 }
-.partition-top{
+
+.partition-top {
   height: 10px;
   width: 100%;
 }
+
 </style>

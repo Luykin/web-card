@@ -27,8 +27,9 @@ import { normalMixin } from 'common/js/mixin'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
+import { Judge } from 'common/js/judge'
 export default {
-  mixins: [normalMixin],
+  mixins: [normalMixin, Judge],
   data() {
     return {
       password: '',

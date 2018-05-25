@@ -54,8 +54,10 @@ import { getTasks, custom } from 'api/order'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import { Judge } from 'common/js/judge'
 const NUM = 11
 export default {
+  mixins: [Judge],
   data() {
     return {
       tableData: [],
@@ -195,7 +197,7 @@ export default {
       let time = Date.parse(new Date()) / 1000
       list.forEach((item) => {
         // console.log(item.status)
-        if (item.status.indexOf('完成') >= 0) {
+        if (item.status ==='完成') {
           item.time = '-'
           return
         }

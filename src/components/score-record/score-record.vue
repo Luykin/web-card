@@ -35,8 +35,10 @@ import { getOrders } from 'api/score-record'
 import { mapGetters, mapMutations } from 'vuex'
 import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
+import { Judge } from 'common/js/judge'
 const NUM = 11
 export default {
+  mixins: [Judge],
   data() {
     return {
       tableData: [],

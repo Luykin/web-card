@@ -78,7 +78,7 @@
           </el-table-column>
         </el-table>
         <div id="i-page" class="i-page flex">
-          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
+          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange" :page-size="page_size">
           </el-pagination>
         </div>
       </div>
@@ -139,6 +139,8 @@ import { sendVerify } from 'api/login'
 export default {
   data() {
     return {
+      page_size: 8,
+      page: 0,
       siteInfo: false,
       min_amount: false,
       rate: false,
@@ -195,7 +197,7 @@ export default {
   methods: {
     handleCurrentChange(val) {
       this.page = val - 1
-      this._getOrders()
+      this._getWithdrawlist(this.page_size, this.page)
     },    
     _rectifyMoney() {
       if (isNaN(this.rmoney)) {
@@ -233,7 +235,8 @@ export default {
           this.dialogText = '申请提现后，我们将在每周二进行统一打款'
           this.centerDialogVisible = true
           this.$root.eventHub.$emit('user')
-          that._getWithdrawlist()
+          this.page = 0
+          that._getWithdrawlist(this.page_size, this.page)
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -359,7 +362,7 @@ export default {
       }
       this._getSiteinfo()
       this._getPoundageConfig()
-      this._getWithdrawlist(10, 0)
+      this._getWithdrawlist(this.page_size, this.page)
       this._getAccount()
       this._setTime()
     },

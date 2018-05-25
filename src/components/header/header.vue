@@ -130,10 +130,10 @@
     <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
     <popup ref="popup">
       <div class="recharge-box">
-        <div class="recharge-box-title flex" v-show="!payUrl">积分充值</div>
+        <div class="recharge-box-title flex" v-show="!payUrl">{{BuyDomainData ? '订单确认' : '积分充值'}}</div>
         <div class="recharge-box-title flex" v-show="payUrl">{{payType}}扫码支付</div>
         <div class="content-qr flex" v-if="payUrl">
-          <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money">{{money||choseGood.price}}</span>元</div>
+          <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元</div>
           <div class="qrcode-box flex">
             <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
           </div>
@@ -147,7 +147,7 @@
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
         <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
-        <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0">
+        <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0 && !BuyDomainData">
           <!-- app  商品 -->
           <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex">
             <div class="good-item-label flex ellipsis">{{item.label}}</div>
@@ -157,12 +157,24 @@
         <!-- app  商品  end -->
         <!-- <div class="net-item flex" v-show="!payUrl">微信支付</div> -->
         <!-- <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img"> -->
-        <div class="flex input-defult width90" v-show="!payUrl">
+        <div class="flex input-defult width90" v-show="!payUrl && !BuyDomainData">
           <!-- onkeyup="value=value.replace(/[^\d]/g,'') " ng-pattern="/[^a-zA-Z]/" -->
           <input type="text" :placeholder="'请输入充值金额（元）'" class="i-ipnput" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder" autocomplete='off' autofocus='on'>
         </div>
-        <div class="min-tips-text flex" v-show="!payUrl&&((money&& money>=Math.ceil(app.min_recharge)) || choseGood)">充值<span class="my-money">{{money|| choseGood.price}}</span>元等于<span class="course-btn">{{Math.ceil(money*scorerate) || choseGood.score}}</span>积分</div>
-        <div class="min-tips-text flex" v-show="!payUrl&&(!money || money<Math.ceil(app.min_recharge)) && !choseGood">最小充值金额为<span class="my-money">{{Math.ceil(app.min_recharge)}}</span>元。</div>
+        <div class="min-tips-text flex" v-show="!payUrl&&((money&& money>=Math.ceil(app.min_recharge)) || choseGood) && !BuyDomainData">充值<span class="my-money">{{money|| choseGood.price}}</span>元等于<span class="course-btn">{{Math.ceil(money*scorerate) || choseGood.score}}</span>积分</div>
+        <div class="min-tips-text flex" v-show="!payUrl&&(!money || money<Math.ceil(app.min_recharge)) && !choseGood && !BuyDomainData">最小充值金额为<span class="my-money">{{Math.ceil(app.min_recharge)}}</span>元。</div>
+        <div class="buy-domain-data" v-if="BuyDomainData && !payUrl">
+          <div class="bdd-item flex">
+            <div class="bdd-item-left flex ellipsis">提交信息</div>
+            <div class="bdd-item-right flex ellipsis cursor bdd-item-right-url" @click="_openUrl(BuyDomainData.addition)">{{BuyDomainData.addition}}</div>
+          </div>
+          <div class="bdd-item flex">
+            <div class="bdd-item-left flex ellipsis">订单详情</div>
+            <div class="bdd-item-right flex ellipsis">{{BuyDomainData.services.label}} * {{BuyDomainData.point}}{{BuyDomainData.services.units||'次'}} = {{BuyDomainData.price}} 元</div>
+          </div>
+          <!--           {{BuyDomainData.addition}}
+          {{BuyDomainData.price}} -->
+        </div>
         <!-- app  支付方式 -->
         <div class="goods-box flex" v-show="!payUrl">
           <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
@@ -170,7 +182,8 @@
         </div>
         <!-- app  支付方式  end -->
         <div class="recharge-btn-box flex" v-show="!payUrl">
-          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder">确认</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder" v-if="!BuyDomainData">确认</div>
+          <div class="recharge-btn-sure flex sure cursor" @click="_addSubSiteTask" v-if="BuyDomainData">确定</div>
           <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
         </div>
       </div>
@@ -279,10 +292,11 @@
       <div>
         <div class="recharge-box-title-agent flex">设置您分站域名</div>
         <div class="rbta-input-warp flex">
-          <input type="text" name="domain" class="rbata-iw-left flex" placeholder="填写您的域名" v-model="domainText" >
+          <input type="text" name="domain" class="rbata-iw-left flex" placeholder="填写您的域名" v-model="domainText">
           <div class="rbata-iw-right flex">.xkfans.com</div>
         </div>
-        <div class="titps-domain flex">温馨提示:设置完成后您可以通过{{domainText}}.xkfans.com访问您的分站</div><!-- #FF9100 -->
+        <div class="titps-domain flex">温馨提示:设置完成后您可以通过{{domainText}}.xkfans.com访问您的分站</div>
+        <!-- #FF9100 -->
         <div class="recharge-btn-box-after flex bottom">
           <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_setDomainSure">确定</div>
           <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenDomain">取消</div>
@@ -292,7 +306,7 @@
   </div>
 </template>
 <script type="text/javascript" scoped>
-import {setDomain} from 'api/site'
+import { setDomain } from 'api/site'
 import sidebar from 'components/sidebar/sidebar'
 import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
@@ -300,12 +314,13 @@ import popup from 'base/popup/popup'
 import { addOrder, agency } from 'api/header'
 import { testToken } from 'common/js/util'
 import QrcodeVue from 'qrcode.vue'
-import { getUserInfo } from 'api/index'
+import { getUserInfo, addSubSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 
 export default {
   data() {
     return {
+      BuyDomainData: null,
       money: '',
       companyName: '',
       applicant: '',
@@ -343,8 +358,8 @@ export default {
     this.$root.eventHub.$on('env', () => {
       this.env = '测试环境'
     })
-    this.$root.eventHub.$on('showPopup', () => {
-      this._showPopup()
+    this.$root.eventHub.$on('showPopup', (data) => {
+      this._showPopup(false, data)
     })
     this.$root.eventHub.$on('domain', () => {
       this._setDomain()
@@ -407,6 +422,19 @@ export default {
     ])
   },
   methods: {
+    _addSubSiteTask() {
+      if (!this.activePayType) {
+        this.$parent._open('请选择支付方式')
+        return
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      this.BuyDomainData.pay_type = this.activePayType
+      addSubSiteTask(this.token, this.BuyDomainData).then((res) => {
+        this._afterAddOrder(res)
+      })
+    },
     _FENZAN() {
       this.FENZAN = true
     },
@@ -699,28 +727,17 @@ export default {
     },
     _sureCompletionPayment() {
       this._hiddenSidebar()
-      this.$router.replace({
-        path: '/score-record'
-      })
+      if (this.BuyDomainData) {
+        this.$router.replace({
+          path: '/order'
+        })
+      } else {
+        this.$router.replace({
+          path: '/score-record'
+        })
+      }
       this.$root.eventHub.$emit('canvas', true)
     },
-    // _getAppInfo(that) {
-    //   getAppInfo().then((res) => {
-    //     if (res.data.err_code === SUCCESS_CODE && res.data.data) {
-    //       if (res.data.data.score_rate) {
-    //         this.setScorerate(res.data.data.score_rate)
-    //         this.setApp(res.data.data)
-    //         this.$root.eventHub.$emit('IndexInit')
-    //       }
-    //     } else {
-    //       if (res.data.err_msg) {
-    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
-    //       } else {
-    //         this.$parent._open('似乎出错了')
-    //       }
-    //     }
-    //   })
-    // },
     _logout(e) {
       e.stopPropagation()
       this.setUser(false)
@@ -752,9 +769,13 @@ export default {
         this.$refs.interlayer._showLayer()
       })
     },
-    _showPopup(e) {
+    _showPopup(e, data) {
       if (e) {
         e.stopPropagation()
+      }
+      if (data) {
+        console.log(data)
+        this.BuyDomainData = data
       }
       this.$nextTick(() => {
         this.popup = true
@@ -800,6 +821,11 @@ export default {
         this.agent = false
         this.$refs.agent._hiddenPopup()
         this.$refs.interlayer._setZIndex(1500)
+      }
+    },
+    _openUrl(e) {
+      if (e.indexOf('http') > -1) {
+        window.open(e)
       }
     },
     _hiddenSidebar() {
@@ -947,6 +973,8 @@ export default {
 
 
 
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1011,6 +1039,8 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
 
 
 
@@ -1438,31 +1468,62 @@ export default {
 */
   /*  box-shadow: 0 2px 1px rgba(0,0,0,.1);*/
 }
-.rbta-input-warp{
+
+.rbta-input-warp {
   width: 80%;
   height: 50px;
   border-radius: 10px;
   background: #f4f4f4;
   color: #353535;
-  border:1px solid #eee;
+  border: 1px solid #eee;
   font-size: 16px;
   margin: 50px auto 10px;
 }
-.rbata-iw-right{
+
+.rbata-iw-right {
   width: 60%;
   height: 100%;
 }
-.rbata-iw-left{
+
+.rbata-iw-left {
   width: 30%;
   height: 80%;
   outline: none;
-  border:none;
+  border: none;
   margin: 0 5%;
   border-radius: 10px;
   text-align: center;
   font-size: 16px;
 }
-.titps-domain{
+
+.titps-domain {
   color: #FF9100;
 }
+
+.bdd-item {
+  height: 50px;
+  width: 100%;
+  margin: 10px auto -10px;
+}
+
+.bdd-item-left {
+  width: 16%;
+  justify-content: flex-end;
+  padding: 0 2%;
+  font-size: 17px;
+  color: #FF6B4E;
+}
+
+.bdd-item-right {
+  width: 72%;
+  justify-content: flex-start;
+  margin: 0 7% 0 1%;
+  color: #353535;
+  font-size: 14px;
+}
+
+.bdd-item-right-url:hover {
+  color: #FF6B4E;
+}
+
 </style>

@@ -29,8 +29,9 @@ import { login } from 'api/login'
 import { normalMixin } from 'common/js/mixin'
 import { mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
+import { Judge } from 'common/js/judge'
 export default {
-  mixins: [normalMixin],
+  mixins: [normalMixin, Judge],
   data() {
     return {
       phone: this.$route.query.phone || '',

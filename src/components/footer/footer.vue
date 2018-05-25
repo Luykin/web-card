@@ -7,8 +7,8 @@
     </div>
     <div class="footer-item flex shpc">
       <div class="footer-item-title footer-item-item flex"></div>
-      <div class="footer-item-name footer-item-item flex">商务联系：钟先生</div>
-      <div class="footer-item-name footer-item-item flex">联系邮箱：raynor@melonblock.com</div>
+      <div class="footer-item-name footer-item-item flex" v-show="!hid">商务联系：钟先生</div>
+      <div class="footer-item-name footer-item-item flex" v-show="!hid">联系邮箱：raynor@melonblock.com</div>
     </div>
     <div class="footer-item flex shpc">
       <div class="footer-item-title footer-item-item flex">商务合作</div>
@@ -18,9 +18,9 @@
     <div class="h-footer-box flex sh-phone">商务联系：{{name}}</div>
     <div class="h-footer-box flex sh-phone">联系邮箱：{{emil}}</div>
     <div class="border-f sh-phone"></div>
-    <div class="h-footer-box flex sh-phone">商务联系：钟先生</div>
-    <div class="h-footer-box flex sh-phone">联系邮箱：raynor@melonblock.com</div>
-    <div class="h-footer-title flex sh-phone">商务联系</div>
+    <div class="h-footer-box flex sh-phone" v-show="!hid">商务联系：钟先生</div>
+    <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：raynor@melonblock.com</div>
+    <div class="h-footer-title flex sh-phone" v-show="!hid">商务联系</div>
     <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">42428851</span></div>
   </footer>
 </template>
@@ -29,16 +29,19 @@ export default {
     data() {
       return {
         name:'张先生',
-        emil: 'zhangheng@melonblock.com'
+        emil: 'zhangheng@melonblock.com',
+        hid: null
       }
     },
     created() {
       const that = this
       this.$root.eventHub.$on('footername', (footer) => {
         that.name = footer
+        that.hid = true
       })
       this.$root.eventHub.$on('footeremail', (footer) => {
         that.emil = footer
+        that.hid = true
       })
     }
 }

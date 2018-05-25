@@ -3,13 +3,10 @@ import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
 import { getSign } from 'common/js/util'
 
-export function getServiceCategory(sub_domain) {
+export function getServiceCategory() {
   const url = `${PREFIX_URL}/service_category`
   let data = {
     uaid: UAID
-  }
-  if (sub_domain) {
-    data = Object.assign({ sub_domain: sub_domain }, data)
   }
   return axios.get(url, {
     params: Object.assign({ sign: getSign(data) }, data)
@@ -17,11 +14,14 @@ export function getServiceCategory(sub_domain) {
     return Promise.resolve(res)
   })
 }
-export function getServices(id) {
+export function getServices(id, sub_domain) {
   const url = `${PREFIX_URL}/services`
   let data = {
     uaid: UAID,
     service_category_id: id
+  }
+  if (sub_domain) {
+    data = Object.assign({ sub_domain: sub_domain }, data)
   }
   return axios.get(url, {
     params: Object.assign({ sign: getSign(data) }, data)
@@ -151,6 +151,51 @@ export function getsubsite(sub_domain) {
   let data = {
     uaid: UAID,
     sub_domain: sub_domain
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+    if (error.response) {
+      // console.log(error.response.data)
+      console.log(error.response.status)
+      // console.log(error.response.headers)
+      return Promise.resolve({
+        data: {
+          err_code: error.response.status,
+          err_msg: error.response.status
+        }
+      })
+    } else {
+      return Promise.resolve({
+        data: {
+          err_code: -1,
+          err_msg: -1
+        }
+      })
+    }
+  })
+}
+//2018.05.23 分站下单
+// point, service_id, uaid, price, addition, sub_domain, pay_type, target_id, appointment_time
+export function addSubSiteTask(token, buydata) {
+  const url = `${PREFIX_URL}/add_sub_site_task`
+  let data = {
+    token: token,
+    point: buydata.point,
+    service_id: buydata.service_id,
+    uaid: UAID,
+    price: buydata.price,
+    addition: buydata.addition,
+    sub_domain: buydata.sub_domain,
+    pay_type: buydata.pay_type
+
+  }
+  if (buydata.target_id) {
+    data = Object.assign({ target_id: buydata.target_id }, data)
+  }
+  if (buydata.appointment_time) {
+    data = Object.assign({ appointment_time: buydata.appointment_time }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

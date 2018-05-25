@@ -75,16 +75,19 @@
       </div>
       <div v-if="nowServices">
         <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-        <div class="rule-hints flex ellipsis">
+        <div class="rule-hints flex ellipsis" v-if="Gdomain && nowServices.price">
+          <span class="rh-title">所需金额:</span>
+          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
+        </div>
+        <div class="rule-hints flex ellipsis" v-if="!Gdomain">
           <span class="rh-title">所需积分:</span>
           <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '积分'}}</span>
-          <!-- <span v-if="user.discount!==1 && user">{{'* ' + (user.discount || 1)*10 + '折'}}</span> -->
         </div>
-        <div class="rule-hints flex ellipsis">
+        <div class="rule-hints flex ellipsis" v-if="!Gdomain">
           <span class="rh-title">剩余积分:</span>
           <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
         </div>
-        <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level">
+        <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
           <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
           <!-- <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span no-indent">-最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span> -->
         </div>
@@ -98,14 +101,19 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getsubsite } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
+import { Judge } from 'common/js/judge'
 const BILI = 0.8
 export default {
+  mixins: [Judge],
   data() {
     return {
+      // 很重要，代表是否为分站的参数
+      Gdomain: null,
+      judgeMust: true,
       popoverWidth: 1000,
       link: '',
       orderTimeD: '',
@@ -125,11 +133,9 @@ export default {
       scorerate: false, // 一元购买多少积分
       pc: true,
       announcement: null,
-      // showNotice: null,
       choseSay: false,
       sublimeTime: false,
       netWorking: false,
-      // agencyPrice: null,
       position: 'right',
       closeName: '关闭',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
@@ -140,28 +146,18 @@ export default {
       }
     }
   },
-  // updated() {
-  //   if (!this.init) {
-  //     this._initNet()
-  //   }
-  // },
   created() {
-    // 2018.05.22
-    this._setFanZan()
     this._setEnv()
     this._setPopoverWidth()
-    this._getAppInfo(this)
-    // this._getshowNotice(this)
     if (this.user) {
       this.$nextTick(() => {
         this.$root.eventHub.$emit('user')
       })
     }
-    this.$root.eventHub.$on('announcement', (announcement)=>{
+    this.$root.eventHub.$on('announcement', (announcement) => {
       this._setAnnouncement(announcement)
     })
     this.$root.eventHub.$emit('canvas')
-    // this.$root.eventHub.$emit('IndexInit')
   },
   updated() {
     this.$nextTick(() => {
@@ -177,16 +173,13 @@ export default {
         submit_category: 1
       }
       if (this.showService) {
-        // console.log('you  showService')
         this.showService.forEach((item) => {
           if (item.id === this.choseServiceValue) {
             nowServer = item
-            // console.log('zhaodao l nowServer', item)
           }
         })
       }
       if (nowServer.submit_category === 2) {
-        // console.log('you  submit_category')
         this.quantity = nowServer.min_num
       }
       return nowServer
@@ -206,7 +199,13 @@ export default {
     },
     consumeNum() {
       return Math.ceil((this.quantity || 0) * this.nowServices.rate)
-      // * (this.user.discount || 1))
+    },
+    consumeMoney() {
+      if (this.nowServices.price) {
+        return (this.quantity || 0) * this.nowServices.price
+      } else {
+        return false
+      }
     },
     agencyPrice() {
       if (this.user.agency_level) {
@@ -226,30 +225,35 @@ export default {
     _setAnnouncement(announcement) {
       this.announcement = announcement
     },
-    _setFanZan(){
-      if (window.location.href.indexOf('.xkfans.com') > -1) {
-        let start = window.location.href.indexOf('://')
-        let end = window.location.href.indexOf('.xkfans.com')
-        let domain = window.location.href.slice(start + 3, end)
-        domain = domain + '.xkfans.com'
-        const that = this
-        if (domain) {
-          getsubsite(domain).then((res)=>{
-            if (res.data.err_code === SUCCESS_CODE) {
-              if (res.data.data) {
-                this.$root.eventHub.$emit('logo', res.data.data.icon)
-                // this.$root.eventHub.$emit('logo', res.data.data.sub_site.icon)
-                this.$root.eventHub.$emit('footername', res.data.data.contact)
-                this.$root.eventHub.$emit('footeremail', res.data.data.email)
-                this.$root.eventHub.$emit('announcement', res.data.data.announcement)
-                this._getServiceCategory(that, domain)
-                document.title = res.data.data.site_name
-              }
-            }
-          })
-        }
-      }
-    },
+    // _setFanZan() {
+    //   if (window.location.href.indexOf('.xkfans.com') > -10) {
+    //     let start = window.location.href.indexOf('://')
+    //     let end = window.location.href.indexOf('.xkfans.com')
+    //     let domain = window.location.href.slice(start + 3, end)
+    //     domain = 'abv' + '.xkfans.com'
+    //     const that = this
+    //     if (domain) {
+    //       getsubsite(domain).then((res) => {
+    //         if (res.data.err_code === SUCCESS_CODE) {
+    //           if (res.data.data) {
+    //             document.title = res.data.data.site_name + res.data.data.title_suffix
+    //             // document.getElementsByTagName('meta').description.content = res.data.data.title_suffix
+    //             this.$root.eventHub.$emit('logo', res.data.data.icon)
+    //             this.$root.eventHub.$emit('footername', res.data.data.contact)
+    //             this.$root.eventHub.$emit('footeremail', res.data.data.email)
+    //             this.$root.eventHub.$emit('announcement', res.data.data.announcement)
+    //             this.Gdomain = domain
+    //             this._getAppInfo(this)
+    //           }
+    //         }
+    //       })
+    //     } else {
+    //       this._getAppInfo(this)
+    //     }
+    //   } else {
+    //     this._getAppInfo(this)
+    //   }
+    // },
     _setEnv() {
       const query = this.$route.query
       if (query.env === 'dev') {
@@ -373,39 +377,57 @@ export default {
         this.sublimeTime = this.orderTimeD / 1000 + H + M
         // return false
       }
-      let price
-      if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
-        // agencyPrice
-        if (this.agencyPrice > this.user.score) {
-          this.$parent._open('积分不足')
-          this.$root.eventHub.$emit('showPopup')
-          return false
+      if (this.Gdomain) {
+        let data = {
+          services: this.nowServices,
+          point: this.quantity,
+          service_id: this.choseServiceValue,
+          price: this.consumeMoney,
+          addition: this.link,
+          sub_domain: this.Gdomain
         }
-        price = this.agencyPrice
+        if (category === 2 || category === 4) {
+          data = Object.assign({ target_id: this.targetid }, data)
+        }
+        if (category === 24 || category === 25) {
+          data = Object.assign({ target_id: false, appointment_time: this.sublimeTime}, data)
+        }
+        this.$root.eventHub.$emit('showPopup', data)
       } else {
-        if (this.consumeNum > this.user.score) {
-          this.$parent._open('积分不足')
-          this.$root.eventHub.$emit('showPopup')
-          return false
+        let price
+        if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
+          // agencyPrice
+          if (this.agencyPrice > this.user.score) {
+            this.$parent._open('积分不足')
+            this.$root.eventHub.$emit('showPopup')
+            return false
+          }
+          price = this.agencyPrice
+        } else {
+          if (this.consumeNum > this.user.score) {
+            this.$parent._open('积分不足')
+            this.$root.eventHub.$emit('showPopup')
+            return false
+          }
+          price = this.consumeNum
         }
-        price = this.consumeNum
-      }
-      if (category === 2 || category === 4) {
-        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+        this.netWorking = true
+        if (category === 2 || category === 4) {
+          addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+            this._afterAddtask(res)
+          })
+          return true
+        }
+        if (category === 24 || category === 25) {
+          addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
+            this._afterAddtask(res)
+          })
+          return true
+        }
+        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
           this._afterAddtask(res)
         })
-        return true
       }
-      if (category === 24 || category === 25) {
-        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
-          this._afterAddtask(res)
-        })
-        return true
-      }
-      this.netWorking = true
-      addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
-        this._afterAddtask(res)
-      })
     },
     _afterAddtask(res) {
       this.orderTimeD = ''
@@ -540,7 +562,7 @@ export default {
       }
       if (!this.services[id]) {
         this.lodingChose = true
-        this._getServices(this, id)
+        this._getServices(this, id, this.Gdomain)
       } else {
         this.showService = this.services[id]
         this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
@@ -596,26 +618,23 @@ export default {
     // },
     _initNet() {
       this.activeCategory = this.app.service_categories[0].id
-      this._getServices(this, this.app.service_categories[0].id) // 服务
+      this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
     },
-    _getServiceCategory(that, domain) {
-      getServiceCategory(domain).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          // that.serviceCategory = res.data.data
-          // that.activeCategory = res.data.data[0].id
-          // that._getServices(that, res.data.data[0].id)
-        } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('似乎出错了')
-          }
-        }
-      })
-    },
-    _getServices(that, id) {
+    // _getServiceCategory(that, domain) {
+    //   getServiceCategory(domain).then((res) => {
+    //     if (res.data.err_code === SUCCESS_CODE) {
+    //     } else {
+    //       if (res.data.err_msg) {
+    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
+    //       } else {
+    //         this.$parent._open('似乎出错了')
+    //       }
+    //     }
+    //   })
+    // },
+    _getServices(that, id, Gdomain) {
       // const that = this
-      getServices(id).then((res) => {
+      getServices(id, Gdomain).then((res) => {
         that.lodingChose = false
         if (res.data.err_code === SUCCESS_CODE) {
           const services = this._normalServices(res.data.data)
@@ -1039,21 +1058,24 @@ export default {
   color: #999;
   font-size: 13px;
 }
-.main-box{
+
+.main-box {
   position: relative;
 }
-.notice{
+
+.notice {
   position: absolute;
   right: 0;
   top: 0;
   transform: translate(106%, 0);
   min-height: 5%;
-  max-height: 50%;
+  /*  max-height: 50%;*/
   width: 50%;
   background: #fff;
   padding: 50px 10px 10px;
 }
-.notice-title{
+
+.notice-title {
   height: 40px;
   position: absolute;
   left: 0;
@@ -1061,6 +1083,10 @@ export default {
   top: 0;
   background: #dfe1e5;
   color: #666;
+}
+
+.notice-content {
+  line-height: 1.5 !important;
 }
 
 </style>
