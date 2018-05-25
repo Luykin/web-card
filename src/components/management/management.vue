@@ -199,11 +199,13 @@ export default {
       this.showMingXi = !this.showMingXi
     },
     _toGoodsManage() {
+      this.$root.eventHub.$emit('siteInit')
       this.$router.replace({
         path: '/goodsManage'
       })
     },
     _toReflect() {
+      this.$root.eventHub.$emit('reflectInit')
       this.$router.replace({
         path: '/reflect'
       })

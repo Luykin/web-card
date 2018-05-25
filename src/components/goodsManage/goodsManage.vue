@@ -79,6 +79,7 @@
             <!-- <span v-if="nowRow">{{nowRow.price}}</span> -->
             <input type="text" placeholder="请填写销售价格" class="aib-ipnput" @keyup="_rectifyMoney" v-model="money" ref='aibinput'>
           </div>
+          <div class="tishi">注：销售定价不可低于成本价</div>
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">是否上架：</div>
@@ -86,9 +87,12 @@
               <span v-if="nowRow" class="abi-span">{{nowStatus}}</span>
           </div>
         </div>
-        <div class="recharge-btn-box flex">
-          <div class="recharge-btn-sure flex sure cursor" @click="_setAgencySure">确认</div>
-          <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
+        <div class="flex agree-input-box">
+          <!-- <div class="aib-label flex ellipsis"></div> -->
+          <div class="flex recharge-btn-box">
+            <div class="recharge-btn-sure flex sure cursor" @click="_setAgencySure">确认</div>
+            <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
+          </div>
         </div>
       </div>
     </popup>
@@ -127,6 +131,10 @@ export default {
   },
   created() {
     this.$root.eventHub.$emit('user')
+    // this.$root.eventHub.$emit('siteInit')
+    this.$root.eventHub.$on('siteInit', () => {
+      this._siteInit()
+    })
     this._siteInit()
     this._orderInt()
   },
@@ -268,6 +276,7 @@ export default {
       this.$refs.interlayer._hiddenLayer()
     },
     _toReflect() {
+      this.$root.eventHub.$emit('reflectInit')
       this.$router.replace({
         path: '/reflect'
       })
@@ -549,7 +558,8 @@ export default {
 }
 
 .goods-table {
-  width: 100%;
+  width: 96%;
+  padding: 2%;
   height: auto;
 }
 
@@ -610,10 +620,9 @@ export default {
 
 .agree-input-box {
   margin: 0 auto 20px;
-  /*margin-bottom: 30px;*/
   width: 100%;
   height: 50px;
-  overflow: hidden;
+  position: relative;
 }
 .aib-label{
   height: 100%;
@@ -638,6 +647,7 @@ export default {
   color: #666;
 }
 .recharge-btn-box {
+  width: 100%;
   height: 70px;
   justify-content: flex-start;
 }
@@ -648,7 +658,7 @@ export default {
 }
 
 .recharge-btn-sure:nth-child(1) {
-  margin: 0 20% 0 5%;
+  margin: 0 30% 0 0;
 }
 .cancel {
   box-sizing: border-box;
@@ -664,5 +674,15 @@ export default {
 }
 .abi-span{
   color: #666;
+}
+.tishi{
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  transform: translate(0, 100%);
+  text-indent: 22%;
+  color: #ff9100;
+  font-size: 14px;
 }
 </style>

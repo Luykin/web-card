@@ -37,10 +37,11 @@
           <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
         </div>
         <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">体现方式:</div>
+          <div class="cbi-name flex ellipsis">提现方式:</div>
           <div class="cbi-input-box flex disable-i">
             <!-- {{user.agency.balance}} -->
-            支付宝
+            <!-- {{wh_type === 1? '支付宝':'微信'}} -->
+            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' :  '微信') :  '去绑定'}}
           </div>
           <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>
@@ -67,15 +68,15 @@
           </el-table-column>
           <el-table-column prop="money" label="提现金额">
           </el-table-column>
-          <el-table-column prop="withdraw_account.account_type" label="提现方式">
+          <el-table-column prop="WAType" label="提现方式">
           </el-table-column>
           <el-table-column prop="withdraw_account.account" label="提现帐号">
           </el-table-column>
           <el-table-column prop="withdraw_account.name" label="账户姓名">
           </el-table-column>
-          <el-table-column prop="status" label="状态">
+          <el-table-column prop="statusA" label="状态">
           </el-table-column>
-          <el-table-column prop="create" label="申请时间">
+          <el-table-column prop="createA" label="申请时间">
           </el-table-column>
         </el-table>
         <div id="i-page" class="i-page flex" v-show='total'>
@@ -88,9 +89,21 @@
       <div class="recharge-box-title-agent flex">绑定提现账户</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
+          <div class="aib-label flex ellipsis">提现方式：</div>
+          <div class="flex aib-input-warp none-bg">
+            <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
+              <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img">
+              支付宝
+            </div>
+            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type!==1?'active-riw':''">
+              <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img">
+              微信
+            </div>
+          </div>
+        </div>
+        <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">提现账户：</div>
           <div class="flex aib-input-warp">
-            <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
             <input type="text" placeholder="输入账户" class="aib-ipnput" v-model="raccount">
           </div>
         </div>
@@ -116,10 +129,16 @@
           <div class="btn-yan flex ellipsis cursor" @click="_getcode">{{time}}
             <span v-if="time > 0">s后重新获取</span></div>
         </div>
-        <div class="recharge-btn-box flex">
+        <div class="flex agree-input-box">
+          <div class="recharge-btn-box flex">
+            <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
+            <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
+          </div>
+        </div>
+<!--         <div class="recharge-btn-box flex">
           <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
           <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
-        </div>
+        </div> -->
       </div>
     </popup>
     <interlayer ref="interlayer"></interlayer>
@@ -132,7 +151,7 @@
 <script type="text/javascript">
 import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
-import { testToken } from 'common/js/util'
+import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
 import popup from 'base/popup/popup'
 import interlayer from 'base/interlayer/interlayer'
@@ -148,6 +167,7 @@ export default {
       showListAccount: false,
       nowAccount: false,
       raccount: '',
+      wh_type: 1,
       rname: '',
       ryan: '',
       rmoney: '0.00',
@@ -155,7 +175,7 @@ export default {
       dialogText: '',
       total:null,
       bgPath: null,
-      account_type: 3,
+      // account_type: 3,
       wdList: [],
       accountList: [],
       centerDialogVisible: false,
@@ -166,7 +186,10 @@ export default {
   },
   created() {
     this.$root.eventHub.$emit('user')
-    this._siteInit()
+    this.$root.eventHub.$on('reflectInit', () => {
+      this._reflectInit()
+    })
+    this._reflectInit()
   },
   computed: {
     proxyRank() {
@@ -197,6 +220,16 @@ export default {
     ])
   },
   methods: {
+    _choseType(e){
+      this.wh_type = e
+    },
+    tableRowClassName(row) {
+      if (row.row.status) {
+        return 'sucess-table'
+      } else {
+        return ''
+      }
+    },
     handleCurrentChange(val) {
       this.page = val - 1
       this._getWithdrawlist(this.page_size, this.page)
@@ -265,7 +298,7 @@ export default {
         return false
       }
       const that = this
-      addAccount(this.token, this.account_type, this.raccount, this.rname, this.ryan).then((res) => {
+      addAccount(this.token, this.wh_type, this.raccount, this.rname, this.ryan).then((res) => {
         this.ryan = ''
         if (res.data.err_code === SUCCESS_CODE) {
           this.$parent._open('绑定成功')
@@ -351,7 +384,7 @@ export default {
         path: '/goodsManage'
       })
     },
-    _siteInit() {
+    _reflectInit() {
       if (!this.user.agency || !this.user.agency.sub_site) {
         this.$parent._open('请先创建分站')
         this.$router.replace({
@@ -389,7 +422,7 @@ export default {
         if (res.data.err_code === SUCCESS_CODE) {
           console.log(res.data.data)
           this.total = res.data.count
-          this.wdList = res.data.data
+          this.wdList = this._formatWDlist(res.data.data)
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -398,6 +431,22 @@ export default {
           }
         }
       })
+    },
+    _formatWDlist(list){
+      list.forEach((item) => {
+        if(item.status){
+          item.statusA = '已打款'
+        } else {
+          item.statusA = '打款中'
+        }
+        if (item.withdraw_account.account_type === 1) {
+          item.WAType = '支付宝'
+        } else {
+          item.WAType = '微信'
+        }
+        item.createA = timeChange(item.create)
+      })
+      return list
     },
     _getPoundageConfig() {
       getPoundageConfig().then((res) => {
@@ -758,6 +807,12 @@ export default {
   justify-content: flex-start;
   flex-shrink: 1;
 }
+.none-bg{
+  width: 80%;
+  padding: 0;
+  background: #fff;
+  border: none;
+}
 .min-warp{
   width: 45%;
 }
@@ -770,6 +825,7 @@ export default {
   font-size: 15px;
 }
 .recharge-btn-box {
+  width: 100%;
   height: 70px;
   justify-content: flex-start;
 }
@@ -780,7 +836,7 @@ export default {
 }
 
 .recharge-btn-sure:nth-child(1) {
-  margin: 0 20% 0 5%;
+  margin: 0 30% 0 0;
 }
 .cancel {
   box-sizing: border-box;
@@ -828,5 +884,21 @@ export default {
   height: 1px;
   background: #ddd;
   margin: 20px auto;
+}
+.r-i-warp{
+  width: 120px;
+  height: 100%;
+  border: 1px solid rgba(0,0,0,.2);
+  margin: 0 20px 0 0;
+  border-radius: 8px;
+}
+.riw-img{
+  width: auto;
+  height: 80%;
+  margin: 0 2%;
+}
+.active-riw{
+  /*background: #f4f4f4;*/
+  border:1px solid #FF9100;
 }
 </style>

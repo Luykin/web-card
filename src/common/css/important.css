@@ -243,3 +243,9 @@ button:hover {
   font-size: 16px;
   color: #000;
 }
+.sucess-table .cell{
+  color: #fff !important;
+}
+.el-table__body-wrapper .el-table__body tbody .sucess-table:hover > td{
+  background:  #9BCB74 !important;
+}
