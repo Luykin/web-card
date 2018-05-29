@@ -66,7 +66,8 @@ export default {
   },
   watch:{
     $route(newUrl, oldUrl){
-      if (newUrl.path === '/goodsManage' || newUrl.path === '/edit' || newUrl.path === '/reflect' || newUrl.path === '/management') {
+      console.log(newUrl)
+      if (newUrl.name === 'management') {
         document.getElementsByTagName("body")[0].className = "add_bg"
       } else {
         document.body.removeAttribute("class","add_bg")

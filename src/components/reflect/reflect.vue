@@ -225,9 +225,9 @@ export default {
     },
     tableRowClassName(row) {
       if (row.row.status) {
-        return 'sucess-table'
-      } else {
         return ''
+      } else {
+        return 'sucess-table'
       }
     },
     handleCurrentChange(val) {

@@ -366,7 +366,7 @@ export default {
   justify-content: flex-start;
   overflow: hidden;
   border: 1px solid #eee;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .cr-box-btn {
@@ -448,7 +448,7 @@ export default {
   width: 98%;
   height: 100%;
   margin: 0 1%;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .edit-textarea {
@@ -461,7 +461,7 @@ export default {
   font-family: '微软雅黑';
   color: #000;
   resize: none;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 </style>

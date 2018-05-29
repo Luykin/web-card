@@ -171,6 +171,13 @@ export default {
     ])
   },
   methods: {
+    tableRowClassName(row) {
+      if (row.row.status === 2) {
+        return ''
+      } else {
+        return 'sucess-table'
+      }
+    },
     _copyDomain() {
       if (this.user.agency.sub_domain) {
         window.open(`http://${this.user.agency.sub_domain}`)
@@ -314,9 +321,9 @@ export default {
 
 .income-box {
   width: 100%;
-  height: 180px;
+  height: auto;
   margin: 40px auto;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .income-box-item {
