@@ -20,7 +20,8 @@ body {
   overflow-x: hidden;
 }
 .add_bg{
-  background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
+  background: url('http://p70pqu6ys.bkt.clouddn.com/siteBg.png') no-repeat;
+  background-size: cover;
 }
 
 div,

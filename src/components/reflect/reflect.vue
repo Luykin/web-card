@@ -420,9 +420,10 @@ export default {
     _getWithdrawlist(num, page) {
       getWithdrawlist(this.token, num, page).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          console.log(res.data.data)
           this.total = res.data.count
-          this.wdList = this._formatWDlist(res.data.data)
+          if (res.data.count > 0) {
+            this.wdList = this._formatWDlist(res.data.data)
+          }
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
