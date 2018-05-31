@@ -6,6 +6,7 @@ export const normalMixin = {
   },
   methods: {
     _verifyPhone(phone) {
+      console.log(phone)
       if (!phone) {
         this.$parent._open('请填手机号哦')
         return false

@@ -40,6 +40,11 @@ export default {
   },
   created() {
     this.$root.eventHub.$emit('canvas')
+    const that = this
+    setTimeout(()=>{
+      console.log(that.phone)
+      console.log(that.password)
+    },1000)
   },
   methods: {
     _changePssword(str) {
@@ -65,7 +70,6 @@ export default {
           }
           if (res.data.data.token) {
             let tokenTime = +new Date() + 60 * 58 * 1000
-            // localStorage.setItem('tokenTime', tokenTime)
             that.setTokenTime(tokenTime)
             that.setToken(res.data.data.token)
           } else {
@@ -100,6 +104,9 @@ export default {
 
 </script>
 <style type="text/css" scoped>
+.i-ipnput{
+  background-color: #fff !important;
+}
 .forget {
   color: #333;
 }

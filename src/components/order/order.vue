@@ -70,6 +70,7 @@ export default {
       loading: false,
       timer: false,
       state: {
+        '-10': '未支付',
         '-9': '进行中',
         '-8': '订单失败',
         '-7': '进行中',
@@ -197,7 +198,7 @@ export default {
       let time = Date.parse(new Date()) / 1000
       list.forEach((item) => {
         // console.log(item.status)
-        if (item.status ==='完成') {
+        if (item.status ==='完成' || item.status ==='未支付') {
           item.time = '-'
           return
         }

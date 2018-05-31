@@ -72,7 +72,11 @@ export default new Router({
       path: '/reflect',
       name: 'management',
       component: () => import('components/reflect/reflect')
+    },
+    {
+      path: '/task',
+      name: 'management',
+      component: () => import('components/task/task')
     }
-    // Reflect
   ]
 })

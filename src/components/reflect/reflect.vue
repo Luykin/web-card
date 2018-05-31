@@ -27,12 +27,14 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">我的提现账户:</div>
           <div class="cbi-input-box flex disable-i cursor" @click="_showList">
-            <div class="cbi-show-list" v-if="showListAccount">
+            <div class="cbi-show-list" v-show="showListAccount">
               <div class="cbi-show-list-item flex" v-for="item in accountList" @click="_choseAccount(item)">
                 {{item.name + item.account}}
               </div>
             </div>
-            {{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}
+            <span>{{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}</span>
+            <i class="el-icon-arrow-down cbi-icon" v-show="!showListAccount"></i>
+            <i class="el-icon-arrow-up cbi-icon" v-show="showListAccount"></i>
           </div>
           <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
         </div>
@@ -692,6 +694,12 @@ export default {
   border: 1px solid #eee;
   position: relative;
 }
+.cbi-icon{
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
 .cbi-show-list{
   position: absolute;
   bottom: 0;
@@ -706,7 +714,8 @@ export default {
 .cbi-show-list-item{
   height: 40px;
   width: 100%;
-  background: rgba(0,0,0,.2);
+ /* background: rgba(0,0,0,.2);*/
+  background: #9BCB14;
   color: #f8f8f8;
   border-bottom: 1px solid #eee;
   border-radius: 5px;
@@ -901,5 +910,8 @@ export default {
 .active-riw{
   /*background: #f4f4f4;*/
   border:1px solid #FF9100;
+}
+.dengji-warp{
+  font-size: 16px;
 }
 </style>

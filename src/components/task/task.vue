@@ -15,82 +15,19 @@
         </div>
         <div class="notice-item flex">
           <div class="notice-item-left flex ellipsis">我的余额</div>
-          <div class="notice-item-right flex nir-color" v-if="user">{{user.score}}</div>
+          <div class="notice-item-right flex" v-if="user">{{user.score}}</div>
         </div>
         <div class="notice-item flex" v-if="siteInfo">
           <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
+          <div class="notice-item-right flex">{{user.agency.balance}}</div>
         </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage" v-show="!showMingXi">商品管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="showMingXi">分站管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkRW">任务列表</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage" v-show="!showMingXi">商品管理</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
       </div>
       <!--  右侧边栏end -->
-      <div class="configure-box flex" v-show="!showMingXi">
-        <div class="cb-left flex">
-          <div class="cb-left-logo" :style="siteLogo"></div>
-        </div>
-        <div class="cb-right" v-if="user.agency">
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">分站名称:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_site.site_name}}</div>
-            <div class="cr-box-btn mg-btn flex cursor" @click="toEdit">分站编辑</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">我的分站:</div>
-            <div class="cr-box-min flex">{{user.agency.sub_domain}}</div>
-            <div class="cr-box-btn mg-btn flex cursor" @click="_copyDomain">访问分站</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">首页公告:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.announcement}}</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">商户联系:</div>
-            <div class="cr-box-min flex margin-right">{{user.agency.sub_site.contact}}</div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">联系邮箱:</div>
-            <div class="cr-box-min flex margin-right">{{user.agency.sub_site.email}}</div>
-          </div>
-          <!-- ,联系邮箱：{{user.agency.sub_site.email}} -->
-        </div>
-      </div>
-      <div class="partition" v-show="!showMingXi"></div>
-      <div class="partition-top" v-show="showMingXi"></div>
-      <div class="income-box flex" v-if="siteInfo">
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex height-light nir-color">{{siteInfo.sum_price_today}}</div>
-            <div class="pic-title flex">今日消费</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex height-light nir-color">{{siteInfo.sum_income_today}}</div>
-            <div class="pic-title flex">今日收入</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%94%B6%E7%9B%8A.png" class="pic-img">
-            <div class="pic-title flex height-light nir-color">{{siteInfo.sum_price}}</div>
-            <div class="pic-title flex">总消费</div>
-          </div>
-        </div>
-        <div class="income-box-item cursor">
-          <div class="position-ibi-content flex">
-            <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%B6%88%E8%B4%B9.png" class="pic-img">
-            <div class="pic-title flex height-light nir-color">{{siteInfo.sum_income}}</div>
-            <div class="pic-title flex">总收入</div>
-          </div>
-        </div>
-      </div>
-      <div class="partition" v-show="showMingXi"></div>
-      <div class="goods-table" v-if="showMingXi && MXList">
+<!--       <div class="partition"></div> -->
+      <div class="goods-table" v-if="tableData">
         <div class="flex input-btn-box">
           <div class="ibb-input-warp">
             <input type="text" name="mxInput" class="aib-ipnput" placeholder="输入ID或订单号查询" v-model="code">
@@ -98,49 +35,86 @@
           <div class="good-btn flex cursor margin20" @click="_chose(false)">查询</div>
           <div class="good-btn flex cursor margin20" @click="_chose(true)">全部订单</div>
         </div>
-        <el-table :data="MXList" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
-          <el-table-column prop="id" label="ID">
-          </el-table-column>
-          <el-table-column prop="code" label="订单号" width='200'>
-          </el-table-column>
-          <el-table-column prop="price" label="充值金额">
-          </el-table-column>
-          <el-table-column prop="statusShow" label="状态">
-          </el-table-column>
-          <el-table-column prop="timeA" label="时间">
-          </el-table-column>
-        </el-table>
+        <!-- :row-class-name="tableRowClassName" -->
+      <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+        <el-table-column prop="label" label="业务" width="140">
+        </el-table-column>
+        <el-table-column prop="id" label="订单ID">
+        </el-table-column>
+        <el-table-column prop="addition" label="分享链接/用户ID">
+        </el-table-column>
+        <el-table-column
+        label="">
+        <template slot-scope="scope">
+          <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+        </template>
+        </el-table-column>
+        <el-table-column prop="start_point" label="初始数量">
+        </el-table-column> 
+        <el-table-column prop="point" label="数量">
+        </el-table-column>
+        <!--  <el-table-column prop="start_point" label="起始数量">
+        </el-table-column>
+        <el-table-column prop="currentNum" label="当前数量">
+        </el-table-column> -->
+        <el-table-column prop="status" label="状态">
+        </el-table-column>
+        <el-table-column prop="time" label="预计完成">
+        </el-table-column>
+        <el-table-column prop="appointment_time" label="预约时间">
+        </el-table-column>
+        <el-table-column prop="createA" label="提交时间">
+        </el-table-column>
+      </el-table>
         <div id="i-page" class="i-page flex">
           <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </div>
-      <div class="mg-btn flex mg-min-btnwidth cursor" @click="_checkMX" v-show="!showMingXi">查看明细</div>
     </div>
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getOrders } from 'api/site'
+import { getTasks } from 'api/site'
 import { mapGetters, mapMutations } from 'vuex'
-import { testToken } from 'common/js/util'
+import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
-import { timeChange } from 'common/js/util'
+const NUM = 11
 export default {
   data() {
     return {
       siteInfo: false,
       showMingXi: false,
-      MXList: false,
+      tableData: false,
       page: 0,
       total: 0,
       bgPath: null,
       code: '',
+      loading: false,
+      state: {
+        '-10': '未支付',
+        '-9': '进行中',
+        '-8': '订单失败',
+        '-7': '进行中',
+        '-6': '订单失败',
+        '-5': '进行中',
+        '-4': '已完成',
+        '-3': '准备中',
+        '-2': '准备中',
+        '-1': '准备中',
+        '0': '准备中',
+        '1': '进行中',
+        '2': '已完成',
+        '3': '进行中',
+        '4': '订单取消',
+        '5': '订单取消'
+      },
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
   created() {
-    this.$root.eventHub.$emit('user')
+    // this.$root.eventHub.$emit('user')
     this._siteInit()
   },
   computed: {
@@ -172,13 +146,11 @@ export default {
     ])
   },
   methods: {
-    _checkRW() {
-      this.$router.replace({
-        path: '/task'
-      })
+    _viewLink(e) {
+      window.open(e.hrefLink)
     },
     tableRowClassName(row) {
-      if (row.row.status === 2) {
+      if (row.row.status === '已完成') {
         return ''
       } else {
         return 'sucess-table'
@@ -195,18 +167,19 @@ export default {
       this.page = 0
       const that = this
       if (e) {
-        this._getOrders(that)
+        this._getTasks()
       } else {
         if (!this.code) {
           this.$parent._open('请先输入订单号')
           return false
         }
-        this._getOrders(that, this.code)
+        this._getTasks(this.code)
       }
     },
     handleCurrentChange(val) {
+      console.log(val)
       this.page = val - 1
-      this._getOrders(that)
+      this._getTasks()
     },
     _checkMX() {
       this.showMingXi = !this.showMingXi
@@ -235,44 +208,100 @@ export default {
         return false
       }
       const that = this
-      this._getSiteinfo(that)
-      this._getOrders(that)
+      // this._getSiteinfo(that)
+      this._getTasks()
     },
-    _getOrders(that, code) {
-      getOrders(this.token, 10, this.page, 1, code).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          that.MXList = this._formatMXlist(res.data.data.data)
-          that.total = res.data.data.count
+    _getTasks(id) {
+      if (!this.checkTock()) {
+        return false
+      }
+      this.loading = true
+      // const that = this
+      if (id) {
+        // console.log(id)
+        getTasks(this.token, NUM, this.page, 1, id).then((res) => {
+          this.afterGetTasks(res, this)
+        })
+      } else {
+        getTasks(this.token, NUM, this.page, 1).then((res) => {
+          this.afterGetTasks(res, this)
+        })
+      }
+    },
+    afterGetTasks(res, that) {
+      this.loading = false
+      if (res.data.err_code === SUCCESS_CODE) {
+        this.total = res.data.data.count
+        this.tableData = that._normalTasks(res.data.data.tasks)
+        // this._timing(this.tableData)
+        setInterval(() => {
+          that._countDown(this.tableData)
+        }, 1000)
+      }
+    }, 
+    _countDown(list) {
+      const that = this
+      let time = Date.parse(new Date()) / 1000
+      list.forEach((item) => {
+        // console.log(item.status)
+        if (item.status ==='完成' || item.status ==='未支付') {
+          item.time = '-'
+          return
+        }
+        if (item.status === '准备中') {
+          item.time = '-'
         } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          if (item.cost_time + item.create > time) {
+            item.time = that.normalTimeCountDown(item.cost_time + item.create - time)
           } else {
-            this.$parent._open('似乎出错了')
+            item.time = '00:00:01'
           }
         }
       })
     },
-    _formatMXlist(list) {
+    normalTimeCountDown: function(item) {
+      let day = item / 3600 >= 24 ? parseInt(item / (3600 * 24)) : 0 // 天
+      let hour = (item - day * 24 * 3600) / 3600 >= 1 ? parseInt((item - day * 24 * 3600) / 3600) : 0 // 小时
+      let minute = (item - day * 24 * 3600 - hour * 3600) / 60 >= 1 ? parseInt((item - day * 24 * 3600 - hour * 3600) / 60) : 0 // 分钟
+      let second = item - day * 24 * 3600 - hour * 3600 - minute * 60 // 秒
+      day = day === 0 ? '' : day + ':'
+      hour = hour === 0 ? '00:' : hour < 10 ? '0' + hour + ':' : hour + ':'
+      minute = minute === 0 ? '' : minute < 10 ? '0' + minute + ':' : minute + ':'
+      second = second < 10 ? '0' + second : second
+      return day + hour + minute + second
+    },   
+    _normalTasks(list) {
+      const that = this
       list.forEach((item) => {
-        item.statusShow = item.status === 1 ? '未支付' : '已支付'
-        item.timeA = timeChange(item.create)
+        item.hrefLink = item.addition
+        item.status = that.state[item.status]
+        item.createA = timeChange(item.create)
+        item.currentNum = '-'
+        item.time = '-'
+        if (item.hrefLink.indexOf('http')> -1) {
+          item.showLink = true
+        } else {
+          item.showLink = false
+        }
+        if (item.appointment_time) {
+          item.appointment_time = timeChange(item.appointment_time)
+        } else {
+          item.appointment_time = '-'
+        }
+        if (item.addition.length >= 15) {
+          item.addition = item.addition.slice(0, 12) + '...'
+          // console.log(item.addition)
+        }
       })
       return list
     },
-    _getSiteinfo(that) {
-      getSiteinfo(this.token).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          // console.log(res.data.data)
-          this.siteInfo = res.data.data
-        } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('似乎出错了')
-          }
-        }
-      })
-    },
+    // _formatMXlist(list) {
+    //   list.forEach((item) => {
+    //     item.statusShow = item.status === 1 ? '未支付' : '已支付'
+    //     item.timeA = timeChange(item.create)
+    //   })
+    //   return list
+    // },
     checkTock() {
       if (!this.user) {
         this.$parent._open('请登录')
@@ -297,11 +326,17 @@ export default {
       this.$router.push({
         path: '/edit'
       })
-    }
+    },
+    ...mapMutations({
+      setToken: 'SET_TOKEN',
+      setUser: 'SET_USER',
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
+    })
   },
   beforeCreate: function() {
     document.getElementsByTagName("body")[0].className = "add_bg"
-  }
+  },
 }
 
 </script>
@@ -466,6 +501,7 @@ export default {
 .goods-table {
   width: 96%;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .good-btn {
@@ -515,7 +551,5 @@ export default {
   /*margin-right: 20px;*/
   margin: 0 20px 0 10px;
 }
-.nir-color{
-  color: #FF9100;
-}
+
 </style>
