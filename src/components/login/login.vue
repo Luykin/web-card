@@ -41,10 +41,8 @@ export default {
   created() {
     this.$root.eventHub.$emit('canvas')
     const that = this
-    setTimeout(()=>{
-      console.log(that.phone)
-      console.log(that.password)
-    },1000)
+    // setTimeout(()=>{
+    // },1000)
   },
   methods: {
     _changePssword(str) {

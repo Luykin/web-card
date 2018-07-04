@@ -14,201 +14,228 @@
         </div>
         <div class="notice-item flex">
           <div class="notice-item-left flex ellipsis">我的余额</div>
-          <div class="notice-item-right flex" v-if="user">{{user.score}}</div>
+          <div class="notice-item-right flex nir-color" v-if="user">{{user.score}}</div>
         </div>
         <div class="notice-item flex" v-if="siteInfo">
           <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex">{{user.agency.balance}}</div>
+          <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
         </div>
+        <!-- <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div> -->
         <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkRW">任务列表</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex">
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">我的提现账户:</div>
-          <div class="cbi-input-box flex disable-i cursor" @click="_showList">
-            <div class="cbi-show-list" v-show="showListAccount">
+          <div class="cbi-input-box flex disable-i">
+           <!--  @click="_showList" 账户列表点击下拉 -->
+ <!--            <div class="cbi-show-list" v-show="showListAccount">
               <div class="cbi-show-list-item flex" v-for="item in accountList" @click="_choseAccount(item)">
                 {{item.name + item.account}}
+                <div class="icon-box flex" @click="_delete(item)">
+                  <i class="el-icon-close cbi-show-list-item-icon"></i>
+                </div>
+              </div>
+            </div> -->
+            <span>{{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}</span>
+            <!-- <i class="el-icon-arrow-down cbi-icon" v-show="!showListAccount"></i>
+              <i class="el-icon-arrow-up cbi-icon" v-show="showListAccount"></i> -->
+            </div>
+            <div class="cbi-btn flex cursor" @click="showPop" v-show="!nowAccount">去绑定</div>
+            <div class="cbi-btn flex cursor" @click="_delete(nowAccount)" v-show="nowAccount">解绑</div>
+          </div>
+          <div class="configure-box-item flex">
+            <div class="cbi-name flex ellipsis">提现方式:</div>
+            <div class="cbi-input-box flex disable-i">
+              {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' :  '微信') :  '去绑定'}}
+            </div>
+            <div class="cbi-btn flex cursor" style="opacity:0;"></div>
+          </div>
+          <div class="configure-box-item flex">
+            <div class="cbi-name flex ellipsis">营业余额:</div>
+            <div class="cbi-input-box flex disable-i">
+              {{user.agency.turnover}}
+            </div>
+            <div class="cbi-btn flex cursor" style="opacity:0;"></div>
+          </div>
+          <div class="configure-box-item flex">
+            <div class="cbi-name flex ellipsis">提现金额:</div>
+            <div class="cbi-input-box flex disable-i">
+              <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
+              <div class="poundage flex" v-if="min_amount">注: 单笔最低提现金额为{{min_amount}}起，提现手续费为{{rate}}</div>
+            </div>
+            <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
+          </div>
+        </div>
+        <div class="show-line"></div>
+        <div class="goods-table">
+          <el-table :data="wdList" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+            <el-table-column prop="id" label="ID">
+            </el-table-column>
+            <el-table-column prop="money" label="提现金额">
+            </el-table-column>
+            <el-table-column prop="WAType" label="提现方式">
+            </el-table-column>
+            <el-table-column prop="withdraw_account.account" label="提现帐号">
+            </el-table-column>
+            <el-table-column prop="withdraw_account.name" label="账户姓名">
+            </el-table-column>
+            <el-table-column prop="statusA" label="状态">
+            </el-table-column>
+            <el-table-column prop="createA" label="申请时间">
+            </el-table-column>
+          </el-table>
+          <div id="i-page" class="i-page flex" v-show='total'>
+            <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange" :page-size="page_size">
+            </el-pagination>
+          </div>
+        </div>
+      </div>
+      <popup ref="popup">
+        <div class="recharge-box-title-agent flex">绑定提现账户</div>
+        <div class="agreement-content overHiden">
+          <div class="flex agree-input-box">
+            <div class="aib-label flex ellipsis">提现方式：</div>
+            <div class="flex aib-input-warp none-bg">
+              <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
+                <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img">
+                支付宝
+              </div>
+              <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type!==1?'active-riw':''">
+                <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img">
+                微信
               </div>
             </div>
-            <span>{{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}</span>
-            <i class="el-icon-arrow-down cbi-icon" v-show="!showListAccount"></i>
-            <i class="el-icon-arrow-up cbi-icon" v-show="showListAccount"></i>
           </div>
-          <div class="cbi-btn flex cursor" @click="showPop">去绑定</div>
-        </div>
-        <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">提现方式:</div>
-          <div class="cbi-input-box flex disable-i">
-            <!-- {{user.agency.balance}} -->
-            <!-- {{wh_type === 1? '支付宝':'微信'}} -->
-            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' :  '微信') :  '去绑定'}}
-          </div>
-          <div class="cbi-btn flex cursor" style="opacity:0;"></div>
-        </div>
-        <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">营业余额:</div>
-          <div class="cbi-input-box flex disable-i">
-            {{user.agency.turnover}}
-          </div>
-          <div class="cbi-btn flex cursor" style="opacity:0;"></div>
-        </div>
-        <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">提现金额:</div>
-          <div class="cbi-input-box flex disable-i">
-            <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
-            <div class="poundage flex" v-if="min_amount">注: 单笔最低提现金额为{{min_amount}}起，提现手续费为{{rate}}</div>
-          </div>
-          <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
-        </div>
-      </div>
-      <div class="show-line"></div>
-      <div class="goods-table">
-        <el-table :data="wdList" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
-          <el-table-column prop="id" label="ID">
-          </el-table-column>
-          <el-table-column prop="money" label="提现金额">
-          </el-table-column>
-          <el-table-column prop="WAType" label="提现方式">
-          </el-table-column>
-          <el-table-column prop="withdraw_account.account" label="提现帐号">
-          </el-table-column>
-          <el-table-column prop="withdraw_account.name" label="账户姓名">
-          </el-table-column>
-          <el-table-column prop="statusA" label="状态">
-          </el-table-column>
-          <el-table-column prop="createA" label="申请时间">
-          </el-table-column>
-        </el-table>
-        <div id="i-page" class="i-page flex" v-show='total'>
-          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange" :page-size="page_size">
-          </el-pagination>
-        </div>
-      </div>
-    </div>
-    <popup ref="popup">
-      <div class="recharge-box-title-agent flex">绑定提现账户</div>
-      <div class="agreement-content overHiden">
-        <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">提现方式：</div>
-          <div class="flex aib-input-warp none-bg">
-            <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
-              <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img">
-              支付宝
-            </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type!==1?'active-riw':''">
-              <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img">
-              微信
+          <div class="flex agree-input-box">
+            <div class="aib-label flex ellipsis">提现账户：</div>
+            <div class="flex aib-input-warp">
+              <input type="text" placeholder="输入账户" class="aib-ipnput" v-model="raccount">
             </div>
           </div>
-        </div>
-        <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">提现账户：</div>
-          <div class="flex aib-input-warp">
-            <input type="text" placeholder="输入账户" class="aib-ipnput" v-model="raccount">
+          <div class="flex agree-input-box">
+            <div class="aib-label flex ellipsis">账户姓名：</div>
+            <div class="flex aib-input-warp">
+              <input type="text" placeholder="输入姓名" class="aib-ipnput" v-model="rname">
+            </div>
           </div>
-        </div>
-        <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">账户姓名：</div>
-          <div class="flex aib-input-warp">
-            <!-- <span v-if="nowRow">{{nowRow.price}}</span> --> <!-- v-model="" -->
-            <input type="text" placeholder="输入姓名" class="aib-ipnput" v-model="rname">
+          <div class="flex agree-input-box">
+            <div class="aib-label flex ellipsis">账户手机：</div>
+            <div class="flex aib-input-warp">
+              <span class="disable-phone">{{user.phone}}</span> <!-- v-model="" -->
+              <!-- <input type="text" placeholder="输入姓名" class="aib-ipnput"> -->
+            </div>
           </div>
-        </div>
-        <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">账户手机：</div>
-          <div class="flex aib-input-warp">
-            <span class="disable-phone">{{user.phone}}</span> <!-- v-model="" -->
-            <!-- <input type="text" placeholder="输入姓名" class="aib-ipnput"> -->
+          <div class="flex agree-input-box">
+            <div class="aib-label flex ellipsis">手机验证：</div>
+            <div class="flex aib-input-warp min-warp">
+              <input type="text" placeholder="输入验证码" class="aib-ipnput" v-model="ryan">
+            </div>
+            <div class="btn-yan flex ellipsis cursor" @click="_getcode">{{time}}
+              <span v-if="time > 0">s后重新获取</span></div>
+            </div>
+            <div class="flex agree-input-box">
+              <div class="recharge-btn-box flex">
+                <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
+                <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">手机验证：</div>
-          <div class="flex aib-input-warp min-warp">
-            <input type="text" placeholder="输入验证码" class="aib-ipnput" v-model="ryan">
+        </popup>
+        <popup ref="sure">
+          <div class="recharge-box-title-agent flex">解绑提现账户</div>
+          <div class="agreement-content overHiden">
+            <div class="flex agree-input-box">
+              <div class="aib-label flex ellipsis">提现账户：</div>
+              <div class="flex aib-input-warp">
+                <input type="text" class="aib-ipnput" v-model="deletItem.name" disabled="disabled">
+              </div>
+            </div>
+            <div class="flex agree-input-box">
+              <div class="aib-label flex ellipsis">账户姓名：</div>
+              <div class="flex aib-input-warp">
+                <input type="text" class="aib-ipnput" v-model="deletItem.account" disabled="disabled">
+              </div>
+            </div>
+            <div class="titps-delet">是否确认解绑此提现账户?</div>
+            <div class="flex agree-input-box">
+              <div class="recharge-btn-box flex">
+                <div class="recharge-btn-sure flex sure cursor" @click="_sureDelet">确认</div>
+                <div class="recharge-btn-sure flex cancel cursor" @click='_cancelDelet'>取消</div>
+              </div>
+            </div>
           </div>
-          <div class="btn-yan flex ellipsis cursor" @click="_getcode">{{time}}
-            <span v-if="time > 0">s后重新获取</span></div>
-        </div>
-        <div class="flex agree-input-box">
-          <div class="recharge-btn-box flex">
-            <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
-            <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
-          </div>
-        </div>
-<!--         <div class="recharge-btn-box flex">
-          <div class="recharge-btn-sure flex sure cursor" @click="_sureAddAccount">确认</div>
-          <div class="recharge-btn-sure flex cancel cursor" @click='_interlayerHide'>取消</div>
-        </div> -->
+        </popup>
+        <interlayer ref="interlayer"></interlayer>
+        <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
+          <div class="dialog-min-text flex">{{dialogText}}</div>
+          <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
+        </el-dialog>
       </div>
-    </popup>
-    <interlayer ref="interlayer"></interlayer>
-    <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
-      <div class="dialog-min-text flex">{{dialogText}}</div>
-      <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
-    </el-dialog>
-  </div>
-</template>
-<script type="text/javascript">
-import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount } from 'api/site'
-import { mapGetters, mapMutations } from 'vuex'
-import { testToken, timeChange } from 'common/js/util'
-import { SUCCESS_CODE } from 'api/config'
-import popup from 'base/popup/popup'
-import interlayer from 'base/interlayer/interlayer'
-import { sendVerify } from 'api/login'
-export default {
-  data() {
-    return {
-      page_size: 8,
-      page: 0,
-      siteInfo: false,
-      min_amount: false,
-      rate: false,
-      showListAccount: false,
-      nowAccount: false,
-      raccount: '',
-      wh_type: 1,
-      rname: '',
-      ryan: '',
-      rmoney: '0.00',
-      dialogTitle: '',
-      dialogText: '',
-      total:null,
-      bgPath: null,
-      // account_type: 3,
-      wdList: [],
-      accountList: [],
-      centerDialogVisible: false,
-      time: '获取验证码',
-      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
-    }
-  },
-  created() {
-    this.$root.eventHub.$emit('user')
-    this.$root.eventHub.$on('reflectInit', () => {
-      this._reflectInit()
-    })
-    this._reflectInit()
-  },
-  computed: {
-    proxyRank() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.rank[this.user.agency.level - 1]
-      } else {
-        return '普通用户'
-      }
-    },
-    proxyIcon() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.iconList[this.user.agency.level - 1]
-      } else {
-        return false
-      }
-    },
-    siteLogo() {
+    </template>
+    <script type="text/javascript">
+      import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount, delAccount } from 'api/site'
+      import { mapGetters, mapMutations } from 'vuex'
+      import { testToken, timeChange } from 'common/js/util'
+      import { SUCCESS_CODE } from 'api/config'
+      import popup from 'base/popup/popup'
+      import interlayer from 'base/interlayer/interlayer'
+      import { sendVerify } from 'api/login'
+      export default {
+        data() {
+          return {
+            page_size: 8,
+            page: 0,
+            siteInfo: false,
+            min_amount: false,
+            rate: false,
+            showListAccount: false,
+            nowAccount: false,
+            raccount: '',
+            wh_type: 1,
+            rname: '',
+            ryan: '',
+            rmoney: '0.00',
+            dialogTitle: '',
+            dialogText: '',
+            total:null,
+            bgPath: null,
+            deletItem: {
+              name:'',
+              account: ''
+            },
+            wdList: [],
+            accountList: [],
+            centerDialogVisible: false,
+            time: '获取验证码',
+            rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
+            iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
+          }
+        },
+        created() {
+          this.$root.eventHub.$emit('user')
+          this.$root.eventHub.$on('reflectInit', () => {
+            this._reflectInit()
+          })
+          this._reflectInit()
+        },
+        computed: {
+          proxyRank() {
+            if (this.user && this.user.agency && this.user.agency.level > 0) {
+              return this.rank[this.user.agency.level - 1]
+            } else {
+              return '普通用户'
+            }
+          },
+          proxyIcon() {
+            if (this.user && this.user.agency && this.user.agency.level > 0) {
+              return this.iconList[this.user.agency.level - 1]
+            } else {
+              return false
+            }
+          },
+          siteLogo() {
       // console.log(this.user.agency.sub_site.icon)
       return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat; background-size: contain;`
     },
@@ -219,9 +246,14 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
+    _checkRW() {
+      this.$router.replace({
+        path: '/task'
+      })
+    },
     _choseType(e){
       this.wh_type = e
     },
@@ -368,7 +400,6 @@ export default {
     },
     _interlayerHide() {
       this.$refs.popup._hiddenPopup()
-      // this.$refs.interlayer._setZIndex(-1000)
       this.$refs.interlayer._hiddenLayer()
     },
     showPop() {
@@ -507,6 +538,41 @@ export default {
       this.$router.push({
         path: '/edit'
       })
+    },
+    _delete(item) {
+      this.deletItem = item
+      this.$refs.sure._showPopup()
+      this.$refs.interlayer._setZIndex(9999)
+      this.$refs.interlayer._showLayer()
+    },
+    _cancelDelet() {
+      this.deletItem = {
+        name:'',
+        account: '',
+        id: ''
+      }
+      this.$refs.sure._hiddenPopup()
+      this.$refs.interlayer._hiddenLayer()
+    },
+    _sureDelet() {
+      if (!this.checkTock()) {
+        return false
+      }
+      // console.log(this.deletItem)
+      delAccount(this.token, this.deletItem.id).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.nowAccount = false
+          this._getAccount()
+          this._cancelDelet()
+          this.$parent._open('删除成功')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
     }
   },
   components: {
@@ -530,8 +596,7 @@ export default {
   top: 0;
   transform: translate(106%, 0);
   min-height: 5%;
-  /* max-height: 50%;*/
-  width: 42%;
+  width: 38%;
   background: #fff;
   padding-bottom: 10px;
 }
@@ -714,11 +779,27 @@ export default {
 .cbi-show-list-item{
   height: 40px;
   width: 100%;
- /* background: rgba(0,0,0,.2);*/
+  /* background: rgba(0,0,0,.2);*/
   background: #9BCB14;
   color: #f8f8f8;
   border-bottom: 1px solid #eee;
   border-radius: 5px;
+  position: relative;
+}
+.cbi-show-list-item-icon{
+  font-size: 18px;
+}
+.icon-box{
+  width: 60px;
+  height: 100%;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 99999;
+}
+.icon-box:hover .cbi-show-list-item-icon{
+  color: red;
 }
 .cbi-show-list-item:last-child{
   border-bottom: none;
@@ -913,5 +994,12 @@ export default {
 }
 .dengji-warp{
   font-size: 16px;
+}
+.titps-delet{
+  color: #FF9100;
+  height: 20px;
+  line-height: 20px;
+  margin-bottom: 20px;
+  text-indent: 2px;
 }
 </style>

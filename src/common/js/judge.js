@@ -9,7 +9,11 @@ export const Judge = {
   },
   methods: {
     _judge() {
-      if (window.location.href.indexOf('.xkfans.com') > -1 && window.location.href.indexOf('dev.xkfans.com') < 0) {
+      // console.log(window.location.href)
+      const start = window.location.href.indexOf('://')
+      const end = window.location.href.indexOf('.xkfans')
+      const QZ = window.location.href.slice(start + 3, end)
+      if (window.location.href.indexOf('.xkfans.com') > -1 && QZ != 'dev' &&  QZ != 'www') {
         let start = window.location.href.indexOf('://')
         let end = window.location.href.indexOf('.xkfans.com')
         let domain = window.location.href.slice(start + 3, end)
@@ -28,6 +32,10 @@ export const Judge = {
               if (this.judgeMust) {
                 this._getAppInfo(this)
               }
+            }
+          } else {
+            if (res.data.err_code === 404) {
+              window.location = 'http://xkfans.com'
             }
           }
         })

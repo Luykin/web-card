@@ -16,7 +16,7 @@ export default {
     return {
       ctx: false,
       bg: false,
-      allNumber: 55,
+        allNumber: 55,
       time: false
     }
   },

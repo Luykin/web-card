@@ -111,7 +111,6 @@ export default {
   },
   methods: {
     _viewLink(e) {
-      // console.log(e.hrefLink)
       window.open(e.hrefLink)
     },
     _orderInt() {

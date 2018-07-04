@@ -1,5 +1,5 @@
 <template>
-<!--   http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png -->
+  <!--   http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png -->
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box" v-if="user">
       <!--  右侧边栏start -->
@@ -21,12 +21,12 @@
           <div class="notice-item-left flex ellipsis">分站营业额</div>
           <div class="notice-item-right flex">{{user.agency.balance}}</div>
         </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="showMingXi">分站管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage" v-show="!showMingXi">商品管理</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX">分站管理</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
       </div>
       <!--  右侧边栏end -->
-<!--       <div class="partition"></div> -->
+      <!--       <div class="partition"></div> -->
       <div class="goods-table" v-if="tableData">
         <div class="flex input-btn-box">
           <div class="ibb-input-warp">
@@ -36,27 +36,23 @@
           <div class="good-btn flex cursor margin20" @click="_chose(true)">全部订单</div>
         </div>
         <!-- :row-class-name="tableRowClassName" -->
-      <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
-        <el-table-column prop="label" label="业务" width="140">
-        </el-table-column>
-        <el-table-column prop="id" label="订单ID">
-        </el-table-column>
-        <el-table-column prop="addition" label="分享链接/用户ID">
-        </el-table-column>
-        <el-table-column
-        label="">
-        <template slot-scope="scope">
-          <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
-        </template>
+        <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
+          <el-table-column prop="label" label="业务">
+          </el-table-column>
+          <el-table-column prop="id" label="订单ID">
+          </el-table-column>
+          <el-table-column prop="addition" label="分享链接/用户ID">
+          </el-table-column>
+          <el-table-column
+          label="">
+          <template slot-scope="scope">
+            <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+          </template>
         </el-table-column>
         <el-table-column prop="start_point" label="初始数量">
         </el-table-column> 
         <el-table-column prop="point" label="数量">
         </el-table-column>
-        <!--  <el-table-column prop="start_point" label="起始数量">
-        </el-table-column>
-        <el-table-column prop="currentNum" label="当前数量">
-        </el-table-column> -->
         <el-table-column prop="status" label="状态">
         </el-table-column>
         <el-table-column prop="time" label="预计完成">
@@ -66,54 +62,54 @@
         <el-table-column prop="createA" label="提交时间">
         </el-table-column>
       </el-table>
-        <div id="i-page" class="i-page flex">
-          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
-          </el-pagination>
-        </div>
+      <div id="i-page" class="i-page flex">
+        <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
+        </el-pagination>
       </div>
     </div>
   </div>
+</div>
 </template>
 <script type="text/javascript">
-import { getTasks } from 'api/site'
-import { mapGetters, mapMutations } from 'vuex'
-import { testToken, timeChange } from 'common/js/util'
-import { SUCCESS_CODE } from 'api/config'
-const NUM = 11
-export default {
-  data() {
-    return {
-      siteInfo: false,
-      showMingXi: false,
-      tableData: false,
-      page: 0,
-      total: 0,
-      bgPath: null,
-      code: '',
-      loading: false,
-      state: {
-        '-10': '未支付',
-        '-9': '进行中',
-        '-8': '订单失败',
-        '-7': '进行中',
-        '-6': '订单失败',
-        '-5': '进行中',
-        '-4': '已完成',
-        '-3': '准备中',
-        '-2': '准备中',
-        '-1': '准备中',
-        '0': '准备中',
-        '1': '进行中',
-        '2': '已完成',
-        '3': '进行中',
-        '4': '订单取消',
-        '5': '订单取消'
-      },
-      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
-    }
-  },
-  created() {
+  import { getTasks } from 'api/site'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { testToken, timeChange } from 'common/js/util'
+  import { SUCCESS_CODE } from 'api/config'
+  const NUM = 11
+  export default {
+    data() {
+      return {
+        siteInfo: false,
+        showMingXi: false,
+        tableData: false,
+        page: 0,
+        total: 0,
+        bgPath: null,
+        code: '',
+        loading: false,
+        state: {
+          '-10': '未支付',
+          '-9': '进行中',
+          '-8': '订单失败',
+          '-7': '进行中',
+          '-6': '订单失败',
+          '-5': '进行中',
+          '-4': '已完成',
+          '-3': '准备中',
+          '-2': '准备中',
+          '-1': '准备中',
+          '0': '准备中',
+          '1': '进行中',
+          '2': '已完成',
+          '3': '进行中',
+          '4': '订单取消',
+          '5': '订单取消'
+        },
+        rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
+        iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
+      }
+    },
+    created() {
     // this.$root.eventHub.$emit('user')
     this._siteInit()
   },
@@ -143,7 +139,7 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
     _viewLink(e) {
@@ -182,7 +178,9 @@ export default {
       this._getTasks()
     },
     _checkMX() {
-      this.showMingXi = !this.showMingXi
+      this.$router.replace({
+        path: '/management'
+      })
     },
     _toGoodsManage() {
       this.$root.eventHub.$emit('siteInit')
@@ -343,19 +341,20 @@ export default {
 <style type="text/css" scoped>
 /*#body{
   background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
-}*/
-#main-box {
-  opacity: .95 !important;
-}
+  }*/
+  #main-box {
+   /* width: 45% !important;*/
+   opacity: .95 !important;
+ }
 
-.notice {
+ .notice {
   position: absolute;
   right: 0;
   top: 0;
   transform: translate(106%, 0);
   min-height: 5%;
   /* max-height: 50%;*/
-  width: 42%;
+  width: 38%;
   background: #fff;
   padding-bottom: 10px;
 }

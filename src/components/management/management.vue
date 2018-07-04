@@ -25,6 +25,7 @@
         <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage" v-show="!showMingXi">商品管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="showMingXi">分站管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_checkRW">任务列表</div>
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="!showMingXi">查看明细</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex" v-show="!showMingXi">
@@ -115,7 +116,7 @@
           </el-pagination>
         </div>
       </div>
-      <div class="mg-btn flex mg-min-btnwidth cursor" @click="_checkMX" v-show="!showMingXi">查看明细</div>
+      <!-- <div class="mg-btn flex mg-min-btnwidth cursor" @click="_checkMX" v-show="!showMingXi">查看明细</div> -->
     </div>
   </div>
 </template>
@@ -319,8 +320,7 @@ export default {
   top: 0;
   transform: translate(106%, 0);
   min-height: 5%;
-  /* max-height: 50%;*/
-  width: 42%;
+  width: 38%;
   background: #fff;
   padding-bottom: 10px;
 }
@@ -514,8 +514,5 @@ export default {
 .margin-right{
   /*margin-right: 20px;*/
   margin: 0 20px 0 10px;
-}
-.nir-color{
-  color: #FF9100;
 }
 </style>

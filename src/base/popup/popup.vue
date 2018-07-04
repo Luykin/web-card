@@ -1,5 +1,5 @@
 <template>
-  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut, protocol:protocol}" v-if="show">
+  <div class="popup" :class="{popupIn:popupIn, popupOut:popupOut, protocol:protocol}" v-if="show" ref='pop'>
     <slot></slot>
   </div>
 </template>

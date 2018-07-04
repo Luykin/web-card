@@ -39,7 +39,6 @@ export function getKey() {
   return key
 }
 export function getSign(data) {
-  // const timestamp = parseInt(Date.parse(new Date()) / 10000)
   let sortedKeys = Object.keys(data).sort()
   let signStr = ''
   for (let item in sortedKeys) {

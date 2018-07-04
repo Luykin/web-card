@@ -17,7 +17,7 @@
   min-height: 200px;
   background: #fff;
   transform: translate(37.5%, 80px);
-  padding-bottom: 20px;
+/*  padding-bottom: 20px;*/
   opacity: .95;
   position: relative;
 }
@@ -308,4 +308,7 @@
 }
 .el-table .sucess-table{
   background: #9BCB14;
+}
+.nir-color{
+  color: #FF9100;
 }

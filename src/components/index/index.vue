@@ -13,7 +13,8 @@
           <!-- <waveCanvas :cWidth="70" :cHeight="65" :cid='item.id' :ref="item.id" :id='item.id'></waveCanvas> -->
         </div>
       </div>
-      <div class="course" v-if="nowServices" v-html='nowServices.tips'>
+      <div class="no-data" v-if="!showService">暂未开放此业务，请平台关注公告!</div>
+      <div class="course" v-if="showService && nowServices" v-html='nowServices.tips'>
       </div>
       <div class="select-box flex">
         <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
@@ -27,7 +28,7 @@
         </div>
         <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25) && pc'>
         </div>
-        <div class="select-item">
+        <div class="select-item" v-if="showService">
           <div class="select-item-label flex ellipsis">
             <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
             <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">
@@ -51,66 +52,66 @@
             </el-popover>
             <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">{{nowServices.category > 0&&nowServices.category
               < 10 ? '获取说说列表': '查看教程'}}</el-button>
+            </div>
+            <div class="flex input-defult" v-if="nowServices">
+              <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
+              <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+            </div>
           </div>
-          <div class="flex input-defult" v-if="nowServices">
-            <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
-            <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+          <div class="select-item" v-if="showService">
+            <div class="select-item-label flex ellipsis">数量</div>
+            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
+              <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+            </div>
+            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
+          </div>
+          <div class="select-item" v-if="showService">
+            <div class="select-item-label flex ellipsis">业务</div>
+            <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
+              <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
+              </el-option>
+            </el-select>
           </div>
         </div>
-        <div class="select-item">
-          <div class="select-item-label flex ellipsis">数量</div>
-          <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-          <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
-            <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+        <div v-if="showService && nowServices">
+          <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
+          <div class="rule-hints flex ellipsis" v-if="Gdomain && nowServices.price">
+            <span class="rh-title">所需金额:</span>
+            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
           </div>
-          <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
+          <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+            <span class="rh-title">所需积分:</span>
+            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '积分'}}</span>
+          </div>
+          <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+            <span class="rh-title">剩余积分:</span>
+            <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
+          </div>
+          <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
+            <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
+          </div>
         </div>
-        <div class="select-item">
-          <div class="select-item-label flex ellipsis">业务</div>
-          <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" v-if="showService" no-data-text="暂无业务" @change="_clear">
-            <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-      <div v-if="nowServices">
-        <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-        <div class="rule-hints flex ellipsis" v-if="Gdomain && nowServices.price">
-          <span class="rh-title">所需金额:</span>
-          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
-        </div>
-        <div class="rule-hints flex ellipsis" v-if="!Gdomain">
-          <span class="rh-title">所需积分:</span>
-          <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '积分'}}</span>
-        </div>
-        <div class="rule-hints flex ellipsis" v-if="!Gdomain">
-          <span class="rh-title">剩余积分:</span>
-          <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
-        </div>
-        <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
-          <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
-          <!-- <span class="max-gray-span">最小数量</span><span class="red-score-sapn">{{nowServices.min_num}}</span><span class="max-gray-span no-indent">-最大数量</span><span class="red-score-sapn">{{nowServices.max_num}}</span> -->
-        </div>
-      </div>
-      <div class="btn flex" @click="_sublime(nowServices.category)">提交订单</div>
-      <div class="agent-box" v-if="false">
-        <div class="main-box-header flex agent-box-title">
-        </div>
+        <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
+        <div class="index-bootom-height"></div>
+  <!--       <div class="agent-box" v-if="false">
+          <div class="main-box-header flex agent-box-title">
+          </div>
+        </div> -->
       </div>
     </div>
-  </div>
-</template>
-<script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
-import { testToken } from 'common/js/util'
-import { mapGetters, mapMutations } from 'vuex'
-import { SUCCESS_CODE, modifyEnv } from 'api/config'
-import { Judge } from 'common/js/judge'
-const BILI = 0.8
-export default {
-  mixins: [Judge],
-  data() {
-    return {
+  </template>
+  <script type="text/javascript">
+    import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+    import { testToken } from 'common/js/util'
+    import { mapGetters, mapMutations } from 'vuex'
+    import { SUCCESS_CODE, modifyEnv } from 'api/config'
+    import { Judge } from 'common/js/judge'
+    const BILI = 0.8
+    export default {
+      mixins: [Judge],
+      data() {
+        return {
       // 很重要，代表是否为分站的参数
       Gdomain: null,
       judgeMust: true,
@@ -219,7 +220,7 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
     _setAnnouncement(announcement) {
@@ -233,7 +234,6 @@ export default {
       }
     },
     _closeCourse() {
-      // console.log(this.$refs.elbutton)
       this.$refs.elbutton.$el.click()
     },
     _choseSayList(item) {
@@ -242,7 +242,6 @@ export default {
         this.targetid = item.tid
         this.suosuo = item.content
       }
-      // this.suosuo = 0
     },
     _getAppInfo(that) {
       getAppInfo().then((res) => {
@@ -261,21 +260,6 @@ export default {
         }
       })
     },
-    // _getshowNotice(that) {
-    //   getshowNotice().then((res) => {
-    //     if (res.data.err_code === SUCCESS_CODE && res.data.data) {
-    //       if (res.data.data && parseInt(JSON.parse(res.data.data[0].value)) === 1) {
-    //         that.showNotice = true
-    //       }
-    //     } else {
-    //       if (res.data.err_msg) {
-    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
-    //       } else {
-    //         this.$parent._open('似乎出错了')
-    //       }
-    //     }
-    //   })
-    // },
     _rectifyMoney() {
       if (isNaN(this.quantity) || this.quantity.indexOf('.') > -1 || this.quantity <= 0) {
         this.quantity = ''
@@ -342,11 +326,7 @@ export default {
         const maohao = this.orderTimeS.indexOf(':')
         const H = parseInt(this.orderTimeS.slice(0, maohao)) * 3600
         const M = parseInt(this.orderTimeS.slice(maohao + 1)) * 60
-        console.log(H)
-        console.log(M)
-        console.log(this.orderTimeD / 1000 + H + M)
         this.sublimeTime = this.orderTimeD / 1000 + H + M
-        // return false
       }
       if (this.Gdomain) {
         let data = {
@@ -528,7 +508,7 @@ export default {
     },
     _chose(e, id) {
       if (this.lodingChose) {
-        this.$parent._open('加载中...')
+        this.$parent._open('加载中')
         return 0
       }
       if (!this.services[id]) {
@@ -608,10 +588,12 @@ export default {
       getServices(id, Gdomain).then((res) => {
         that.lodingChose = false
         if (res.data.err_code === SUCCESS_CODE) {
-          const services = this._normalServices(res.data.data)
+          const services = res.data.data
           that.services[that.activeCategory] = services
           that.showService = services
-          that.choseServiceValue = that.showService[0] ? that.showService[0].id : ''
+          if (res.data.data) {
+            that.choseServiceValue = that.showService[0] ? that.showService[0].id : ''
+          }
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -620,17 +602,6 @@ export default {
           }
         }
       })
-    },
-    _normalServices(list) {
-      // list.forEach((item) => {
-      //   if (typeof item.form === 'string') {
-      //     if (item.form.indexOf('[{') > -1 && item.form.indexOf('}]') > -1) {
-      //       item.form = eval(item.form)
-      //     }
-      //   }
-      // })
-      // console.log(list)
-      return list
     },
     ...mapMutations({
       setToken: 'SET_TOKEN',
@@ -1040,8 +1011,7 @@ export default {
   top: 0;
   transform: translate(106%, 0);
   min-height: 5%;
-  /*  max-height: 50%;*/
-  width: 50%;
+  width: 45%;
   background: #fff;
   padding: 50px 10px 10px;
 }
@@ -1058,6 +1028,15 @@ export default {
 
 .notice-content {
   line-height: 1.5 !important;
+}
+.no-data{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 100%);
+}
+.index-bootom-height{
+  height: 10px;
 }
 
 </style>

@@ -14,18 +14,18 @@
         </div>
         <div class="notice-item flex">
           <div class="notice-item-left flex ellipsis">我的余额</div>
-          <div class="notice-item-right flex" v-if="user">{{user.score}}</div>
+          <div class="notice-item-right flex nir-color" v-if="user">{{user.score}}</div>
         </div>
         <div class="notice-item flex" v-if="siteInfo">
           <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex">{{user.agency.balance}}</div>
+          <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
         </div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_back">分站管理</div>
         <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
       </div>
       <!--  右侧边栏end -->
       <div class="configure-box flex">
-        <div class="chose-box flex">
+        <div class="chose-box-top flex">
           <el-select v-model="chose" placeholder="请选择" no-data-text="暂无商品">
             <el-option v-for="item in choseItem" :key="item.choseTitle" :label="item.choseTitle" :value="item.id">
             </el-option>
@@ -84,7 +84,9 @@
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">是否上架：</div>
           <div class="flex aib-input-warp cursor" v-if='nowRow' @click="_chekStaus">
-              <span v-if="nowRow" class="abi-span">{{nowStatus}}</span>
+            <span v-if="nowRow" class="abi-span">{{nowStatus}}</span>
+            <i class="el-icon-d-caret aib-icon"></i>
+            <div class="chose-box flex" v-show="showStatusValue" @click="_newChekStaus">{{nowStatusN}}</div>
           </div>
         </div>
         <div class="flex agree-input-box">
@@ -100,37 +102,38 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getAgencyservice, setAgency } from 'api/site'
-import { mapGetters, mapMutations } from 'vuex'
-import { testToken } from 'common/js/util'
-import { SUCCESS_CODE } from 'api/config'
-import popup from 'base/popup/popup'
-import interlayer from 'base/interlayer/interlayer'
-export default {
-  data() {
-    return {
-      siteInfo: false,
-      agencyService: [],
-      choseItem: [],
-      money: '',
-      chose: '全部商品',
-      nowRow: null,
-      fastclike: null,
-      timeChose:null,
-      statusList:[{
-        title:'是',
-        value: 1
-      },{
-        title:'否',
-        value: 2
-      }],
-      nowStatusValue: null,
-      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
-    }
-  },
-  created() {
-    this.$root.eventHub.$emit('user')
+  import { getSiteinfo, getAgencyservice, setAgency } from 'api/site'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { testToken } from 'common/js/util'
+  import { SUCCESS_CODE } from 'api/config'
+  import popup from 'base/popup/popup'
+  import interlayer from 'base/interlayer/interlayer'
+  export default {
+    data() {
+      return {
+        siteInfo: false,
+        agencyService: [],
+        choseItem: [],
+        money: '',
+        chose: '全部商品',
+        nowRow: null,
+        fastclike: null,
+        timeChose:null,
+        showStatusValue: false,
+        statusList:[{
+          title:'是',
+          value: 1
+        },{
+          title:'否',
+          value: 2
+        }],
+        nowStatusValue: null,
+        rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
+        iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
+      }
+    },
+    created() {
+      this.$root.eventHub.$emit('user')
     // this.$root.eventHub.$emit('siteInit')
     this.$root.eventHub.$on('siteInit', () => {
       this._siteInit()
@@ -144,6 +147,12 @@ export default {
         this.nowStatusValue = this.nowRow.status
       }
       return this.nowStatusValue === 1 ? '是' : '否'
+    },
+    nowStatusN(){
+      if (!this.nowStatusValue) {
+        this.nowStatusValue = this.nowRow.status
+      }
+      return this.nowStatusValue === 1 ? '否' : '是'
     },
     proxyRank() {
       if (this.user && this.user.agency && this.user.agency.level > 0) {
@@ -170,7 +179,7 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
     _chose() {
@@ -198,6 +207,14 @@ export default {
       this._getAgencyservice()
     },
     _chekStaus() {
+      // if (this.nowStatusValue === 1) {
+      //   this.nowStatusValue = 2
+      // } else {
+      //   this.nowStatusValue = 1
+      // }
+      this.showStatusValue = !this.showStatusValue
+    },
+    _newChekStaus() {
       if (this.nowStatusValue === 1) {
         this.nowStatusValue = 2
       } else {
@@ -205,7 +222,7 @@ export default {
       }
     },
     _setAgencySure() {
-      // this.nowRow = e
+      this._chekStaus()
       if (!this.money || this.money < this.nowRow.origin_price) {
         this.$parent._open('销售价需大于成本价')
         return false
@@ -261,7 +278,7 @@ export default {
           that.time = setTimeout(() => {
             that.fastclike = false
             clearTimeout(that.time)
-          }, 1200)
+          }, 300)
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -272,6 +289,7 @@ export default {
       })
     },
     _interlayerHide() {
+      this._chekStaus()
       this.$refs.popup._hiddenPopup()
       this.$refs.interlayer._hiddenLayer()
     },
@@ -411,7 +429,7 @@ export default {
   transform: translate(106%, 0);
   min-height: 5%;
   /* max-height: 50%;*/
-  width: 42%;
+  width: 38%;
   background: #fff;
   padding-bottom: 10px;
 }
@@ -563,7 +581,7 @@ export default {
   height: auto;
 }
 
-.chose-box {
+.chose-box-top {
   width: 100%;
   height: 100px;
   justify-content: flex-start;
@@ -636,6 +654,7 @@ export default {
   border: 1px solid #eee;
   border-radius: 5px;
   justify-content: flex-start;
+  position: relative;
 }
 .aib-ipnput{
   width: 100%;
@@ -684,5 +703,27 @@ export default {
   text-indent: 22%;
   color: #ff9100;
   font-size: 14px;
+}
+.aib-icon{
+  color: #666;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.chose-box{
+  width: 90%;
+  height: 100%;
+  padding: 0 5%;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate(0, 100%);
+  background: #999;
+  color: #fff;
+  justify-content: flex-start;
+  opacity: .6;
+  z-index: 99999;
 }
 </style>
