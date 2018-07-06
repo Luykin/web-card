@@ -29,10 +29,8 @@
         </el-table-column> 
         <el-table-column prop="point" label="数量">
         </el-table-column>
-        <!--  <el-table-column prop="start_point" label="起始数量">
+        <el-table-column prop="price" label="订单价格">
         </el-table-column>
-        <el-table-column prop="currentNum" label="当前数量">
-        </el-table-column> -->
         <el-table-column prop="status" label="状态">
         </el-table-column>
         <el-table-column prop="time" label="预计完成">

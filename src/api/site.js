@@ -394,11 +394,12 @@ export function setDomain(token, sub_domain) {
     }
   })
 }
-export function delAccount(token, account_id) {
+export function delAccount(token, account_id, code) {
   const url = `${PREFIX_URL}/del_withdraw_account`
   let data = {
     token: token,
-    account_id: account_id
+    account_id: account_id,
+    code: code
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

@@ -10,12 +10,13 @@
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
+            <el-menu-item index="/official">主页</el-menu-item>
             <el-menu-item index="/index">{{env}}</el-menu-item>
             <el-menu-item index="/order" v-show="user">我的订单</el-menu-item>
-            <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item>
-            <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
+            <!-- <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item> -->
+            <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/agent" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
@@ -35,13 +36,12 @@
                   <div class="agent-ul-li-right flex ellipsis">{{userPhone}}</div>
                 </div>
               </el-menu-item>
-              <el-menu-item index="/none" class='phone-item flex' v-show="user && !FENZAN" disabled>
-                <!-- 我的积分<span class="green-text">{{user.score}}</span> -->
+<!--               <el-menu-item index="/none" class='phone-item flex' v-show="user && !FENZAN" disabled>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">我的积分</div>
                   <div class="agent-ul-li-right flex ellipsis">{{user.score}}</div>
                 </div>
-              </el-menu-item>
+              </el-menu-item> -->
               <el-menu-item index="/none" v-show="user.is_agency && user.agency_level && !user.agency.sub_domain && !FENZAN" class='flex' disabled>
                 <div class="agent-ul-li flex cursor" @click="_setDomain($event)">
                   <div class="agent-ul-li-left flex ellipsis">创建分站</div>
@@ -83,27 +83,22 @@
       <el-row class="tac">
         <el-col>
           <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
+            <el-menu-item index="/official">
+              <i class="iconfont icon-tijiaodingdan"></i>主页
+            </el-menu-item>
             <el-menu-item index="/index">
-              <i class="iconfont icon-tijiaodingdan"></i> 主页
+              <i class="iconfont icon-tijiaodingdan"></i>{{env}}
             </el-menu-item>
             <el-menu-item index="/order" v-show="user">
               <i class="iconfont icon-unie64a"></i> 我的订单
             </el-menu-item>
-            <!--            <el-submenu index="/order">
-              <template slot="title">
-                <i class="iconfont icon-unie64a"></i> 我的订单
-              </template>
-              <el-menu-item index="/order/1">选项1</el-menu-item>
-              <el-menu-item index="/order/2">选项2</el-menu-item>
-              <el-menu-item index="/order/3">选项3</el-menu-item>
-            </el-submenu> -->
-            <el-menu-item index="/score-record" v-show="user">
+  <!--           <el-menu-item index="/score-record" v-show="user">
               <i class="iconfont icon-jilu"></i> 积分记录
-            </el-menu-item>
-            <el-menu-item index="/none/1" v-show="user" class='disable'>
+            </el-menu-item> -->
+<!--             <el-menu-item index="/none/1" v-show="user" class='disable'>
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/agent" v-show="user" class='disable'>
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
@@ -114,7 +109,7 @@
               </template>
               <el-menu-item index="/none" class='phone-item disable' v-show="proxyRank">{{proxyRank}}</el-menu-item>
               <el-menu-item index="/none" class='phone-item disable'>{{userPhone}}</el-menu-item>
-              <el-menu-item index="/none" class='phone-item disable'><i class="iconfont icon-jifen"></i>我的积分<span class="green-text">{{user.score}}</span></el-menu-item>
+<!--               <el-menu-item index="/none" class='phone-item disable'><i class="iconfont icon-jifen"></i>我的积分<span class="green-text">{{user.score}}</span></el-menu-item> -->
               <el-menu-item index="/modify-password">修改密码</el-menu-item>
               <el-menu-item index="/none" class='disable'>
                 <div class="log-out log-out-min" @click="_logout($event)">注销</div>
@@ -144,9 +139,6 @@
             <!-- <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div> -->
           </div>
         </div>
-        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
-        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
-        <!-- 2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>2018.4.11>>-->
         <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0 && !BuyDomainData">
           <!-- app  商品 -->
           <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex">
@@ -308,7 +300,7 @@
         </popup>
       </div>
     </template>
-    <script type="text/javascript" scoped>
+    <script type="text/javascript">
       import { setDomain, setSiteinfo, subDomains } from 'api/site'
       import sidebar from 'components/sidebar/sidebar'
       import { mapGetters, mapMutations } from 'vuex'
@@ -317,7 +309,7 @@
       import { addOrder, agency } from 'api/header'
       import { testToken } from 'common/js/util'
       import QrcodeVue from 'qrcode.vue'
-      import { getUserInfo, addSubSiteTask } from 'api/index'
+      import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
       import { SUCCESS_CODE } from 'api/config'
 
       export default {
@@ -341,7 +333,7 @@
             choseGoodId: -1,
             inputFocus: true,
             activePayType: false,
-            env: '主页',
+            env: '网红代刷',
             time: false,
             hadAgree: false,
             centerDialogVisible: false,
@@ -442,7 +434,7 @@
         return false
       }
       this.BuyDomainData.pay_type = this.activePayType
-      addSubSiteTask(this.token, this.BuyDomainData).then((res) => {
+      addSiteTask(this.token, this.BuyDomainData).then((res) => {
         this._afterAddOrder(res)
       })
     },
@@ -809,13 +801,14 @@
       this.$root.eventHub.$emit('canvas', true)
     },
     _toIndex() {
-      this.$root.eventHub.$emit('updateOrder')
-      this.$root.eventHub.$emit('user')
-      this.$root.eventHub.$emit('updateScoreRecord')
-      this.$router.replace({
-        path: '/index'
-      })
-      this.$root.eventHub.$emit('canvas', true)
+      window.location.href = 'http://www.7shuiguo.cn'
+      // this.$root.eventHub.$emit('updateOrder')
+      // this.$root.eventHub.$emit('user')
+      // this.$root.eventHub.$emit('updateScoreRecord')
+      // this.$router.replace({
+      //   path: '/index'
+      // })
+      // this.$root.eventHub.$emit('canvas', true)
     },
     _buy() {
       // console.log('buy')
@@ -921,6 +914,9 @@
       if (key.indexOf('/none') > -1) {
         return false
       }
+      if (key.indexOf('/official') > -1) {
+        window.location.href = 'http://www.7shuiguo.cn'
+      }
       if (this.sidebar) {
         this._hiddenSidebar()
       }
@@ -930,6 +926,9 @@
       this.$router.replace({
         path: key
       })
+      if (key === '/management') {
+        this.$root.eventHub.$emit('showMX', 0)
+      }
       if (key === '/order') {
         this.$root.eventHub.$emit('updateOrder')
       }

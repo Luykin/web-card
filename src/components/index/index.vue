@@ -76,20 +76,20 @@
         </div>
         <div v-if="showService && nowServices">
           <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-          <div class="rule-hints flex ellipsis" v-if="Gdomain && nowServices.price">
+          <div class="rule-hints flex ellipsis" v-if="nowServices.price">
             <span class="rh-title">所需金额:</span>
             <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
           </div>
-          <div class="rule-hints flex ellipsis" v-if="!Gdomain">
-            <span class="rh-title">所需积分:</span>
-            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '积分'}}</span>
-          </div>
-          <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+<!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+            <span class="rh-title">所需金额:</span>
+            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '元'}}</span>
+          </div> -->
+<!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
             <span class="rh-title">剩余积分:</span>
             <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
-          </div>
+          </div> -->
           <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
-            <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+consumeNum + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '积分'}}</span>
+            <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+ consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</span>
           </div>
         </div>
         <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
@@ -203,16 +203,16 @@
     },
     consumeMoney() {
       if (this.nowServices.price) {
-        return (this.quantity || 0) * this.nowServices.price
+        return Math.ceil((this.quantity || 0) * this.nowServices.price)
       } else {
         return false
       }
     },
     agencyPrice() {
       if (this.user.agency_level) {
-        return Math.ceil((this.quantity || 0) * this.nowServices.rate * (this.user.agency_level.discount || 1))
+        return Math.ceil((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1))
       } else {
-        return Math.ceil((this.quantity || 0) * this.nowServices.rate)
+        return Math.ceil((this.quantity || 0) * this.nowServices.price)
       }
     },
     ...mapGetters([
@@ -298,15 +298,15 @@
       }
       let max = 0
       let min = 0
-      let rate = 0
+      // let price = 0
       this.services[this.activeCategory].forEach((item) => {
         if (item.id === this.choseServiceValue) {
           max = item.max_num
           min = item.min_num
-          rate = item.rate
+          // rate = item.price
         }
       })
-      if (!max || !rate) {
+      if (!max) {
         this.$parent._open('后台数量限制有误')
         return false
       }
@@ -328,57 +328,58 @@
         const M = parseInt(this.orderTimeS.slice(maohao + 1)) * 60
         this.sublimeTime = this.orderTimeD / 1000 + H + M
       }
-      if (this.Gdomain) {
-        let data = {
-          services: this.nowServices,
-          point: this.quantity,
-          service_id: this.choseServiceValue,
-          price: this.consumeMoney,
-          addition: this.link,
-          sub_domain: this.Gdomain
-        }
-        if (category === 2 || category === 4) {
-          data = Object.assign({ target_id: this.targetid }, data)
-        }
-        if (category === 24 || category === 25) {
-          data = Object.assign({ target_id: false, appointment_time: this.sublimeTime}, data)
-        }
-        this.$root.eventHub.$emit('showPopup', data)
-      } else {
-        let price
-        if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
-          // agencyPrice
-          if (this.agencyPrice > this.user.score) {
-            this.$parent._open('积分不足')
-            this.$root.eventHub.$emit('showPopup')
-            return false
-          }
-          price = this.agencyPrice
-        } else {
-          if (this.consumeNum > this.user.score) {
-            this.$parent._open('积分不足')
-            this.$root.eventHub.$emit('showPopup')
-            return false
-          }
-          price = this.consumeNum
-        }
-        this.netWorking = true
-        if (category === 2 || category === 4) {
-          addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
-            this._afterAddtask(res)
-          })
-          return true
-        }
-        if (category === 24 || category === 25) {
-          addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
-            this._afterAddtask(res)
-          })
-          return true
-        }
-        addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
-          this._afterAddtask(res)
-        })
+      let data = {
+        services: this.nowServices,
+        point: this.quantity,
+        service_id: this.choseServiceValue,
+        price: this.agencyPrice,
+        addition: this.link
       }
+      if (this.Gdomain) {
+        data = Object.assign({sub_domain: this.Gdomain}, data)
+      }
+      if (category === 2 || category === 4) {
+        data = Object.assign({ target_id: this.targetid }, data)
+      }
+      if (category === 24 || category === 25) {
+        data = Object.assign({ target_id: false, appointment_time: this.sublimeTime}, data)
+      }
+      this.$root.eventHub.$emit('showPopup', data)
+      // else {
+      //   let price
+      //   if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
+      //     // agencyPrice
+      //     if (this.agencyPrice > this.user.score) {
+      //       this.$parent._open('积分不足')
+      //       this.$root.eventHub.$emit('showPopup')
+      //       return false
+      //     }
+      //     price = this.agencyPrice
+      //   } else {
+      //     if (this.consumeNum > this.user.score) {
+      //       this.$parent._open('积分不足')
+      //       this.$root.eventHub.$emit('showPopup')
+      //       return false
+      //     }
+      //     price = this.consumeNum
+      //   }
+      //   this.netWorking = true
+      //   if (category === 2 || category === 4) {
+      //     addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
+      //       this._afterAddtask(res)
+      //     })
+      //     return true
+      //   }
+      //   if (category === 24 || category === 25) {
+      //     addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
+      //       this._afterAddtask(res)
+      //     })
+      //     return true
+      //   }
+      //   addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
+      //     this._afterAddtask(res)
+      //   })
+      // }
     },
     _afterAddtask(res) {
       this.orderTimeD = ''

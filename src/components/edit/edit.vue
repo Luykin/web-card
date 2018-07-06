@@ -25,7 +25,8 @@
       <div class="cr-item flex">
         <div class="cr-box-tit ellipsis flex">首页公告:</div>
         <div class="cr-box-max flex">
-          <textarea type="text" v-model="siteAnnouncement" class="edit-textarea" min="0" max="80"></textarea>
+          <!-- <textarea type="text" v-model="siteAnnouncement" class="edit-textarea" min="0" max="80"></textarea> -->
+          <vue-editor v-model="siteAnnouncement" :editorToolbar="customToolbar"></vue-editor>
         </div>
       </div>
       <div class="cr-item flex">
@@ -60,6 +61,8 @@ import { mapGetters, mapMutations } from 'vuex'
 import { testToken } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
 import CryptoJS from 'crypto-js'
+import { VueEditor } from 'vue2-editor'
+
 export default {
   data() {
     return {
@@ -72,6 +75,15 @@ export default {
       siteAnnouncement: '',
       sitFooter: '',
       sitFooterEmail: '',
+      customToolbar: [
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        // [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+        // [{ 'indent': '-1'}, { 'indent': '+1' }],
+        // ['link', 'image'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'direction': 'rtl' }]
+      ],
       Process: '点击上传Logo'
     }
   },
@@ -100,6 +112,9 @@ export default {
       'tokenTime',
       'app'
     ])
+  },
+  components: {
+    VueEditor
   },
   methods: {
     _editInit() {
@@ -308,6 +323,9 @@ export default {
 
 </script>
 <style scoped>
+.quillWrapper{
+  width: 100%;
+}
 .edit-logo {
   width: 25%;
   padding-top: 10%;
@@ -375,16 +393,17 @@ export default {
 }
 
 .cr-box-max {
-  height: 100px;
+  min-height: 100px;
+  height: auto;
   margin: 0 10px;
   border-radius: 5px;
   background: #f4f4f4;
-  text-indent: 10px;
+/*  text-indent: 10px;*/
   justify-content: flex-start;
   flex-grow: 1;
   margin-right: 5%;
   align-items: flex-start;
-  line-height: 40px;
+  /*line-height: 40px;*/
   overflow: hidden;
   border: 1px solid #eee;
 }

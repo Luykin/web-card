@@ -3,28 +3,7 @@
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box" v-if="user">
       <!--  右侧边栏start -->
-      <div class="notice" v-if="user.agency">
-        <div class="notice-heder flex">
-          <div class="mg-btn flex dengji-warp">代理等级: {{proxyRank}}
-            <img :src="proxyIcon" v-if="proxyIcon" class="proxy-icon">
-          </div>
-        </div>
-        <div class="notice-item flex">
-          <div class="notice-item-left flex ellipsis">我的账户</div>
-          <div class="notice-item-right flex" v-if="user">{{user.phone}}</div>
-        </div>
-        <div class="notice-item flex">
-          <div class="notice-item-left flex ellipsis">我的余额</div>
-          <div class="notice-item-right flex" v-if="user">{{user.score}}</div>
-        </div>
-        <div class="notice-item flex" v-if="siteInfo">
-          <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex">{{user.agency.balance}}</div>
-        </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX">分站管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage">商品管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
-      </div>
+      <m-agent></m-agent>
       <!--  右侧边栏end -->
       <!--       <div class="partition"></div> -->
       <div class="goods-table" v-if="tableData">
@@ -75,6 +54,7 @@
   import { mapGetters, mapMutations } from 'vuex'
   import { testToken, timeChange } from 'common/js/util'
   import { SUCCESS_CODE } from 'api/config'
+  import MAgent from 'components/agent-banner/agent-banner'
   const NUM = 11
   export default {
     data() {
@@ -104,9 +84,7 @@
           '3': '进行中',
           '4': '订单取消',
           '5': '订单取消'
-        },
-        rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-        iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
+        }
       }
     },
     created() {
@@ -114,32 +92,18 @@
     this._siteInit()
   },
   computed: {
-    proxyRank() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.rank[this.user.agency.level - 1]
-      } else {
-        return '普通用户'
-      }
-    },
-    proxyIcon() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.iconList[this.user.agency.level - 1]
-      } else {
-        return false
-      }
-    },
     siteLogo() {
-      // console.log(this.user.agency.sub_site.icon)
       return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat;`
     },
-    //   background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
-    // background-size: cover;
     ...mapGetters([
       'user',
       'token',
       'tokenTime',
       'app'
       ])
+  },
+  components: {
+    MAgent
   },
   methods: {
     _viewLink(e) {

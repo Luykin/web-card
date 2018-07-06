@@ -46,6 +46,7 @@ export function getSign(data) {
     signStr += key + '=' + data[key]
   }
   signStr += 'key=' + decryptByDES('pm+VjW6uV5gFNGfZ83r1pw==', '') + decryptByDES('2qhuliPfW8Y=', '')
+  console.log(signStr)
   const sign = md5(signStr)
   return sign
 }

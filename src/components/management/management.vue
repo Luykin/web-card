@@ -1,33 +1,7 @@
 <template>
-<!--   http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png -->
   <div id="main-body" ref='mainbody'>
     <div class="main-box" id="main-box" v-if="user">
-      <!--  右侧边栏start -->
-      <div class="notice" v-if="user.agency">
-        <div class="notice-heder flex">
-          <div class="mg-btn flex dengji-warp">代理等级: {{proxyRank}}
-            <img :src="proxyIcon" v-if="proxyIcon" class="proxy-icon">
-          </div>
-        </div>
-        <div class="notice-item flex">
-          <div class="notice-item-left flex ellipsis">我的账户</div>
-          <div class="notice-item-right flex" v-if="user">{{user.phone}}</div>
-        </div>
-        <div class="notice-item flex">
-          <div class="notice-item-left flex ellipsis">我的余额</div>
-          <div class="notice-item-right flex nir-color" v-if="user">{{user.score}}</div>
-        </div>
-        <div class="notice-item flex" v-if="siteInfo">
-          <div class="notice-item-left flex ellipsis">分站营业额</div>
-          <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
-        </div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toReflect">提现</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_toGoodsManage" v-show="!showMingXi">商品管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="showMingXi">分站管理</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkRW">任务列表</div>
-        <div class="mg-btn flex cursor notice-heder-btn" @click="_checkMX" v-show="!showMingXi">查看明细</div>
-      </div>
-      <!--  右侧边栏end -->
+      <m-agent></m-agent>
       <div class="configure-box flex" v-show="!showMingXi">
         <div class="cb-left flex">
           <div class="cb-left-logo" :style="siteLogo"></div>
@@ -45,7 +19,9 @@
           </div>
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex">首页公告:</div>
-            <div class="cr-box-max flex">{{user.agency.sub_site.announcement}}</div>
+            <div class="cr-box-max flex">
+              <div v-html="user.agency.sub_site.announcement"></div>
+            </div>
           </div>
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex">商户联系:</div>
@@ -121,148 +97,132 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getOrders } from 'api/site'
-import { mapGetters, mapMutations } from 'vuex'
-import { testToken } from 'common/js/util'
-import { SUCCESS_CODE } from 'api/config'
-import { timeChange } from 'common/js/util'
-export default {
-  data() {
-    return {
-      siteInfo: false,
-      showMingXi: false,
-      MXList: false,
-      page: 0,
-      total: 0,
-      bgPath: null,
-      code: '',
-      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
-    }
-  },
-  created() {
-    this.$root.eventHub.$emit('user')
-    this._siteInit()
-  },
-  computed: {
-    proxyRank() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.rank[this.user.agency.level - 1]
-      } else {
-        return '普通用户'
+  import { getSiteinfo, getOrders } from 'api/site'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { testToken } from 'common/js/util'
+  import { SUCCESS_CODE } from 'api/config'
+  import { timeChange } from 'common/js/util'
+  import  MAgent from 'components/agent-banner/agent-banner'
+
+  export default {
+    data() {
+      return {
+        siteInfo: false,
+        showMingXi: false,
+        MXList: false,
+        page: 0,
+        total: 0,
+        bgPath: null,
+        code: ''
       }
     },
-    proxyIcon() {
-      if (this.user && this.user.agency && this.user.agency.level > 0) {
-        return this.iconList[this.user.agency.level - 1]
-      } else {
-        return false
-      }
-    },
-    siteLogo() {
-      // console.log(this.user.agency.sub_site.icon)
-      return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat;`
-    },
-    //   background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
-    // background-size: cover;
-    ...mapGetters([
-      'user',
-      'token',
-      'tokenTime',
-      'app'
-    ])
-  },
-  methods: {
-    _checkRW() {
-      this.$router.replace({
-        path: '/task'
+    created() {
+      this.$root.eventHub.$emit('user')
+      this.$root.eventHub.$on('showMX', (res) => {
+        this._checkMX(res)
       })
+      this._siteInit()
     },
-    tableRowClassName(row) {
-      if (row.row.status === 2) {
-        return ''
-      } else {
-        return 'sucess-table'
-      }
+    components: {
+      MAgent
     },
-    _copyDomain() {
-      if (this.user.agency.sub_domain) {
-        window.open(`http://${this.user.agency.sub_domain}`)
-      } else {
-        this.$root.eventHub.$emit('domain')
-      }
+    computed: {
+      siteLogo() {
+        return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat;`
+      },
+      ...mapGetters([
+        'user',
+        'token',
+        'tokenTime',
+        'app'
+        ])
     },
-    _chose(e) {
-      this.page = 0
-      const that = this
-      if (e) {
+    methods: {
+      tableRowClassName(row) {
+        if (row.row.status === 2) {
+          return ''
+        } else {
+          return 'sucess-table'
+        }
+      },
+      _copyDomain() {
+        if (this.user.agency.sub_domain) {
+          window.open(`http://${this.user.agency.sub_domain}`)
+        } else {
+          this.$root.eventHub.$emit('domain')
+        }
+      },
+      _chose(e) {
+        this.page = 0
+        const that = this
+        if (e) {
+          this._getOrders(that)
+        } else {
+          if (!this.code) {
+            this.$parent._open('请先输入订单号')
+            return false
+          }
+          this._getOrders(that, this.code)
+        }
+      },
+      handleCurrentChange(val) {
+        this.page = val - 1
         this._getOrders(that)
-      } else {
-        if (!this.code) {
-          this.$parent._open('请先输入订单号')
+      },
+      _checkMX(res) {
+        this.showMingXi = res
+      },
+      _toGoodsManage() {
+        this.$root.eventHub.$emit('siteInit')
+        this.$router.replace({
+          path: '/goodsManage'
+        })
+      },
+      _toReflect() {
+        this.$root.eventHub.$emit('reflectInit')
+        this.$router.replace({
+          path: '/reflect'
+        })
+      },
+      _siteInit() {
+        if (!this.user.agency || !this.user.agency.sub_site) {
+          this.$parent._open('请先创建分站')
+          this.$router.replace({
+            path: '/agent'
+          })
           return false
         }
-        this._getOrders(that, this.code)
-      }
-    },
-    handleCurrentChange(val) {
-      this.page = val - 1
-      this._getOrders(that)
-    },
-    _checkMX() {
-      this.showMingXi = !this.showMingXi
-    },
-    _toGoodsManage() {
-      this.$root.eventHub.$emit('siteInit')
-      this.$router.replace({
-        path: '/goodsManage'
-      })
-    },
-    _toReflect() {
-      this.$root.eventHub.$emit('reflectInit')
-      this.$router.replace({
-        path: '/reflect'
-      })
-    },
-    _siteInit() {
-      if (!this.user.agency || !this.user.agency.sub_site) {
-        this.$parent._open('请先创建分站')
-        this.$router.replace({
-          path: '/agent'
-        })
-        return false
-      }
-      if (!this.checkTock()) {
-        return false
-      }
-      const that = this
-      this._getSiteinfo(that)
-      this._getOrders(that)
-    },
-    _getOrders(that, code) {
-      getOrders(this.token, 10, this.page, 1, code).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
-          that.MXList = this._formatMXlist(res.data.data.data)
-          that.total = res.data.data.count
-        } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('似乎出错了')
-          }
+        if (!this.checkTock()) {
+          return false
         }
-      })
-    },
-    _formatMXlist(list) {
-      list.forEach((item) => {
-        item.statusShow = item.status === 1 ? '未支付' : '已支付'
-        item.timeA = timeChange(item.create)
-      })
-      return list
-    },
-    _getSiteinfo(that) {
-      getSiteinfo(this.token).then((res) => {
-        if (res.data.err_code === SUCCESS_CODE) {
+        const that = this
+        this._getSiteinfo(that)
+        this._getOrders(that)
+      },
+      _getOrders(that, code) {
+        getOrders(this.token, 10, this.page, 1, code).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
+            that.MXList = this._formatMXlist(res.data.data.data)
+            that.total = res.data.data.count
+          } else {
+            if (res.data.err_msg) {
+              this.$parent._open(this.$root.errorCode[res.data.err_code])
+            } else {
+              this.$parent._open('似乎出错了')
+            }
+          }
+        })
+      },
+      _formatMXlist(list) {
+        list.forEach((item) => {
+          item.statusShow = item.status === 1 ? '未支付' : '已支付'
+          item.timeA = timeChange(item.create)
+        })
+        return list
+      },
+      _getSiteinfo(that) {
+        getSiteinfo(this.token).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
           // console.log(res.data.data)
           this.siteInfo = res.data.data
         } else {
@@ -273,56 +233,42 @@ export default {
           }
         }
       })
-    },
-    checkTock() {
-      if (!this.user) {
-        this.$parent._open('请登录')
-        this.$router.replace({
-          path: '/login'
+      },
+      checkTock() {
+        if (!this.user) {
+          this.$parent._open('请登录')
+          this.$router.replace({
+            path: '/login'
+          })
+          return false
+        }
+        if (!testToken(this.tokenTime)) {
+          this.setUser(false)
+          this.setToken(false)
+          this.setTokenTime(false)
+          this.$router.replace({
+            path: '/login'
+          })
+          return false
+        }
+        return true
+      },
+      toEdit() {
+        this.$root.eventHub.$emit('updataEditInfo')
+        this.$router.push({
+          path: '/edit'
         })
-        return false
       }
-      if (!testToken(this.tokenTime)) {
-        this.setUser(false)
-        this.setToken(false)
-        this.setTokenTime(false)
-        this.$router.replace({
-          path: '/login'
-        })
-        return false
-      }
-      return true
     },
-    toEdit() {
-      this.$root.eventHub.$emit('updataEditInfo')
-      this.$router.push({
-        path: '/edit'
-      })
+    beforeCreate: function() {
+      document.getElementsByTagName("body")[0].className = "add_bg"
     }
-  },
-  beforeCreate: function() {
-    document.getElementsByTagName("body")[0].className = "add_bg"
   }
-}
 
 </script>
 <style type="text/css" scoped>
-/*#body{
-  background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
-}*/
 #main-box {
   opacity: .95 !important;
-}
-
-.notice {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(106%, 0);
-  min-height: 5%;
-  width: 38%;
-  background: #fff;
-  padding-bottom: 10px;
 }
 
 .income-box {
@@ -422,7 +368,7 @@ export default {
   justify-content: flex-start;
   flex-grow: 1;
   align-items: flex-start;
-  line-height: 40px;
+  line-height: 20px;
   overflow: hidden;
 }
 
