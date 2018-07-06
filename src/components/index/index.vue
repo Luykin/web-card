@@ -13,73 +13,75 @@
           <!-- <waveCanvas :cWidth="70" :cHeight="65" :cid='item.id' :ref="item.id" :id='item.id'></waveCanvas> -->
         </div>
       </div>
-      <div class="no-data" v-if="!showService">暂未开放此业务，请平台关注公告!</div>
-      <div class="course" v-if="showService && nowServices" v-html='nowServices.tips'>
-      </div>
-      <div class="select-box flex">
-        <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
-          <div class="select-item-label flex ellipsis">预约时间</div>
-          <div class="flex input-defult no-border">
-            <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd'>
-            </el-date-picker>
-            <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
-            </el-time-select>
+      <div v-loading='loading'>
+        <!-- loading 开始 -->
+        <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
+        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips'>
+        </div>
+        <div class="select-box flex">
+          <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
+            <div class="select-item-label flex ellipsis">预约时间</div>
+            <div class="flex input-defult no-border">
+              <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd'>
+              </el-date-picker>
+              <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
+              </el-time-select>
+            </div>
           </div>
-        </div>
-        <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25) && pc'>
-        </div>
-        <div class="select-item" v-if="showService">
-          <div class="select-item-label flex ellipsis">
-            <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
-            <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">
-              <div class="p-course-box" v-show="!pc || choseSay">
-                <div class="pcb-warp">
-                  <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
-                  <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList && !lodingS" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
-                  <div class="flex no-tutorials loding" v-if="lodingS">加载中</div>
-                  <img :src="nowServices.tutorials_mobile" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
-                  <div v-if="sayList && (nowServices.category ===2 || nowServices.category ===4)" v-for="item in sayList" class="say-list-item" @click="_choseSayList(item)">
-                    {{item.content}}
+          <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25) && pc'>
+          </div>
+          <div class="select-item" v-if="showService">
+            <div class="select-item-label flex ellipsis">
+              <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
+              <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">
+                <div class="p-course-box" v-show="!pc || choseSay">
+                  <div class="pcb-warp">
+                    <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
+                    <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList && !lodingS" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
+                    <div class="flex no-tutorials loding" v-if="lodingS">加载中</div>
+                    <img :src="nowServices.tutorials_mobile" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+                    <div v-if="sayList && (nowServices.category ===2 || nowServices.category ===4)" v-for="item in sayList" class="say-list-item" @click="_choseSayList(item)">
+                      {{item.content}}
+                    </div>
                   </div>
+                  <div class="close-btn-c flex cursor phone-btn" @click='_closeCourse'>{{closeName}}</div>
                 </div>
-                <div class="close-btn-c flex cursor phone-btn" @click='_closeCourse'>{{closeName}}</div>
+                <div class="pc-course" v-show='pc && !choseSay' ref='pcCourse'>
+                  <div class="close-btn-c flex cursor" @click='_closeCourse'>{{closeName}}</div>
+                  <div v-if="!nowServices.tutorials" class="flex no-tutorials">暂无教程</div>
+                  <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+                </div>
+              </el-popover>
+              <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">{{nowServices.category > 0&&nowServices.category
+                < 10 ? '获取说说列表': '查看教程'}}</el-button>
               </div>
-              <div class="pc-course" v-show='pc && !choseSay' ref='pcCourse'>
-                <div class="close-btn-c flex cursor" @click='_closeCourse'>{{closeName}}</div>
-                <div v-if="!nowServices.tutorials" class="flex no-tutorials">暂无教程</div>
-                <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+              <div class="flex input-defult" v-if="nowServices">
+                <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
+                <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
               </div>
-            </el-popover>
-            <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">{{nowServices.category > 0&&nowServices.category
-              < 10 ? '获取说说列表': '查看教程'}}</el-button>
             </div>
-            <div class="flex input-defult" v-if="nowServices">
-              <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
-              <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+            <div class="select-item" v-if="showService">
+              <div class="select-item-label flex ellipsis">数量</div>
+              <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
+                <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+              </div>
+              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
+            </div>
+            <div class="select-item" v-if="showService">
+              <div class="select-item-label flex ellipsis">业务</div>
+              <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
+                <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
+                </el-option>
+              </el-select>
             </div>
           </div>
-          <div class="select-item" v-if="showService">
-            <div class="select-item-label flex ellipsis">数量</div>
-            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
-              <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+          <div v-if="showService && nowServices">
+            <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
+            <div class="rule-hints flex ellipsis" v-if="nowServices.price">
+              <span class="rh-title">所需金额:</span>
+              <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
             </div>
-            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
-          </div>
-          <div class="select-item" v-if="showService">
-            <div class="select-item-label flex ellipsis">业务</div>
-            <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
-              <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
-              </el-option>
-            </el-select>
-          </div>
-        </div>
-        <div v-if="showService && nowServices">
-          <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-          <div class="rule-hints flex ellipsis" v-if="nowServices.price">
-            <span class="rh-title">所需金额:</span>
-            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
-          </div>
 <!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
             <span class="rh-title">所需金额:</span>
             <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '元'}}</span>
@@ -94,29 +96,28 @@
         </div>
         <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
         <div class="index-bootom-height"></div>
-  <!--       <div class="agent-box" v-if="false">
-          <div class="main-box-header flex agent-box-title">
-          </div>
-        </div> -->
+        <!-- loading 结束 -->
       </div>
     </div>
-  </template>
-  <script type="text/javascript">
-    import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
-    import { testToken } from 'common/js/util'
-    import { mapGetters, mapMutations } from 'vuex'
-    import { SUCCESS_CODE, modifyEnv } from 'api/config'
-    import { Judge } from 'common/js/judge'
-    const BILI = 0.8
-    export default {
-      mixins: [Judge],
-      data() {
-        return {
+  </div>
+</template>
+<script type="text/javascript">
+  import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+  import { testToken } from 'common/js/util'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { SUCCESS_CODE, modifyEnv } from 'api/config'
+  import { Judge } from 'common/js/judge'
+  const BILI = 0.8
+  export default {
+    mixins: [Judge],
+    data() {
+      return {
       // 很重要，代表是否为分站的参数
       Gdomain: null,
       judgeMust: true,
       popoverWidth: 1000,
       link: '',
+      loading: true,
       orderTimeD: '',
       orderTimeS: '',
       quantity: '',
@@ -585,9 +586,10 @@
     //   })
     // },
     _getServices(that, id, Gdomain) {
-      // const that = this
+      this.loading = true
       getServices(id, Gdomain).then((res) => {
-        that.lodingChose = false
+        this.lodingChose = false
+        this.loading = false
         if (res.data.err_code === SUCCESS_CODE) {
           const services = res.data.data
           that.services[that.activeCategory] = services
