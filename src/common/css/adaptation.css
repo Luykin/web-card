@@ -51,7 +51,7 @@
     height: 220px;
     width: 85%;
     padding-left: 15%;
-    background: #353535;
+    background: #fff;
     color: #999999;
     padding-top: 20px;
   }
@@ -84,7 +84,7 @@
     height: 240px;
     width: 90%;
     padding: 15px 5%;
-    background: #353535;
+    background: #fff;
     color: #999999;
     flex-wrap: wrap;
   }

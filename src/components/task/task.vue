@@ -7,6 +7,36 @@
       <!--  右侧边栏end -->
       <!--       <div class="partition"></div> -->
       <div class="goods-table" v-if="tableData">
+        <div class="income-box flex" v-if="siteInfo">
+          <div class="income-box-item cursor">
+            <div class="position-ibi-content flex">
+              <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%94%B6%E7%9B%8A.png" class="pic-img">
+              <div class="pic-title flex height-light nir-color">{{siteInfo.sum_price_today}}</div>
+              <div class="pic-title flex">今日消费</div>
+            </div>
+          </div>
+          <div class="income-box-item cursor">
+            <div class="position-ibi-content flex">
+              <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%B6%88%E8%B4%B9.png" class="pic-img">
+              <div class="pic-title flex height-light nir-color">{{siteInfo.sum_income_today}}</div>
+              <div class="pic-title flex">今日收入</div>
+            </div>
+          </div>
+          <div class="income-box-item cursor">
+            <div class="position-ibi-content flex">
+              <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%94%B6%E7%9B%8A.png" class="pic-img">
+              <div class="pic-title flex height-light nir-color">{{siteInfo.sum_price}}</div>
+              <div class="pic-title flex">总消费</div>
+            </div>
+          </div>
+          <div class="income-box-item cursor">
+            <div class="position-ibi-content flex">
+              <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%B4%AF%E7%A7%AF%E6%B6%88%E8%B4%B9.png" class="pic-img">
+              <div class="pic-title flex height-light nir-color">{{siteInfo.sum_income}}</div>
+              <div class="pic-title flex">总收入</div>
+            </div>
+          </div>
+        </div>
         <div class="flex input-btn-box">
           <div class="ibb-input-warp">
             <input type="text" name="mxInput" class="aib-ipnput" placeholder="输入ID或订单号查询" v-model="code">
@@ -50,7 +80,8 @@
 </div>
 </template>
 <script type="text/javascript">
-  import { getTasks } from 'api/site'
+  // import { getSiteinfo, getOrders } from 'api/site'
+  import { getTasks, getSiteinfo } from 'api/site'
   import { mapGetters, mapMutations } from 'vuex'
   import { testToken, timeChange } from 'common/js/util'
   import { SUCCESS_CODE } from 'api/config'
@@ -66,6 +97,7 @@
         total: 0,
         bgPath: null,
         code: '',
+        siteInfo: false,
         loading: false,
         state: {
           '-10': '未支付',
@@ -123,6 +155,20 @@
         this.$root.eventHub.$emit('domain')
       }
     },
+    _getSiteinfo(that) {
+      getSiteinfo(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          // console.log(res.data.data)
+          this.siteInfo = res.data.data
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
     _chose(e) {
       this.page = 0
       const that = this
@@ -171,6 +217,7 @@
       }
       const that = this
       // this._getSiteinfo(that)
+      this._getSiteinfo(that)
       this._getTasks()
     },
     _getTasks(id) {

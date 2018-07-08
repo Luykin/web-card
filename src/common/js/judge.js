@@ -14,7 +14,6 @@ export const Judge = {
       const end = window.location.href.indexOf('.xkfans')
       const QZ = window.location.href.slice(start + 3, end)
       if (window.location.href.indexOf('.xkfans.com') > -1 && QZ != 'dev' &&  QZ != 'www') {
-        this.Gdomain = true
         let start = window.location.href.indexOf('://')
         let end = window.location.href.indexOf('.xkfans.com')
         let domain = window.location.href.slice(start + 3, end)

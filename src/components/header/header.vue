@@ -10,7 +10,7 @@
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
-            <el-menu-item index="/official">主页</el-menu-item>
+            <!-- <el-menu-item index="/official">主页</el-menu-item> -->
             <el-menu-item index="/index">{{env}}</el-menu-item>
             <el-menu-item index="/order" v-show="user">我的订单</el-menu-item>
             <!-- <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item> -->
@@ -83,9 +83,9 @@
       <el-row class="tac">
         <el-col>
           <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
-            <el-menu-item index="/official">
+            <!-- <el-menu-item index="/official">
               <i class="iconfont icon-tijiaodingdan"></i>主页
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/index">
               <i class="iconfont icon-tijiaodingdan"></i>{{env}}
             </el-menu-item>
@@ -914,9 +914,9 @@
       if (key.indexOf('/none') > -1) {
         return false
       }
-      if (key.indexOf('/official') > -1) {
-        window.location.href = 'http://www.7shuiguo.cn'
-      }
+      // if (key.indexOf('/official') > -1) {
+      //   window.location.href = 'http://www.7shuiguo.cn'
+      // }
       if (this.sidebar) {
         this._hiddenSidebar()
       }
