@@ -197,7 +197,6 @@
         }
         const that = this
         this._getSiteinfo(that)
-        this._getOrders(that)
       },
       _getOrders(that, code) {
         getOrders(this.token, 10, this.page, 1, code).then((res) => {
@@ -305,80 +304,6 @@
   background: #fff;
   height: 520px;
 }
-
-.cb-left {
-  width: 30%;
-  height: 100%;
-  align-items: flex-start;
-  overflow: hidden;
-}
-
-.cb-right {
-  width: 70%;
-  height: 100%;
-  overflow: hidden;
-  align-items: flex-start;
-}
-
-.partition {
-  width: 100%;
-  background: #f4f4f4;
-  height: 20px;
-}
-
-.cb-left-logo {
-  width: 85%;
-  padding-bottom: 30%;
-  margin: 40px auto 0;
-  background-size: 100% 100% !important;
-}
-
-.cr-item {
-  width: 100%;
-  margin-top: 40px;
-}
-
-.cr-box-min {
-  width: 60%;
-  flex-grow: 1;
-  height: 44px;
-  font-size: 14px;
-  margin: 0 10px;
-  border-radius: 5px;
-  background: #f4f4f4;
-  text-indent: 10px;
-  justify-content: flex-start;
-  overflow: hidden;
-}
-
-.cr-box-btn {
-  width: 100px;
-  margin-right: 20px;
-  font-size: 16px;
-  height: 44px;
-}
-
-.cr-box-max {
-  height: 100px;
-  margin: 0 20px 0 10px;
-  border-radius: 5px;
-  background: #f4f4f4;
-  text-indent: 10px;
-  font-size: 14px;
-  justify-content: flex-start;
-  flex-grow: 1;
-  align-items: flex-start;
-  line-height: 20px;
-  overflow: hidden;
-}
-
-.cr-box-tit {
-  width: 15%;
-  height: 100%;
-  min-width: 60px;
-  font-size: 16px;
-}
-
 .position-ibi-content {
   position: absolute;
   left: 0;

@@ -361,7 +361,7 @@ export default {
   max-width: 850px;
   min-height: 800px;
   height: auto;
-  margin: 0 auto;
+  margin: 0 auto 40px;
   /*transform: translate(0 , 10%);*/
   background: #fff;
   overflow: hidden;

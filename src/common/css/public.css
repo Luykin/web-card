@@ -285,14 +285,14 @@
   width: 40%;
   justify-content: flex-start;
   text-indent: 20px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .notice-item-right {
   justify-content: flex-end;
   padding-right: 5%;
   width: 60%;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .dengji-warp {
@@ -304,7 +304,7 @@
 .notice .notice-heder-btn {
   width: 80%;
   margin: 20px auto;
-  font-size: 16px;
+  font-size: 15px;
   background: #fff;
   border: 1px solid #FFDA5B;
 }
@@ -324,4 +324,76 @@
 }
 .notice-heder-btn:hover{
   background: rgba(255, 210, 54, 1);
+}
+.cb-left {
+  width: 30%;
+  height: 100%;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.cb-right {
+  width: 70%;
+  height: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+}
+
+.partition {
+  width: 100%;
+  background: #f4f4f4;
+  height: 20px;
+}
+
+.cb-left-logo {
+  width: 85%;
+  padding-bottom: 30%;
+  margin: 40px auto 0;
+  background-size: 100% 100% !important;
+}
+
+.cr-item {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.cr-box-min {
+  width: 60%;
+  flex-grow: 1;
+  height: 44px;
+  font-size: 14px;
+  margin: 0 10px;
+  border-radius: 5px;
+  background: #f4f4f4;
+  text-indent: 10px;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.cr-box-btn {
+  width: 100px;
+  margin-right: 20px;
+  font-size: 16px;
+  height: 44px;
+}
+
+.cr-box-max {
+  height: 100px;
+  margin: 0 20px 0 10px;
+  border-radius: 5px;
+  background: #f4f4f4;
+  text-indent: 10px;
+  font-size: 14px;
+  justify-content: flex-start;
+  flex-grow: 1;
+  align-items: flex-start;
+  line-height: 20px;
+  overflow: hidden;
+}
+
+.cr-box-tit {
+  width: 15%;
+  height: 100%;
+  min-width: 60px;
+  font-size: 16px;
 }
