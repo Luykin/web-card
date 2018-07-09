@@ -1,19 +1,30 @@
 <template>
   <footer class="flex new-footer">
-    <div class="footer-item flex shpc">
-      <div class="footer-item-title footer-item-item flex">商务合作</div>
-      <div class="footer-item-name footer-item-item flex">商务联系：{{name}}</div>
-      <div class="footer-item-name footer-item-item flex">联系邮箱：{{emil}}</div>
+    <div class="new-footer-top flex shpc">
+      <div class="footer-left flex">
+        <img src="../../assets/logo.png" alt="网站图标" class="footer-logo">
+        <div class="segmenting-line"></div>
+      </div>
+      <div class="footer-right flex">
+<!--         <div class="footer-right-item flex">
+          <img src="http://p70pqu6ys.bkt.clouddn.com/%E8%81%94%E7%B3%BB%E4%BA%BA.png" alt="联系人"  class="footer-right-icon">
+          {{name}}
+        </div> -->
+        <div class="footer-right-item flex">
+          <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%94%B5%E8%AF%9D.png" alt="电话" class="footer-right-icon">
+          {{phone}}
+        </div>
+        <div class="footer-right-item flex">
+          <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%82%AE%E4%BB%B6.png" alt="邮件" class="footer-right-icon">
+          {{emil}}
+        </div>
+        <div class="footer-right-item flex">
+          <img src="http://p70pqu6ys.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1.png" alt="微信" class="footer-right-icon">
+          {{wx}}
+        </div>
+      </div>
     </div>
-    <div class="footer-item flex shpc">
-      <div class="footer-item-title footer-item-item flex"></div>
-      <div class="footer-item-name footer-item-item flex" v-show="!hid">商务联系：钟先生</div>
-      <div class="footer-item-name footer-item-item flex" v-show="!hid">联系邮箱：raynor@melonblock.com</div>
-    </div>
-    <div class="footer-item flex shpc">
-      <div class="footer-item-title footer-item-item flex">商务合作</div>
-      <div class="footer-item-name footer-item-item flex">QQ联系: 42428851</div>
-    </div>
+    <div class="new-footer-bottom flex shpc">© Melon Tech Design. all rights reserved. Powered by Melon Tech.. <a href="http://www.miitbeian.gov.cn" class="footer-to-gx" target="_blank">渝ICP备18002374号-3</a></div>
     <div class="h-footer-title flex sh-phone">商务合作</div>
     <div class="h-footer-box flex sh-phone">商务联系：{{name}}</div>
     <div class="h-footer-box flex sh-phone">联系邮箱：{{emil}}</div>
@@ -26,28 +37,86 @@
 </template>
 <script type="text/javascript">
 export default {
-    data() {
-      return {
-        name:'张先生',
-        emil: 'zhangheng@melonblock.com',
-        hid: null
-      }
-    },
-    created() {
-      const that = this
-      this.$root.eventHub.$on('footername', (footer) => {
-        that.name = footer
-        that.hid = true
-      })
-      this.$root.eventHub.$on('footeremail', (footer) => {
-        that.emil = footer
-        that.hid = true
-      })
+  data() {
+    return {
+      name: '张先生',
+      emil: 'zhangheng@melonblock.com',
+      phone: '13212399922',
+      wx: 'fans10005',
+      hid: null
     }
+  },
+  created() {
+    const that = this
+    this.$root.eventHub.$on('footername', (footer) => {
+      that.name = footer
+      that.hid = true
+    })
+    this.$root.eventHub.$on('footeremail', (footer) => {
+      that.emil = footer
+      that.hid = true
+    })
+  }
 }
 
 </script>
 <style type="text/css" scoped>
+/*.new-footer{
+  opacity: .8;
+}*/
+.new-footer-bottom {
+  width: 100%;
+  height: 18%;
+  border-top: 1px solid #e3e3e3;
+  color: #BDBDBD;
+}
+.footer-to-gx{
+  color: #BDBDBD;
+}
+.new-footer-top {
+  width: 100%;
+  height: 82%;
+}
+
+.footer-logo {
+  margin: 0 40px;
+}
+
+.footer-left {
+  width: 50%;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.footer-right {
+  width: 50%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.footer-right-item {
+  width: 100%;
+  height: 35px;
+  color: #828282;
+  font-size: 12px;
+  justify-content: flex-start;
+}
+.footer-right-icon{
+  max-width: 20px;
+  height: auto;
+  margin: 0 20px 0 40px;
+}
+.segmenting-line {
+  height: 60%;
+  width: 2px;
+  background: #e7e7e7;
+}
+
 .footer-item {
   width: 30%;
   height: 90%;
@@ -76,9 +145,12 @@ export default {
 }
 
 
+
+
+
 /*.max-length{
   width: 200px;
-}*/
+  }*/
 
 .h-footer-title {
   justify-content: flex-start;
@@ -113,6 +185,9 @@ export default {
 }
 
 
+
+
+
 /*footer{
   width: 100%;
   height: 125px;
@@ -136,6 +211,6 @@ export default {
 }
 .font-min{
   font-size: 14px;
-}*/
+  }*/
 
 </style>

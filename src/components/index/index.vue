@@ -54,39 +54,39 @@
               </el-popover>
               <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) && link)">{{nowServices.category > 0&&nowServices.category
                 < 10 ? '获取说说列表': '查看教程'}}</el-button>
-              </div>
-              <div class="flex input-defult" v-if="nowServices">
-                <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
-                <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
-              </div>
             </div>
-            <div class="select-item" v-if="showService">
-              <div class="select-item-label flex ellipsis">数量</div>
-              <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
-                <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
-              </div>
-              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
-            </div>
-            <div class="select-item" v-if="showService">
-              <div class="select-item-label flex ellipsis">业务</div>
-              <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
-                <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
-                </el-option>
-              </el-select>
+            <div class="flex input-defult" v-if="nowServices">
+              <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
+              <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
             </div>
           </div>
-          <div v-if="showService && nowServices">
-            <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-            <div class="rule-hints flex ellipsis" v-if="nowServices.price">
-              <span class="rh-title">所需金额:</span>
-              <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
+          <div class="select-item" v-if="showService">
+            <div class="select-item-label flex ellipsis">数量</div>
+            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
+              <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
             </div>
-<!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
+          </div>
+          <div class="select-item" v-if="showService">
+            <div class="select-item-label flex ellipsis">业务</div>
+            <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
+              <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+        <div v-if="showService && nowServices">
+          <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
+          <div class="rule-hints flex ellipsis" v-if="nowServices.price">
+            <span class="rh-title">所需金额:</span>
+            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</span>
+          </div>
+          <!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
             <span class="rh-title">所需金额:</span>
             <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '元'}}</span>
           </div> -->
-<!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
+          <!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
             <span class="rh-title">剩余积分:</span>
             <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
           </div> -->
@@ -102,22 +102,22 @@
   </div>
 </template>
 <script type="text/javascript">
-  import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
-  import { testToken } from 'common/js/util'
-  import { mapGetters, mapMutations } from 'vuex'
-  import { SUCCESS_CODE, modifyEnv } from 'api/config'
-  import { Judge } from 'common/js/judge'
-  const BILI = 0.8
-  export default {
-    mixins: [Judge],
-    data() {
-      return {
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+import { testToken } from 'common/js/util'
+import { mapGetters, mapMutations } from 'vuex'
+import { SUCCESS_CODE, modifyEnv } from 'api/config'
+import { Judge } from 'common/js/judge'
+const BILI = 0.8
+export default {
+  mixins: [Judge],
+  data() {
+    return {
       // 很重要，代表是否为分站的参数
       Gdomain: null,
       judgeMust: true,
       popoverWidth: 1000,
       link: '',
-      loading: true,
+      loading: false,
       orderTimeD: '',
       orderTimeS: '',
       quantity: '',
@@ -204,16 +204,16 @@
     },
     consumeMoney() {
       if (this.nowServices.price) {
-        return Math.ceil((this.quantity || 0) * this.nowServices.price)
+        return Math.floor(((this.quantity || 0) * this.nowServices.price) * 100) / 100
       } else {
         return false
       }
     },
     agencyPrice() {
       if (this.user.agency_level) {
-        return Math.ceil((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1))
+        return Math.floor((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1) * 100) / 100
       } else {
-        return Math.ceil((this.quantity || 0) * this.nowServices.price)
+        return Math.floor(((this.quantity || 0) * this.nowServices.price) * 100) / 100
       }
     },
     ...mapGetters([
@@ -221,7 +221,7 @@
       'token',
       'tokenTime',
       'app'
-      ])
+    ])
   },
   methods: {
     _setAnnouncement(announcement) {
@@ -337,13 +337,13 @@
         addition: this.link
       }
       if (this.Gdomain) {
-        data = Object.assign({sub_domain: this.Gdomain}, data)
+        data = Object.assign({ sub_domain: this.Gdomain }, data)
       }
       if (category === 2 || category === 4) {
         data = Object.assign({ target_id: this.targetid }, data)
       }
       if (category === 24 || category === 25) {
-        data = Object.assign({ target_id: false, appointment_time: this.sublimeTime}, data)
+        data = Object.assign({ target_id: false, appointment_time: this.sublimeTime }, data)
       }
       this.$root.eventHub.$emit('showPopup', data)
       // else {
@@ -570,8 +570,10 @@
     //   return services
     // },
     _initNet() {
-      this.activeCategory = this.app.service_categories[0].id
-      this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+      if (this.app.service_categories.length > 0) {
+        this.activeCategory = this.app.service_categories[0].id
+        this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+      }
     },
     // _getServiceCategory(that, domain) {
     //   getServiceCategory(domain).then((res) => {
@@ -1032,13 +1034,15 @@
 .notice-content {
   line-height: 1.5 !important;
 }
-.no-data{
+
+.no-data {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, 100%);
 }
-.index-bootom-height{
+
+.index-bootom-height {
   height: 10px;
 }
 

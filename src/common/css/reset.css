@@ -17,7 +17,7 @@ body {
   line-height: 1;
   background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
   background-size: cover;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .add_bg{
   background: url('http://p70pqu6ys.bkt.clouddn.com/siteBg.png') no-repeat;
