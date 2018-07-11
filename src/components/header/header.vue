@@ -12,12 +12,12 @@
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
             <!-- <el-menu-item index="/official">主页</el-menu-item> -->
             <el-menu-item index="/index">{{env}}</el-menu-item>
-            <el-menu-item index="/order" v-show="user">我的订单</el-menu-item>
+            <el-menu-item index="/order" v-show="user && $route.name != 'management'">我的订单</el-menu-item>
             <!-- <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item> -->
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management'" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
@@ -36,7 +36,7 @@
                   <div class="agent-ul-li-right flex ellipsis">{{userPhone}}</div>
                 </div>
               </el-menu-item>
-              <el-menu-item index="/none" v-show="user.is_agency && user.agency_level && !user.agency.sub_domain && !FENZAN" class='flex' disabled>
+              <!--               <el-menu-item index="/none" v-show="user.is_agency && user.agency_level && !user.agency.sub_domain && !FENZAN" class='flex' disabled>
                 <div class="agent-ul-li flex cursor" @click="_setDomain($event)">
                   <div class="agent-ul-li-left flex ellipsis">创建分站</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
@@ -47,19 +47,19 @@
                   <div class="agent-ul-li-left flex ellipsis">分站管理</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
-              </el-menu-item>
- <!--              <el-menu-item index="/backstage">
+              </el-menu-item> -->
+              <el-menu-item index="/backstage" v-show="user.is_agency && user.agency_level">
                 <div class="agent-ul-li flex cursor">
-                  <div class="agent-ul-li-left flex ellipsis">分站后台</div>
+                  <div class="agent-ul-li-left flex ellipsis">代理后台</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
-              </el-menu-item> -->
-              <el-menu-item index="/edit" v-show="false" class='flex'>
+              </el-menu-item>
+              <!--              <el-menu-item index="/edit" v-show="false" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">分站编辑</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
-              </el-menu-item>
+              </el-menu-item> -->
               <el-menu-item index="/modify-password" v-show="user" class='flex'>
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">修改密码</div>
@@ -128,11 +128,15 @@
         <div class="recharge-box-title flex" v-show="!payUrl">{{BuyDomainData ? '订单确认' : '积分充值'}}</div>
         <div class="recharge-box-title flex" v-show="payUrl">{{payType}}扫码支付</div>
         <div class="content-qr flex" v-if="payUrl">
-          <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元</div>
-          <div class="qrcode-box flex">
-            <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
+          <div class="cq-left flex"><img :src="'http://p70pqu6ys.bkt.clouddn.com/'+ activePayType +'.png'" alt="支付方式" class="cq-pay-img"></div>
+          <div class="cq-right flex">
+            <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
+            </div>
+            <div class="qrcode-box flex">
+              <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
+            </div>
+            <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
           </div>
-          <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
           <div class="recharge-btn-box-after flex">
             <div class="recharge-btn-sure-after flex sure cursor" @click="_sureCompletionPayment">确定已完成支付</div>
             <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenSidebar">我再考虑考虑</div>
@@ -302,6 +306,7 @@
 </template>
 <script type="text/javascript">
 import { setDomain, setSiteinfo, subDomains } from 'api/site'
+import { getOrders } from 'api/score-record'
 import sidebar from 'components/sidebar/sidebar'
 import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
@@ -311,6 +316,7 @@ import { testToken } from 'common/js/util'
 import QrcodeVue from 'qrcode.vue'
 import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
+import { UAID } from 'api/config'
 
 export default {
   data() {
@@ -340,11 +346,14 @@ export default {
       exists: 1,
       dialogText: '',
       dialogTitle: '',
+      _timeforSPS: null,
+      _timeforCumt: 0,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
   created() {
+    // console.log(this.$route.name ! == management)
     this.$root.eventHub.$on('user', (location) => {
       this._updataUser(location)
     })
@@ -762,6 +771,14 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
+        this._timeforCumt = 0
+        this._timeforSPS = setInterval(() => {
+          this._surePaySuc(this.code)
+          this._timeforCumt++
+            if (this._timeforCumt >= 70) {
+              this._clearTimeforSPS()
+            }
+        }, 3000)
       } else {
         this._hiddenSidebar()
         this.money = ''
@@ -772,17 +789,31 @@ export default {
         }
       }
     },
-    _sureCompletionPayment() {
-      this._hiddenSidebar()
-      if (this.BuyDomainData) {
-        this.$router.replace({
-          path: '/order'
-        })
+    _surePaySuc(code) {
+      if (!this._timeforSPS) {
+        return false
       } else {
-        this.$router.replace({
-          path: '/score-record'
+        getOrders(this.token, 11, 0, code).then((res) => {
+          if (res.data.err_code === SUCCESS_CODE) {
+            if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
+              this.$parent._open('支付成功！')
+              this._clearTimeforSPS()
+              this._sureCompletionPayment()
+            }
+          }
         })
       }
+    },
+    _clearTimeforSPS() {
+      clearInterval(this._timeforSPS)
+      this._timeforSPS = null
+      this._timeforCumt = 0
+    },
+    _sureCompletionPayment() {
+      this._hiddenSidebar()
+      this.$router.replace({
+        path: '/order'
+      })
       this.$root.eventHub.$emit('canvas', true)
     },
     _logout(e) {
@@ -797,7 +828,17 @@ export default {
       this.$root.eventHub.$emit('canvas', true)
     },
     _toIndex() {
-      window.location.href = 'http://www.7shuiguo.cn'
+      if (UAID === 60001) {
+        window.location.href = 'http://www.7shuiguo.cn'
+      } else {
+        this.$root.eventHub.$emit('updateOrder')
+        this.$root.eventHub.$emit('user')
+        this.$root.eventHub.$emit('updateScoreRecord')
+        this.$router.replace({
+          path: '/index'
+        })
+        this.$root.eventHub.$emit('canvas', true)
+      }
       // this.$root.eventHub.$emit('updateOrder')
       // this.$root.eventHub.$emit('user')
       // this.$root.eventHub.$emit('updateScoreRecord')
@@ -877,6 +918,9 @@ export default {
       }
     },
     _hiddenSidebar() {
+      if (this._timeforSPS) {
+        this._clearTimeforSPS()
+      }
       if (this.payUrl) {
         this.$root.eventHub.$emit('user')
         this.$root.eventHub.$emit('updateScoreRecord')
@@ -907,12 +951,12 @@ export default {
     },
     handleSelect(key, keyPath) {
       this.$root.eventHub.$emit('canvas')
+      if (this._timeforSPS) {
+        this._clearTimeforSPS()
+      }
       if (key.indexOf('/none') > -1) {
         return false
       }
-      // if (key.indexOf('/official') > -1) {
-      //   window.location.href = 'http://www.7shuiguo.cn'
-      // }
       if (this.sidebar) {
         this._hiddenSidebar()
       }
@@ -1030,6 +1074,14 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1094,6 +1146,14 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -1190,6 +1250,18 @@ export default {
   width: 100%;
   height: auto;
   flex-wrap: wrap;
+}
+
+.cq-right {
+  /*  width: 60%;*/
+  height: auto;
+  flex-wrap: wrap;
+}
+
+.cq-left {
+  width: 0;
+  flex-grow: 1;
+  height: 100%;
 }
 
 .net-item {
@@ -1596,6 +1668,11 @@ export default {
 
 .fail-domain {
   color: #e6a23c;
+}
+
+.cq-pay-img {
+  width: 80%;
+  height: auto;
 }
 
 </style>

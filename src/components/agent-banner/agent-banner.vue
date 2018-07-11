@@ -17,11 +17,12 @@
       <div class="notice-item-left flex ellipsis">分站营业额</div>
       <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
     </div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
+    <div class="backstage-fenge"></div>
+  <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div> -->
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
   </div>
 </template>
 <script type="text/javascript">
@@ -81,6 +82,18 @@ export default {
 
 .active-mg-btn {
   background: #FFD236;
+}
+
+.backstage-fenge {
+  width: 100%;
+  height: 20px;
+  background: #F4F4F4;
+  margin: 20px 0;
+}
+.proxy-icon{
+	width: 20px;
+	height:auto;
+	margin: 0 5px;
 }
 
 </style>

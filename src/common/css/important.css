@@ -26,7 +26,7 @@
 
 .el-input__inner:focus {
   border: none !important;
-  border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+  border-bottom: 1px solid #f4f4f4 !important;
 }
 
 .el-input__inner:hover {

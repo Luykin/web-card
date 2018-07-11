@@ -82,37 +82,37 @@
   </div>
 </template>
 <script type="text/javascript">
-  import { getSiteinfo, getAgencyservice, setAgency } from 'api/site'
-  import { mapGetters, mapMutations } from 'vuex'
-  import { testToken } from 'common/js/util'
-  import { SUCCESS_CODE } from 'api/config'
-  import popup from 'base/popup/popup'
-  import interlayer from 'base/interlayer/interlayer'
-   import MAgent from 'components/agent-banner/agent-banner'
-  export default {
-    data() {
-      return {
-        siteInfo: false,
-        agencyService: [],
-        choseItem: [],
-        money: '',
-        chose: '全部商品',
-        nowRow: null,
-        fastclike: null,
-        timeChose:null,
-        showStatusValue: false,
-        statusList:[{
-          title:'是',
-          value: 1
-        },{
-          title:'否',
-          value: 2
-        }],
-        nowStatusValue: null
-      }
-    },
-    created() {
-      this.$root.eventHub.$emit('user')
+import { getSiteinfo, getAgencyservice, setAgency } from 'api/site'
+import { mapGetters, mapMutations } from 'vuex'
+import { testToken } from 'common/js/util'
+import { SUCCESS_CODE } from 'api/config'
+import popup from 'base/popup/popup'
+import interlayer from 'base/interlayer/interlayer'
+import MAgent from 'components/agent-banner/agent-banner'
+export default {
+  data() {
+    return {
+      siteInfo: false,
+      agencyService: [],
+      choseItem: [],
+      money: '',
+      chose: '全部商品',
+      nowRow: null,
+      fastclike: null,
+      timeChose: null,
+      showStatusValue: false,
+      statusList: [{
+        title: '是',
+        value: 1
+      }, {
+        title: '否',
+        value: 2
+      }],
+      nowStatusValue: null
+    }
+  },
+  created() {
+    this.$root.eventHub.$emit('user')
     // this.$root.eventHub.$emit('siteInit')
     this.$root.eventHub.$on('siteInit', () => {
       this._siteInit()
@@ -121,13 +121,13 @@
     this._orderInt()
   },
   computed: {
-    nowStatus(){
+    nowStatus() {
       if (!this.nowStatusValue) {
         this.nowStatusValue = this.nowRow.status
       }
       return this.nowStatusValue === 1 ? '是' : '否'
     },
-    nowStatusN(){
+    nowStatusN() {
       if (!this.nowStatusValue) {
         this.nowStatusValue = this.nowRow.status
       }
@@ -141,7 +141,7 @@
       'token',
       'tokenTime',
       'app'
-      ])
+    ])
   },
   methods: {
     _chose() {
@@ -169,11 +169,6 @@
       this._getAgencyservice()
     },
     _chekStaus() {
-      // if (this.nowStatusValue === 1) {
-      //   this.nowStatusValue = 2
-      // } else {
-      //   this.nowStatusValue = 1
-      // }
       this.showStatusValue = !this.showStatusValue
     },
     _newChekStaus() {
@@ -203,7 +198,7 @@
           }
           that._getAgencyservice(false, chose)
           that._interlayerHide()
-        }  else {
+        } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
           } else {
@@ -251,7 +246,8 @@
       })
     },
     _interlayerHide() {
-      this._chekStaus()
+      // this._chekStaus()
+      this.showStatusValue = false
       this.$refs.popup._hiddenPopup()
       this.$refs.interlayer._hiddenLayer()
     },
@@ -316,7 +312,7 @@
       }
       getAgencyservice(this.token, status, id).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          this.agencyService = res.data.data || []
+          this.agencyService = this._formatagencyService(res.data.data)
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -325,6 +321,18 @@
           }
         }
       })
+    },
+    _formatagencyService(list) {
+      if (!list) {
+        return []
+      } else {
+        list.forEach((item) => {
+          item.real_origin_price = parseFloat(item.real_origin_price)
+          item.origin_price = parseFloat(item.origin_price)
+          item.price = parseFloat(item.price)
+        })
+        return list
+      }
     },
     _getSiteinfo() {
       if (!this.checkTock()) {
@@ -367,7 +375,13 @@
       this.$router.push({
         path: '/edit'
       })
-    }
+    },
+    ...mapMutations({
+      setToken: 'SET_TOKEN',
+      setUser: 'SET_USER',
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
+    })
   },
   components: {
     popup,
@@ -376,7 +390,7 @@
   },
   beforeCreate: function() {
     document.getElementsByTagName("body")[0].className = "add_bg"
-  } 
+  }
 }
 
 </script>
@@ -605,11 +619,13 @@
   height: 50px;
   position: relative;
 }
-.aib-label{
+
+.aib-label {
   height: 100%;
   width: 20%;
 }
-.aib-input-warp{
+
+.aib-input-warp {
   height: 70%;
   width: 72%;
   padding: 0 4%;
@@ -619,7 +635,8 @@
   justify-content: flex-start;
   position: relative;
 }
-.aib-ipnput{
+
+.aib-ipnput {
   width: 100%;
   height: 100%;
   outline: none;
@@ -628,11 +645,13 @@
   font-size: 15px;
   color: #666;
 }
+
 .recharge-btn-box {
   width: 100%;
   height: 70px;
   justify-content: flex-start;
 }
+
 .recharge-btn-sure {
   width: 35%;
   height: 46px;
@@ -642,10 +661,11 @@
 .recharge-btn-sure:nth-child(1) {
   margin: 0 30% 0 0;
 }
+
 .cancel {
   box-sizing: border-box;
   color: #fff;
-  background: rgba(166,166,166,1);
+  background: rgba(166, 166, 166, 1);
 }
 
 .sure {
@@ -654,10 +674,12 @@
   background: #FFD236;
   /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
 }
-.abi-span{
+
+.abi-span {
   color: #666;
 }
-.tishi{
+
+.tishi {
   position: absolute;
   bottom: 5px;
   left: 0;
@@ -667,14 +689,16 @@
   color: #ff9100;
   font-size: 14px;
 }
-.aib-icon{
+
+.aib-icon {
   color: #666;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.chose-box{
+
+.chose-box {
   width: 90%;
   height: 100%;
   padding: 0 5%;
@@ -689,4 +713,5 @@
   opacity: .6;
   z-index: 99999;
 }
+
 </style>

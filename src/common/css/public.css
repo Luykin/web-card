@@ -159,7 +159,7 @@
   overflow: hidden;
   justify-content: flex-start;
   text-indent: 20px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #353535;
   border-radius: 5px;
@@ -187,7 +187,7 @@
   padding: 0 20px;
   background: #555;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   opacity: .9;
   border-radius: 10px;
 }
@@ -214,7 +214,7 @@
 }
 
 #main-body {
-  padding-bottom: 100px;
+  padding-bottom: 160px;
   height: auto;
 }
 
@@ -367,7 +367,8 @@
   background: #f4f4f4;
   text-indent: 10px;
   justify-content: flex-start;
-  overflow: hidden;
+/*  overflow-x: hidden;*/
+/*  overflow: hidden;*/
 }
 
 .cr-box-btn {
@@ -395,5 +396,5 @@
   width: 15%;
   height: 100%;
   min-width: 60px;
-  font-size: 16px;
+  font-size: 15px;
 }

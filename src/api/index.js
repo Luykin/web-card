@@ -56,6 +56,7 @@ export function addTask(score, point, token, serviceid, addition, targetid, subl
   if (sublimeTime) {
     data = Object.assign({ appointment_time: sublimeTime }, data)
   }
+  console.log(data)
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
   .then(function(res) {
     return Promise.resolve(res)
@@ -119,9 +120,7 @@ export function getShuoshuoList(qq, token) {
     qq: qq,
     token: token
   }
-  return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
-  })
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
   .then(function(res) {
     return Promise.resolve(res)
   })

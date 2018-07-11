@@ -96,6 +96,24 @@ export default new Router({
       name: 'management',
       component: () =>
         import ('components/backstage/backstage')
+    },
+    {
+      path: '/recharge',
+      name: 'management',
+      component: () =>
+        import ('components/recharge/recharge')
+    },
+    {
+      path: '/bg-money-record',
+      name: 'management',
+      component: () =>
+        import ('components/bg-money-record/bg-money-record')
+    },
+    {
+      path: '/bg-task-record',
+      name: 'management',
+      component: () =>
+        import ('components/bg-task-record/bg-task-record')
     }
   ]
 })

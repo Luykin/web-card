@@ -44,11 +44,11 @@
       <div class="cr-item flex">
         <div class="cr-box-tit ellipsis flex"></div>
         <div class="btn-box flex">
-           <div class="mg-btn flex cursor" @click="_submit">确认修改</div>
-           <div class="mg-btn flex cancle cursor" @click="_cancle">取消</div>
+          <div class="mg-btn flex cursor" @click="_submit">确认修改</div>
+          <div class="mg-btn flex cancle cursor" @click="_cancle">取消</div>
         </div>
       </div>
-<!--       <div class="btn-box flex">
+      <!--       <div class="btn-box flex">
         <div class="mg-btn flex cursor" @click="_submit">确认修改</div>
         <div class="mg-btn flex cancle cursor" @click="_cancle">取消</div>
       </div> -->
@@ -314,7 +314,13 @@ export default {
         return false
       }
       return true
-    }
+    },
+    ...mapMutations({
+      setToken: 'SET_TOKEN',
+      setUser: 'SET_USER',
+      setScorerate: 'SET_SCORERATE',
+      setTokenTime: 'SET_TOKENTIME'
+    })
   },
   beforeCreate: function() {
     document.getElementsByTagName("body")[0].className = "add_bg"
@@ -323,9 +329,10 @@ export default {
 
 </script>
 <style scoped>
-.quillWrapper{
+.quillWrapper {
   width: 100%;
 }
+
 .edit-logo {
   width: 25%;
   padding-top: 10%;
@@ -334,14 +341,15 @@ export default {
   position: relative;
   background-size: 100% 100% !important;
 }
-.zushi{
+
+.zushi {
   position: absolute;
   bottom: 0;
   left: -40px;
   right: -40px;
   height: 50px;
   line-height: 50px;
-  transform:translate(0,100%); 
+  transform: translate(0, 100%);
   text-align: center;
   font-size: 14px;
   color: #ff9100;
@@ -353,7 +361,7 @@ export default {
   height: auto;
   opacity: .95;
   padding-top: 85px;
- /* background: #eee;*/
+  /* background: #eee;*/
 }
 
 .edit-content {
@@ -398,7 +406,7 @@ export default {
   margin: 0 10px;
   border-radius: 5px;
   background: #f4f4f4;
-/*  text-indent: 10px;*/
+  /*  text-indent: 10px;*/
   justify-content: flex-start;
   flex-grow: 1;
   margin-right: 5%;

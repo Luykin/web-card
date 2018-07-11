@@ -6,11 +6,11 @@
         <div class="segmenting-line"></div>
       </div>
       <div class="footer-right flex">
-<!--         <div class="footer-right-item flex">
+        <div class="footer-right-item flex" v-if="name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E8%81%94%E7%B3%BB%E4%BA%BA.png" alt="联系人"  class="footer-right-icon">
           {{name}}
-        </div> -->
-        <div class="footer-right-item flex">
+        </div>
+        <div class="footer-right-item flex" v-if="!name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%94%B5%E8%AF%9D.png" alt="电话" class="footer-right-icon">
           {{phone}}
         </div>
@@ -18,7 +18,7 @@
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%82%AE%E4%BB%B6.png" alt="邮件" class="footer-right-icon">
           {{emil}}
         </div>
-        <div class="footer-right-item flex">
+        <div class="footer-right-item flex" v-if="!name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1.png" alt="微信" class="footer-right-icon">
           {{wx}}
         </div>
@@ -39,7 +39,7 @@
 export default {
   data() {
     return {
-      name: '张先生',
+      name: false,
       emil: 'zhangheng@melonblock.com',
       phone: '13212399922',
       wx: 'fans10005',

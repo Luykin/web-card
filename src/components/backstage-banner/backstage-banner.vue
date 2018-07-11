@@ -19,11 +19,13 @@
     </div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
     <div class="backstage-fenge"></div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">充值余额</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">订单查询</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">客服帮助</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">发票申请</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">发票申请</div>
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div> -->
     <!-- 		<div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->
@@ -39,17 +41,27 @@ export default {
     }
   },
   created() {
-    console.log('132321')
+    // console.log('132321')
   },
   methods: {
-    _openc(url, show) {
-      if (show) {
-        this.$root.eventHub.$emit('showMX', show - 1)
+    _openc(url, show, windowOpen) {
+      if (windowOpen) {
+      	if (!this.user.agency.sub_site) {
+      		this.$root.eventHub.$emit('domain')
+      	} else {
+      		window.open(window.location.origin + '/#/management', '_brank')
+      	}
+      } else {
+        if (show) {
+          this.$root.eventHub.$emit('showMX', show - 1)
+        }
+        this.$router.replace({
+          path: url
+        })
       }
-      this.$router.replace({
-        path: url
-      })
-      // console.log(this.$route.fullPath)
+    },
+    _openQQ() {
+      window.open('http://wpa.qq.com/msgrd?v=3&uin=42428851&site=qq&menu=yes', '_brank')
     }
   },
   computed: {
@@ -96,5 +108,9 @@ export default {
   background: #F4F4F4;
   margin: 20px 0;
 }
-
+.proxy-icon{
+	width: 20px;
+	height:auto;
+	margin: 0 5px;
+}
 </style>

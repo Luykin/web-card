@@ -14,7 +14,7 @@
     width: 45%;
   }
   .popup {
-    width: 500px;
+    width: 650px;
     height: auto;
     min-height: 330px;
   }
@@ -60,10 +60,16 @@
   .title-img {
     max-height: 75px;
   }
+  .cq-right {
+    width: 60%;
+  }
 }
 
 @media screen and (max-width: 769px) {
-  .notice{
+  .cq-right {
+    width: 100%;
+  }
+  .notice {
     display: none;
     opacity: 0;
   }
