@@ -17,7 +17,7 @@
       <div class="notice-item-left flex ellipsis">分站营业额</div>
       <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
     </div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect', false, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
@@ -49,7 +49,7 @@ export default {
       	if (!this.user.agency.sub_site) {
       		this.$root.eventHub.$emit('domain')
       	} else {
-      		window.open(window.location.origin + '/#/management', '_brank')
+      		window.open(window.location.origin + '/#' + url, '_brank')
       	}
       } else {
         if (show) {

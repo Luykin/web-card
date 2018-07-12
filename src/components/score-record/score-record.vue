@@ -17,11 +17,6 @@
         </el-table-column>
         <el-table-column prop="create" label="提交时间">
         </el-table-column>
-        <!--         <el-table-column fixed="right" label="操作" width="100">
-          <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">继续支付</el-button>
-          </template>
-        </el-table-column> -->
       </el-table>
     </div>
     <div id="i-page" class="i-page flex">

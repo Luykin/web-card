@@ -143,13 +143,12 @@
             <!-- <div class="colseBtn flex" @click="_hiddenSidebar">我再考虑考虑</div> -->
           </div>
         </div>
-        <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0 && !BuyDomainData">
-          <!-- app  商品 -->
+<!--         <div class="goods-box flex" v-show="!payUrl  && app && app.goods.length > 0 && !BuyDomainData">
           <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item.id)" class="good-item cursor flex">
             <div class="good-item-label flex ellipsis">{{item.label}}</div>
             <div class="good-item-label flex ellipsis">{{'￥'+parseInt(item.price)}}</div>
           </div>
-        </div>
+        </div> -->
         <!-- app  商品  end -->
         <!-- <div class="net-item flex" v-show="!payUrl">微信支付</div> -->
         <!-- <img src="../../assets/weixin.jpg" v-show="!payUrl" class="pay-img"> -->
@@ -317,7 +316,6 @@ import QrcodeVue from 'qrcode.vue'
 import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import { UAID } from 'api/config'
-
 export default {
   data() {
     return {
@@ -376,7 +374,7 @@ export default {
     this.$root.eventHub.$emit('canvas')
     // this._getAppInfo(this)
     this.telephone = this.user.phone || ''
-    this.choseGoodId = this.app.goods[0].id || -1
+    // this.choseGoodId = this.app.goods[0].id || -1
     this.activePayType = 'wx'
   },
   computed: {
@@ -680,7 +678,6 @@ export default {
     },
     checkTock() {
       if (!this.user) {
-
         this.$parent._open('请登录')
         this.$router.replace({
           path: '/login'
@@ -997,13 +994,11 @@ export default {
     QrcodeVue
   }
 }
-
 </script>
 <style type="text/css" scoped>
 .input-defult:hover {
   animation: gradientIndex .5s ease 1 forwards;
 }
-
 @keyframes gradientIndex {
   0% {
     border-bottom: 1px solid rgba(0, 0, 0, .1);
@@ -1012,12 +1007,10 @@ export default {
     border-bottom: 1px solid #ff9430;
   }
 }
-
 .iconfont {
   font-size: 20px;
   margin: 0 10px 0 0;
 }
-
 .header {
   height: auto;
   min-height: 65px;
@@ -1027,13 +1020,11 @@ export default {
   box-shadow: 0px 1px 10px rgba(0, 0, 0, .1);
   overflow: hidden;
 }
-
 .phone-nav {
   width: 50px;
   height: 65px;
   flex-shrink: 0;
 }
-
 .pc-nav {
   height: 65px;
   flex-grow: 1;
@@ -1041,7 +1032,6 @@ export default {
   max-width: 100%;
   flex-shrink: 0;
 }
-
 .logo {
   height: 65px;
   max-width: 100%;
@@ -1049,51 +1039,18 @@ export default {
   flex-shrink: 0;
   flex-grow: 1;
 }
-
 .disable:hover {
   pointer-events: none;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*start ---改写我的账户下拉窗 2018.04.27*/
-
 .phone-item {
   color: #000 !important;
   font-size: 13px;
   height: 50px;
 }
-
 .phone-item:hover {
   color: #000 !important;
 }
-
 .agent-item {
   height: 70px !important;
   width: 100%;
@@ -1101,7 +1058,6 @@ export default {
   /*border-bottom: 1px solid red;*/
   position: relative;
 }
-
 .agent-ul-warp {
   width: 86%;
   height: 55%;
@@ -1111,7 +1067,6 @@ export default {
   font-size: 14px;
   transform: translate(0, -15%);
 }
-
 .agent-border-bootom {
   position: absolute;
   bottom: 0;
@@ -1120,18 +1075,15 @@ export default {
   width: 100%;
   background: rgba(0, 0, 0, .1);
 }
-
 .agent-ul-li {
   box-sizing: content-box;
   min-width: 100%;
   height: 100%;
   font-size: 14px;
 }
-
 .agent-ul-li:hover {
   background: #FFD236 !important;
 }
-
 .agent-ul-li-left {
   width: 35%;
   height: 100%;
@@ -1139,41 +1091,19 @@ export default {
   padding-left: 5%;
   /*flex-grow: 1;*/
 }
-
 .agent-ul-li-right {
   width: 55%;
   height: 100%;
   justify-content: flex-end;
   padding-right: 5%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*end ---改写我的账户下拉窗*/
-
 .icon-jifen {
   color: #777 !important;
 }
-
-
 .iconfont {
   color: #000;
 }
-
 .log-out {
   display: inline-block;
   height: 100%;
@@ -1185,18 +1115,15 @@ export default {
   margin-top: -3px;
   font-size: 15px;
 }
-
 .log-out-min {
   line-height: 36px;
 }
-
 .green-text {
   display: inline-block;
   font-size: 15px;
   color: #4CAF50;
   margin: -5px 10px 0;
 }
-
 .recharge-box {
   width: 100%;
   height: 100%;
@@ -1205,14 +1132,12 @@ export default {
   align-content: center;
   position: relative;
 }
-
 .input-defult {
   width: 90%;
   height: 45px;
   margin: 10px auto;
   border-bottom: 1px solid rgba(0, 0, 0, .1);
 }
-
 .recharge-box-title {
   width: 90%;
   height: 70px;
@@ -1222,7 +1147,6 @@ export default {
   color: #D94D37;
   border-bottom: 1px solid rgba(0, 0, 0, .2);
 }
-
 .recharge-box-title-agent {
   width: 100%;
   height: 70px;
@@ -1232,7 +1156,6 @@ export default {
   color: #000;
   background: #FFD236;
 }
-
 .agreement-content {
   width: 82%;
   height: auto;
@@ -1245,25 +1168,21 @@ export default {
   overflow-y: scroll;
   overflow-x: hidden;
 }
-
 .content-qr {
   width: 100%;
   height: auto;
   flex-wrap: wrap;
 }
-
 .cq-right {
   /*  width: 60%;*/
   height: auto;
   flex-wrap: wrap;
 }
-
 .cq-left {
   width: 0;
   flex-grow: 1;
   height: 100%;
 }
-
 .net-item {
   width: 40%;
   height: 40px;
@@ -1272,44 +1191,36 @@ export default {
   margin: 20px 5% 0;
   border: 1px solid rgba(0, 0, 0, .1);
 }
-
 .net-item:hover {
   cursor: pointer;
   /* color: #ff9430;*/
 }
-
 .recharge-btn-box {
   height: 70px;
   justify-content: flex-start;
 }
-
 .recharge-btn-box-after {
   width: 100%;
   height: 70px;
   margin-bottom: 10px;
 }
-
 .recharge-btn-sure {
   width: 35%;
   height: 46px;
   border-radius: 6px;
 }
-
 .recharge-btn-sure:nth-child(1) {
   margin: 0 20% 0 5%;
 }
-
 .recharge-btn-sure-after {
   width: 180px;
   height: 46px;
   border-radius: 6px;
   margin: 0 5%;
 }
-
 .recharge-btn-sure-after:nth-child(1) {
   /*margin: 0 10% 0 5%;*/
 }
-
 .min-tips-text {
   width: 100%;
   height: 20px;
@@ -1319,17 +1230,14 @@ export default {
   color: #999;
   justify-content: flex-start;
 }
-
 .course-btn {
   color: #42A5F5;
   text-indent: 0px;
 }
-
 .code-div {
   width: 100%;
   height: 40px;
 }
-
 .showWX {
   background-color: #E8F8FF;
   border: 1px solid #D9F3FF;
@@ -1340,7 +1248,6 @@ export default {
   min-width: 120px;
   margin: 10px 0 0;
 }
-
 .sureBtn {
   border: 1px solid #ff9430;
   border-radius: 20px;
@@ -1350,7 +1257,6 @@ export default {
   min-width: 120px;
   margin: 0 15px 10px;
 }
-
 .colseBtn {
   border: 1px solid #999;
   border-radius: 20px;
@@ -1360,46 +1266,38 @@ export default {
   min-width: 120px;
   margin: 0 15px 10px;
 }
-
 .colseBtn:hover {
   background: #666;
   color: #fff;
   cursor: pointer;
 }
-
 .sureBtn:hover {
   background: #ff9430;
   color: #fff;
   cursor: pointer;
 }
-
 .qrcode-box {
   width: 100%;
   flex-shrink: 0;
   height: auto;
 }
-
 .logo-class {
   width: 155px;
   height: 47px;
   /*  margin-left: -50px;*/
 }
-
 .logo-class:hover {
   cursor: pointer;
 }
-
 .pay-img {
   width: 144px;
   height: 44px;
   margin: 0 30px;
 }
-
 .my-money {
   color: #d94d37;
   text-indent: 0px;
 }
-
 .good-item {
   box-sizing: border-box;
   min-width: 75px;
@@ -1415,12 +1313,10 @@ export default {
   align-content: center;
   border-radius: 8px;
 }
-
 .good-item-label {
   width: 100%;
   height: 40%;
 }
-
 .pay-item {
   box-sizing: border-box;
   max-width: 29.3%;
@@ -1437,7 +1333,6 @@ export default {
   border: 1px solid rgba(0, 0, 0, .2);
   border-radius: 8px;
 }
-
 .pay-icon {
   max-width: 30px;
   width: auto;
@@ -1446,8 +1341,6 @@ export default {
   margin-right: 2%;
   flex-shrink: 1;
 }
-
-
 .goods-box {
   min-height: 50px;
   height: auto;
@@ -1458,55 +1351,45 @@ export default {
   margin: 20px auto 5px;
   flex-wrap: wrap;
 }
-
 .active-good {
   /*color: red;*/
   color: #fff;
   background: #FF6B4E;
 }
-
 .cancel {
   box-sizing: border-box;
   color: #353535;
   background: rgba(223, 225, 229, 1);
 }
-
 .sure {
   box-sizing: border-box;
   color: #fff;
   background: #FF6B4E;
   /* box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);*/
 }
-
 .sure-agent {
   box-sizing: border-box;
   color: #000;
   background: #FFD236;
 }
-
 .active-pay-type {
   border: 1px solid #FF6B4E;
   color: #FF6B4E;
 }
-
 .sure:hover {
   box-shadow: 2px 0px 8px rgba(157, 106, 95, 1);
 }
-
 .cancel:hover {
   box-shadow: 2px 0px 8px rgba(0, 0, 0, .3);
 }
-
 .disable-pay-type {
   color: rgba(0, 0, 0, .2);
   cursor: not-allowed;
 }
-
 .bottom {
   position: absolute;
   bottom: 0;
 }
-
 .agreement-content-title {
   width: 100%;
   height: 40px;
@@ -1514,12 +1397,9 @@ export default {
   color: #000;
   justify-content: flex-start;
 }
-
-
 .marginbottom20 {
   margin-bottom: 30px;
 }
-
 .agree-input-box {
   margin: 0 auto 20px;
   /*margin-bottom: 30px;*/
@@ -1527,7 +1407,6 @@ export default {
   height: 50px;
   overflow: hidden;
 }
-
 .agree-label {
   width: auto;
   height: 100%;
@@ -1537,31 +1416,25 @@ export default {
   margin: 0 10px;
   /* justify-content: flex-start;*/
 }
-
 .input-defult {
   width: auto !important;
   flex-grow: 1;
 }
-
 .overHiden {
   overflow: hidden;
 }
-
 .must {
   font-weight: 600;
   font-size: 13px;
   color: red;
 }
-
 .not-must {
   font-size: 12px;
   color: #999;
 }
-
 .width90 {
   width: 90% !important;
 }
-
 .dialog-min-text {
   width: 100%;
   height: auto;
@@ -1570,7 +1443,6 @@ export default {
   font-size: 15px;
   color: #999;
 }
-
 .dialog-min-btn {
   width: 40%;
   padding: 2% 0;
@@ -1580,23 +1452,19 @@ export default {
   font-size: 15px;
   margin: 5% auto 0;
 }
-
 .proxy-icon {
   max-width: 20px;
   height: auto;
   margin: 0 5px;
 }
-
 .font-weight-agent {
   font-weight: 600;
 }
-
 .agreement-content {
   /*border-bottom: 1px solid rgba(0,0,0,.1);
   */
   /*  box-shadow: 0 2px 1px rgba(0,0,0,.1);*/
 }
-
 .rbta-input-warp {
   width: 80%;
   height: 50px;
@@ -1607,12 +1475,10 @@ export default {
   font-size: 16px;
   margin: 50px auto 10px;
 }
-
 .rbata-iw-right {
   width: 30%;
   height: 100%;
 }
-
 .rbata-iw-left {
   width: 30%;
   height: 80%;
@@ -1623,17 +1489,14 @@ export default {
   text-align: center;
   font-size: 16px;
 }
-
 .titps-domain {
   color: #FF9100;
 }
-
 .bdd-item {
   height: 50px;
   width: 100%;
   margin: 10px auto -10px;
 }
-
 .bdd-item-left {
   width: 16%;
   justify-content: flex-end;
@@ -1641,7 +1504,6 @@ export default {
   font-size: 17px;
   color: #FF6B4E;
 }
-
 .bdd-item-right {
   width: 72%;
   justify-content: flex-start;
@@ -1649,11 +1511,9 @@ export default {
   color: #353535;
   font-size: 14px;
 }
-
 .bdd-item-right-url:hover {
   color: #FF6B4E;
 }
-
 .rbta-btn {
   background: #FFD236;
   border-radius: 10px;
@@ -1661,18 +1521,15 @@ export default {
   width: 25%;
   margin: 0 auto;
 }
-
 .sucess-domain {
   color: #67c23a;
 }
-
 .fail-domain {
   color: #e6a23c;
 }
-
 .cq-pay-img {
-  width: 80%;
+  width: 75%;
+  max-width: 190px;
   height: auto;
 }
-
 </style>

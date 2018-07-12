@@ -18,7 +18,7 @@
         <router-link tag="span" class="forget cursor flex" to="/retrieve-password">忘记密码?</router-link>
       </div>
       <div class="flex login-item">
-        <router-link tag="span" class="to-register ellipsis cursor flex" to="/register">没有帐号？现在注册，免费获得积分</router-link>
+        <router-link tag="span" class="to-register ellipsis cursor flex" to="/register">没有帐号？现在去注册!</router-link>
       </div>
     </div>
   </div>

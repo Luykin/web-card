@@ -24,7 +24,7 @@
             <div class="flex input-defult no-border">
               <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd'>
               </el-date-picker>
-              <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
+              <el-time-select v-model="orderTimeS" :picker-options="{start: _startTime,step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
               </el-time-select>
             </div>
           </div>
@@ -140,6 +140,7 @@ export default {
       netWorking: false,
       position: 'right',
       closeName: '关闭',
+      _startTime: '00:00',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       pickerOptions: {
         disabledDate(time) {
@@ -160,6 +161,21 @@ export default {
       this._setAnnouncement(announcement)
     })
     this.$root.eventHub.$emit('canvas')
+    // 预约时间修正
+    const myDate = new Date()
+    if (myDate.getHours() < 23) {
+      if (myDate.getMinutes() < 30) {
+        this._startTime = myDate.getHours() + ':30'
+      } else {
+        this._startTime = (myDate.getHours() + 1) + ':00'
+      }
+    } else {
+      if (myDate.getMinutes() < 30) {
+        this._startTime = myDate.getHours() + ':30'
+      } else {
+        this._startTime = myDate.getHours() + ':59'
+      }
+    }
   },
   updated() {
     this.$nextTick(() => {
@@ -346,41 +362,6 @@ export default {
         data = Object.assign({ target_id: false, appointment_time: this.sublimeTime }, data)
       }
       this.$root.eventHub.$emit('showPopup', data)
-      // else {
-      //   let price
-      //   if (this.user.agency && this.user.agency_level && this.user.agency_level.discount < 1) {
-      //     // agencyPrice
-      //     if (this.agencyPrice > this.user.score) {
-      //       this.$parent._open('积分不足')
-      //       this.$root.eventHub.$emit('showPopup')
-      //       return false
-      //     }
-      //     price = this.agencyPrice
-      //   } else {
-      //     if (this.consumeNum > this.user.score) {
-      //       this.$parent._open('积分不足')
-      //       this.$root.eventHub.$emit('showPopup')
-      //       return false
-      //     }
-      //     price = this.consumeNum
-      //   }
-      //   this.netWorking = true
-      //   if (category === 2 || category === 4) {
-      //     addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, this.targetid).then((res) => {
-      //       this._afterAddtask(res)
-      //     })
-      //     return true
-      //   }
-      //   if (category === 24 || category === 25) {
-      //     addTask(price, this.quantity, this.token, this.choseServiceValue, this.link, false, this.sublimeTime).then((res) => {
-      //       this._afterAddtask(res)
-      //     })
-      //     return true
-      //   }
-      //   addTask(price, this.quantity, this.token, this.choseServiceValue, this.link).then((res) => {
-      //     this._afterAddtask(res)
-      //   })
-      // }
     },
     _afterAddtask(res) {
       this.orderTimeD = ''
@@ -430,6 +411,7 @@ export default {
         return
       }
       if (this.link.length < 5) {
+        this._closeCourse()
         this.$parent._open('请正确输入QQ号')
         return
       }
@@ -647,7 +629,6 @@ export default {
     background: #ff9430;
   }
 }
-
 
 @keyframes labelColor {
   0% {

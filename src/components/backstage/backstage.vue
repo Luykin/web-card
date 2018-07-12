@@ -300,6 +300,7 @@ export default {
         return
       }
       if (this.link.length < 5) {
+        this._closeCourse()
         this.$parent._open('请正确输入QQ号')
         return
       }

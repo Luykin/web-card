@@ -19,14 +19,13 @@
         </el-table-column>
         <el-table-column prop="addition" label="分享链接/用户ID">
         </el-table-column>
-        <el-table-column
-        label="">
-        <template slot-scope="scope">
-          <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
-        </template>
+        <el-table-column label="">
+          <template slot-scope="scope">
+            <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+          </template>
         </el-table-column>
         <el-table-column prop="start_point" label="初始数量">
-        </el-table-column> 
+        </el-table-column>
         <el-table-column prop="point" label="数量">
         </el-table-column>
         <el-table-column prop="price" label="订单价格">
@@ -195,7 +194,7 @@ export default {
       let time = Date.parse(new Date()) / 1000
       list.forEach((item) => {
         // console.log(item.status)
-        if (item.status ==='完成' || item.status ==='未支付') {
+        if (item.status === '完成' || item.status === '未支付') {
           item.time = '-'
           return
         }
@@ -223,13 +222,20 @@ export default {
     },
     _normalTasks(list) {
       const that = this
+      let ret = []
       list.forEach((item) => {
         item.hrefLink = item.addition
+        // console.log(item.status)
+        if (item.status != -10) {
+          ret.push(item)
+        } else {
+          that.total = that.total - 1
+        }
         item.status = that.state[item.status]
         item.createA = timeChange(item.create)
         item.currentNum = '-'
         item.time = '-'
-        if (item.hrefLink.indexOf('http')> -1) {
+        if (item.hrefLink.indexOf('http') > -1) {
           item.showLink = true
         } else {
           item.showLink = false
@@ -244,7 +250,7 @@ export default {
           // console.log(item.addition)
         }
       })
-      return list
+      return ret
     },
     _timing(list) {
       if (this.timer) {
