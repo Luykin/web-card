@@ -23,14 +23,17 @@
             <el-table-column label="是否上架">
               <template slot-scope="scope">
                 <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
-                <div class="chose_status cursor" v-show="scope.row.status === 2" @click="_setAgency(scope.row)"></div>
-                <div class="chose_status chose_status-sj cursor" v-show="scope.row.status === 1" @click="_setAgency(scope.row)"></div>
+                <div class="chose_status cursor" v-show="scope.row.status === 2 && scope.row.behavior > 0" @click="_setAgency(scope.row)"></div>
+                <div class="chose_status chose_status-sj cursor" v-show="scope.row.status === 1 && scope.row.behavior > 0" @click="_setAgency(scope.row)"></div>
               </template>
+            </el-table-column>
+            <el-table-column prop="behaviorA" label="商品状态">
             </el-table-column>
             <el-table-column label="">
               <template slot-scope="scope">
                 <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
-                <div class="good-btn flex cursor" @click="showPop(scope.row)">调整价格</div>
+                <div class="good-btn flex cursor" @click="showPop(scope.row)" v-show="scope.row.behavior > 0">调整价格</div>
+                <div class="good-btn flex cursor weihu" v-show="scope.row.behavior <= 0" @click="_showWH">临时维护</div>
               </template>
             </el-table-column>
           </el-table>
@@ -280,6 +283,9 @@ export default {
         }
       })
     },
+    _showWH() {
+      this.$parent._open('该商品临时维护，请关注平台公告')
+    },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
       this.choseItem.forEach((item) => {
@@ -330,6 +336,7 @@ export default {
           item.real_origin_price = parseFloat(item.real_origin_price)
           item.origin_price = parseFloat(item.origin_price)
           item.price = parseFloat(item.price)
+          item.behaviorA = item.behavior > 0 ? '正常' : '维护中'
         })
         return list
       }
@@ -550,6 +557,10 @@ export default {
   border-radius: 5px;
   background: #FFD236;
   color: #353535;
+}
+.weihu{
+  background: #fff;
+  border: 1px solid #999;
 }
 
 .goods-table {

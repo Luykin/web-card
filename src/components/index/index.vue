@@ -4,6 +4,20 @@
       <div class="notice" v-show="announcement || app.show_announcement">
         <div class="notice-title flex">系统公告</div>
         <div class="notice-content" v-html='announcement || app.announcement'></div>
+        <div class="notice-down" v-if="app && app.uaid == 60002">
+          <div class="notice-title flex">APP下载</div>
+          <div class="qr-down-warp flex">
+            <img src="http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png" alt="快手刷粉" v-show='downLink == 0' class="qr-down">
+            <img src="http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png" alt="快手刷粉" v-show='downLink == 1' class="qr-down">
+            <div class="zi-warp flex">
+              <img src="http://p8sxtcg6t.bkt.clouddn.com/Group%202.png" alt="快手刷粉">
+            </div>
+            <div class="qr-down-btn flex cursor" :class="{'active-qr-down-btn' : downLink == 0}" @click="_updataDownLink(0)">
+              <img src="http://p8sxtcg6t.bkt.clouddn.com/iOS.png" alt="IOS快手刷粉" class="qdb-img">IOS</div>
+            <div class="qr-down-btn flex cursor" :class="{'active-qr-down-btn' : downLink == 1}" @click="_updataDownLink(1)">
+              <img src="http://p8sxtcg6t.bkt.clouddn.com/android.png" alt="Android快手刷粉" class="qdb-img">Android</div>
+          </div>
+        </div>
       </div>
       <div class="main-box-header flex">
         <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
@@ -24,7 +38,7 @@
             <div class="flex input-defult no-border">
               <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd'>
               </el-date-picker>
-              <el-time-select v-model="orderTimeS" :picker-options="{start: _startTime,step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
+              <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp'>
               </el-time-select>
             </div>
           </div>
@@ -140,7 +154,8 @@ export default {
       netWorking: false,
       position: 'right',
       closeName: '关闭',
-      _startTime: '00:00',
+      // _startTime: '00:00',
+      downLink: '0',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       pickerOptions: {
         disabledDate(time) {
@@ -162,20 +177,20 @@ export default {
     })
     this.$root.eventHub.$emit('canvas')
     // 预约时间修正
-    const myDate = new Date()
-    if (myDate.getHours() < 23) {
-      if (myDate.getMinutes() < 30) {
-        this._startTime = myDate.getHours() + ':30'
-      } else {
-        this._startTime = (myDate.getHours() + 1) + ':00'
-      }
-    } else {
-      if (myDate.getMinutes() < 30) {
-        this._startTime = myDate.getHours() + ':30'
-      } else {
-        this._startTime = myDate.getHours() + ':59'
-      }
-    }
+    // const myDate = new Date()
+    // if (myDate.getHours() < 23) {
+    //   if (myDate.getMinutes() < 30) {
+    //     this._startTime = myDate.getHours() + ':30'
+    //   } else {
+    //     this._startTime = (myDate.getHours() + 1) + ':00'
+    //   }
+    // } else {
+    //   if (myDate.getMinutes() < 30) {
+    //     this._startTime = myDate.getHours() + ':30'
+    //   } else {
+    //     this._startTime = myDate.getHours() + ':59'
+    //   }
+    // }
   },
   updated() {
     this.$nextTick(() => {
@@ -240,6 +255,9 @@ export default {
     ])
   },
   methods: {
+    _updataDownLink(res) {
+      this.downLink = res
+    },
     _setAnnouncement(announcement) {
       this.announcement = announcement
     },
@@ -1026,6 +1044,71 @@ export default {
 
 .index-bootom-height {
   height: 10px;
+}
+
+
+
+/* 60002 加入下载框*/
+
+.notice-down {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  background: #fff;
+  transform: translate(0, 108%);
+}
+
+.qr-down {
+  width: 120px;
+  height: 120px;
+}
+
+.qr-down-warp {
+  width: 100%;
+  height: 265px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+  /*align-items: flex-start;*/
+}
+
+.zi-warp {
+  width: 92%;
+  padding-left: 8%;
+  height: auto;
+  max-height: 50px;
+  overflow: hidden;
+}
+
+.qr-down-btn {
+  width: 40%;
+  height: 42px;
+  margin: 0 3% 10px 7%;
+  border-radius: 8px;
+  color: #fff;
+  background: #66677A;
+  box-shadow: -1px 3px 6px #66677A;
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-down-btn:nth-child(2n - 1) {
+  margin: 0 7% 10px 3%;
+}
+
+.active-qr-down-btn {
+  background: #FD6E52;
+  box-shadow: -1px 3px 6px #FD6E52;
+}
+
+.qdb-img {
+  width: 35px;
+  height: auto;
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  z-index: 100;
 }
 
 </style>

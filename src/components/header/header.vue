@@ -920,7 +920,7 @@ export default {
       }
       if (this.payUrl) {
         this.$root.eventHub.$emit('user')
-        this.$root.eventHub.$emit('updateScoreRecord')
+        this.$root.eventHub.$emit('updateOrder')
       }
       this.payUrl = false
       if (this.sidebar && !this.popup) {

@@ -25,6 +25,8 @@
         <div class="btn-back flex cursor" @click="_addOrder">确认充值</div>
       </div>
       <div class="content-qr flex" v-show="payUrl && page === 1">
+        <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
+        </div>
         <div class="qrcode-box flex">
           <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
         </div>
@@ -67,6 +69,7 @@ export default {
       choseGoodId: -1,
       choseGood: false,
       size: 180,
+      code: false,
       payUrl: false,
       page: 1,
       tableData: [{ label: '支付宝', code: 'zh42429951', name: '张恒' },
@@ -352,6 +355,16 @@ export default {
 
 .recharge-table {
   margin-top: 20px;
+}
+
+.code-div {
+  width: 100%;
+  height: 40px;
+}
+
+.my-money {
+  color: #d94d37;
+  text-indent: 0px;
 }
 
 </style>

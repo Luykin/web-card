@@ -30,7 +30,7 @@
         </div>
       </div>
       <div class="cr-item flex">
-        <div class="cr-box-tit ellipsis flex">联系人:</div>
+        <div class="cr-box-tit ellipsis flex">联系客服:</div>
         <div class="cr-box-min flex">
           <input type="text" v-model="sitFooter" class="edit-input" min="0" max="12">
         </div>

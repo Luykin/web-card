@@ -33,7 +33,8 @@ export function getSiteinfo(token) {
     }
   })
 }
-export function setSiteinfo(token, icon, site_name, title_suffix, announcement, email, contact) {
+export function setSiteinfo(token, icon, site_name, title_suffix, announcement, contact, email) {
+  // this.token, this.logoUrl, this.siteName, this.siteFix, this.siteAnnouncement, this.sitFooter, this.sitFooterEmail
   const url = `${PREFIX_URL}/set_sub_site`
   let data = {
     token: token,

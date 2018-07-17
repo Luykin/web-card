@@ -6,7 +6,7 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">我的提现账户:</div>
           <div class="cbi-input-box flex disable-i">
-            <span>{{nowAccount ? nowAccount.name + nowAccount.account :  '去绑定'}}</span>
+            <span>{{nowAccount ? nowAccount.account :  '去绑定'}}</span>
           </div>
           <div class="cbi-btn flex cursor" @click="showPop" v-show="!nowAccount">去绑定</div>
           <div class="cbi-btn flex cursor" @click="_delete(nowAccount)" v-show="nowAccount">解绑</div>
@@ -29,7 +29,7 @@
           <div class="cbi-name flex ellipsis">提现金额:</div>
           <div class="cbi-input-box flex disable-i">
             <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
-            <div class="poundage flex" v-if="min_amount">注: 单笔最低提现金额为{{min_amount}}起，提现手续费为{{rate}}</div>
+            <div class="poundage flex">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div>
           </div>
           <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
         </div>
@@ -154,111 +154,112 @@
   </div>
 </template>
 <script type="text/javascript">
-  import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount, delAccount } from 'api/site'
-  import { mapGetters, mapMutations } from 'vuex'
-  import { testToken, timeChange } from 'common/js/util'
-  import { SUCCESS_CODE } from 'api/config'
-  import popup from 'base/popup/popup'
-  import interlayer from 'base/interlayer/interlayer'
-  import { sendVerify } from 'api/login'
-  import MAgent from 'components/agent-banner/agent-banner'
-  export default {
-    data() {
-      return {
-        page_size: 8,
-        page: 0,
-        siteInfo: false,
-        min_amount: false,
-        rate: false,
-        showListAccount: false,
-        nowAccount: false,
-        raccount: '',
-        wh_type: 1,
-        rname: '',
-        ryan: '',
-        rmoney: '0.00',
-        dialogTitle: '',
-        dialogText: '',
-        total: null,
-        bgPath: null,
-        deletItem: {
-          name: '',
-          account: ''
-        },
-        wdList: [],
-        accountList: [],
-        centerDialogVisible: false,
-        time: '获取验证码'
+import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount, delAccount } from 'api/site'
+import { mapGetters, mapMutations } from 'vuex'
+import { testToken, timeChange } from 'common/js/util'
+import { SUCCESS_CODE } from 'api/config'
+import popup from 'base/popup/popup'
+import interlayer from 'base/interlayer/interlayer'
+import { sendVerify } from 'api/login'
+import MAgent from 'components/agent-banner/agent-banner'
+export default {
+  data() {
+    return {
+      page_size: 8,
+      page: 0,
+      siteInfo: false,
+      // min_amount: false,
+      // rate: false,
+      showListAccount: false,
+      nowAccount: false,
+      raccount: '',
+      wh_type: 1,
+      rname: '',
+      ryan: '',
+      rmoney: '0.00',
+      dialogTitle: '',
+      dialogText: '',
+      total: null,
+      bgPath: null,
+      deletItem: {
+        name: '',
+        account: ''
+      },
+      wdList: [],
+      accountList: [],
+      centerDialogVisible: false,
+      time: '获取验证码'
+    }
+  },
+  created() {
+    this.$root.eventHub.$emit('user')
+    this.$root.eventHub.$on('reflectInit', () => {
+      this._reflectInit()
+    })
+    this._reflectInit()
+  },
+  computed: {
+    siteLogo() {
+      return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat; background-size: contain;`
+    },
+    ...mapGetters([
+      'user',
+      'token',
+      'tokenTime',
+      'app'
+    ])
+  },
+  methods: {
+    _checkRW() {
+      this.$router.replace({
+        path: '/task'
+      })
+    },
+    _choseType(e) {
+      this.wh_type = e
+    },
+    tableRowClassName(row) {
+      if (row.row.status) {
+        return ''
+      } else {
+        return 'sucess-table'
       }
     },
-    created() {
-      this.$root.eventHub.$emit('user')
-      this.$root.eventHub.$on('reflectInit', () => {
-        this._reflectInit()
-      })
-      this._reflectInit()
+    handleCurrentChange(val) {
+      this.page = val - 1
+      this._getWithdrawlist(this.page_size, this.page)
     },
-    computed: {
-      siteLogo() {
-        return `background: url(${this.user.agency.sub_site.icon || require('../../assets/logo.png')}) no-repeat; background-size: contain;`
-      },
-      ...mapGetters([
-        'user',
-        'token',
-        'tokenTime',
-        'app'
-        ])
+    _rectifyMoney() {
+      if (isNaN(this.rmoney)) {
+        this.rmoney = ''
+      }
+      if (this.rmoney.indexOf('.') > -1) {
+        const end = this.rmoney.indexOf('.')
+        this.rmoney = this.rmoney.slice(0, end + 3)
+      }
     },
-    methods: {
-      _checkRW() {
-        this.$router.replace({
-          path: '/task'
-        })
-      },
-      _choseType(e) {
-        this.wh_type = e
-      },
-      tableRowClassName(row) {
-        if (row.row.status) {
-          return ''
-        } else {
-          return 'sucess-table'
-        }
-      },
-      handleCurrentChange(val) {
-        this.page = val - 1
-        this._getWithdrawlist(this.page_size, this.page)
-      },
-      _rectifyMoney() {
-        if (isNaN(this.rmoney)) {
-          this.rmoney = ''
-        }
-        if (this.rmoney.indexOf('.') > -1) {
-          const end = this.rmoney.indexOf('.')
-          this.rmoney = this.rmoney.slice(0, end + 3)
-        }
-      },
-      _withdraw() {
-        if (!this.nowAccount) {
-          this.$parent._open('请选择提现账户')
-          return false
-        }
-        if (!this.rmoney || this.rmoney <= 0) {
-          this.$parent._open('请填写提现金额')
-          return false
-        }
-        if (this.rmoney > this.user.agency.turnover) {
-          console.log(this.user.agency.turnover)
-          console.log(this.rmoney)
-          this.$parent._open('提现金额应小于营业余额')
-          return false
-        }
-        if (!this.checkTock()) {
-          return false
-        }
-        const that = this
-        withdraw(this.token, this.rmoney, this.nowAccount.id).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
+    _withdraw() {
+      if (!this.nowAccount) {
+        this.$parent._open('请选择提现账户')
+        return false
+      }
+      if (!this.rmoney || this.rmoney <= 0) {
+        this.$parent._open('请填写提现金额')
+        return false
+      }
+      if (this.rmoney > parseInt(this.user.agency.turnover)) {
+        // console.log(parseInt(this.user.agency.turnover))
+        // console.log(this.rmoney)
+        console.log(this.rmoney > this.user.agency.turnover)
+        this.$parent._open('提现金额应小于营业余额')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      const that = this
+      withdraw(this.token, this.rmoney, this.nowAccount.id).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
           // console.log(res.data)
           this.$parent._open('申请提交成功')
           this.dialogTitle = '温馨提示'
@@ -275,32 +276,32 @@
           }
         }
       })
-      },
-      _sureAddAccount() {
-        if (!this.raccount) {
-          this.$parent._open('请填写账户')
-          return false
-        }
-        if (!this.rname) {
-          this.$parent._open('请填写姓名')
-          return false
-        }
-        if (!this.ryan) {
-          this.$parent._open('请填写验证码')
-          return false
-        }
-        if (!this.checkTock()) {
-          return false
-        }
-        const that = this
-        addAccount(this.token, this.wh_type, this.raccount, this.rname, this.ryan).then((res) => {
-          this.ryan = ''
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.$parent._open('绑定成功')
-            that._getAccount()
-            that._interlayerHide()
-            that.raccount = ''
-            that.rname = ''
+    },
+    _sureAddAccount() {
+      if (!this.raccount) {
+        this.$parent._open('请填写账户')
+        return false
+      }
+      if (!this.rname) {
+        this.$parent._open('请填写姓名')
+        return false
+      }
+      if (!this.ryan) {
+        this.$parent._open('请填写验证码')
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      const that = this
+      addAccount(this.token, this.wh_type, this.raccount, this.rname, this.ryan).then((res) => {
+        this.ryan = ''
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$parent._open('绑定成功')
+          that._getAccount()
+          that._interlayerHide()
+          that.raccount = ''
+          that.rname = ''
           // console.log(res.data)
         } else {
           if (res.data.err_msg) {
@@ -310,159 +311,159 @@
           }
         }
       })
-      },
-      _getcode() {
-        if (typeof this.time === 'string') {
-          let lastTime = +new Date() + 60 * 1000
-          localStorage.setItem('codeTime', lastTime)
-          this._countdown(60)
-          this.netSendCode()
+    },
+    _getcode() {
+      if (typeof this.time === 'string') {
+        let lastTime = +new Date() + 60 * 1000
+        localStorage.setItem('codeTime', lastTime)
+        this._countdown(60)
+        this.netSendCode()
+      } else {
+        this.$parent._open('请稍后再试哦')
+      }
+    },
+    _setTime() {
+      let nowTime = +new Date()
+      let lastTime = localStorage.getItem('codeTime') || 0
+      if (nowTime < lastTime) {
+        this._countdown(parseInt((lastTime - nowTime) / 1000))
+      }
+    },
+    _countdown(time) {
+      this.time = time
+      let timer = setInterval(() => {
+        if (this.time > 1) {
+          this.time = this.time - 1
         } else {
-          this.$parent._open('请稍后再试哦')
+          this.time = '获取验证码'
+          clearInterval(timer)
+          timer = null
         }
-      },
-      _setTime() {
-        let nowTime = +new Date()
-        let lastTime = localStorage.getItem('codeTime') || 0
-        if (nowTime < lastTime) {
-          this._countdown(parseInt((lastTime - nowTime) / 1000))
+      }, 1000)
+    },
+    netSendCode() {
+      sendVerify(this.user.phone).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.$parent._open('验证码已发送')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
         }
-      },
-      _countdown(time) {
-        this.time = time
-        let timer = setInterval(() => {
-          if (this.time > 1) {
-            this.time = this.time - 1
-          } else {
-            this.time = '获取验证码'
-            clearInterval(timer)
-            timer = null
-          }
-        }, 1000)
-      },
-      netSendCode() {
-        sendVerify(this.user.phone).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.$parent._open('验证码已发送')
-          } else {
-            if (res.data.err_msg) {
-              this.$parent._open(this.$root.errorCode[res.data.err_code])
-            } else {
-              this.$parent._open('似乎出错了')
-            }
-          }
-        })
-      },
-      _choseAccount(e) {
-        this.nowAccount = e
-      },
-      _showList() {
-        this.showListAccount = !this.showListAccount
-      },
-      _interlayerHide() {
-        this.$refs.popup._hiddenPopup()
-        this.$refs.interlayer._hiddenLayer()
-      },
-      showPop() {
-        this.$refs.popup._showPopup()
-        this.$refs.interlayer._setZIndex(9999)
-        this.$refs.interlayer._showLayer()
-      },
-      _back() {
+      })
+    },
+    _choseAccount(e) {
+      this.nowAccount = e
+    },
+    _showList() {
+      this.showListAccount = !this.showListAccount
+    },
+    _interlayerHide() {
+      this.$refs.popup._hiddenPopup()
+      this.$refs.interlayer._hiddenLayer()
+    },
+    showPop() {
+      this.$refs.popup._showPopup()
+      this.$refs.interlayer._setZIndex(9999)
+      this.$refs.interlayer._showLayer()
+    },
+    _back() {
+      this.$router.replace({
+        path: '/management'
+      })
+    },
+    _toGoodsManage() {
+      this.$router.replace({
+        path: '/goodsManage'
+      })
+    },
+    _reflectInit() {
+      if (!this.user.agency || !this.user.agency.sub_site) {
+        this.$parent._open('请先创建分站')
         this.$router.replace({
-          path: '/management'
+          path: '/agent'
         })
-      },
-      _toGoodsManage() {
-        this.$router.replace({
-          path: '/goodsManage'
-        })
-      },
-      _reflectInit() {
-        if (!this.user.agency || !this.user.agency.sub_site) {
-          this.$parent._open('请先创建分站')
-          this.$router.replace({
-            path: '/agent'
-          })
-          return false
+        return false
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      this._getSiteinfo()
+      // this._getPoundageConfig()
+      this._getWithdrawlist(this.page_size, this.page)
+      this._getAccount()
+      this._setTime()
+    },
+    _getAccount() {
+      getAccount(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.accountList = res.data.data
+          if (res.data.data && res.data.data.length > 0) {
+            this.nowAccount = res.data.data[0] || false
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
         }
-        if (!this.checkTock()) {
-          return false
+      })
+    },
+    _getWithdrawlist(num, page) {
+      getWithdrawlist(this.token, num, page).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.total = res.data.count
+          if (res.data.count > 0) {
+            this.wdList = this._formatWDlist(res.data.data)
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
         }
-        this._getSiteinfo()
-        this._getPoundageConfig()
-        this._getWithdrawlist(this.page_size, this.page)
-        this._getAccount()
-        this._setTime()
-      },
-      _getAccount() {
-        getAccount(this.token).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.accountList = res.data.data
-            if (res.data.data && res.data.data.length > 0) {
-              this.nowAccount = res.data.data[0] || false
-            }
-          } else {
-            if (res.data.err_msg) {
-              this.$parent._open(this.$root.errorCode[res.data.err_code])
-            } else {
-              this.$parent._open('似乎出错了')
-            }
-          }
-        })
-      },
-      _getWithdrawlist(num, page) {
-        getWithdrawlist(this.token, num, page).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.total = res.data.count
-            if (res.data.count > 0) {
-              this.wdList = this._formatWDlist(res.data.data)
-            }
-          } else {
-            if (res.data.err_msg) {
-              this.$parent._open(this.$root.errorCode[res.data.err_code])
-            } else {
-              this.$parent._open('似乎出错了')
-            }
-          }
-        })
-      },
-      _formatWDlist(list) {
-        list.forEach((item) => {
-          if (item.status) {
-            item.statusA = '已打款'
-          } else {
-            item.statusA = '打款中'
-          }
-          if (item.withdraw_account.account_type === 1) {
-            item.WAType = '支付宝'
-          } else {
-            item.WAType = '微信'
-          }
-          item.createA = timeChange(item.create)
-        })
-        return list
-      },
-      _getPoundageConfig() {
-        getPoundageConfig().then((res) => {
-          if (res.data.err_code === SUCCESS_CODE && res.data.data[0].value) {
-            console.log(res.data.data[0].value)
-            const reflectInfo = JSON.parse(res.data.data[0].value)
-            this.min_amount = reflectInfo.min_amount
-            this.rate = reflectInfo.rate
-            console.log(reflectInfo)
-          } else {
-            if (res.data.err_msg) {
-              this.$parent._open(this.$root.errorCode[res.data.err_code])
-            } else {
-              this.$parent._open('似乎出错了')
-            }
-          }
-        })
-      },
-      _getSiteinfo() {
-        getSiteinfo(this.token).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
+      })
+    },
+    _formatWDlist(list) {
+      list.forEach((item) => {
+        if (item.status) {
+          item.statusA = '已打款'
+        } else {
+          item.statusA = '打款中'
+        }
+        if (item.withdraw_account.account_type === 1) {
+          item.WAType = '支付宝'
+        } else {
+          item.WAType = '微信'
+        }
+        item.createA = timeChange(item.create)
+      })
+      return list
+    },
+    // _getPoundageConfig() {
+    //   getPoundageConfig().then((res) => {
+    //     if (res.data.err_code === SUCCESS_CODE && res.data.data[0].value) {
+    //       console.log(res.data.data[0].value)
+    //       const reflectInfo = JSON.parse(res.data.data[0].value)
+    //       this.min_amount = reflectInfo.min_amount
+    //       this.rate = reflectInfo.rate
+    //       console.log(reflectInfo)
+    //     } else {
+    //       if (res.data.err_msg) {
+    //         this.$parent._open(this.$root.errorCode[res.data.err_code])
+    //       } else {
+    //         this.$parent._open('似乎出错了')
+    //       }
+    //     }
+    //   })
+    // },
+    _getSiteinfo() {
+      getSiteinfo(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
           // console.log(res.data.data)
           this.siteInfo = res.data.data
         } else {
@@ -474,81 +475,81 @@
         }
 
       })
-      },
-      checkTock() {
-        if (!this.user) {
-          this.$parent._open('请登录')
-          this.$router.replace({
-            path: '/login'
-          })
-          return false
-        }
-        if (!testToken(this.tokenTime)) {
-          this.setUser(false)
-          this.setToken(false)
-          this.setTokenTime(false)
-          this.$router.replace({
-            path: '/login'
-          })
-          return false
-        }
-        return true
-      },
-      toEdit() {
-        this.$root.eventHub.$emit('updataEditInfo')
-        this.$router.push({
-          path: '/edit'
+    },
+    checkTock() {
+      if (!this.user) {
+        this.$parent._open('请登录')
+        this.$router.replace({
+          path: '/login'
         })
-      },
-      _delete(item) {
-        this.deletItem = item
-        this.$refs.sure._showPopup()
-        this.$refs.interlayer._setZIndex(9999)
-        this.$refs.interlayer._showLayer()
-      },
-      _cancelDelet() {
-        this.deletItem = {
-          name: '',
-          account: '',
-          id: ''
-        }
-        this.$refs.sure._hiddenPopup()
-        this.$refs.interlayer._hiddenLayer()
-      },
-      _sureDelet() {
-        if (!this.checkTock()) {
-          return false
-        }
-        if (!this.ryan) {
-          this.$parent._open('请填写验证码')
-          return false
-        }
-        delAccount(this.token, this.deletItem.id, this.ryan).then((res) => {
-          this.ryan = ''
-          if (res.data.err_code === SUCCESS_CODE) {
-            this.nowAccount = false
-            this._getAccount()
-            this._cancelDelet()
-            this.$parent._open('删除成功')
-          } else {
-            if (res.data.err_msg) {
-              this.$parent._open(this.$root.errorCode[res.data.err_code])
-            } else {
-              this.$parent._open('似乎出错了')
-            }
-          }
-        })
+        return false
       }
+      if (!testToken(this.tokenTime)) {
+        this.setUser(false)
+        this.setToken(false)
+        this.setTokenTime(false)
+        this.$router.replace({
+          path: '/login'
+        })
+        return false
+      }
+      return true
     },
-    components: {
-      popup,
-      interlayer,
-      MAgent
+    toEdit() {
+      this.$root.eventHub.$emit('updataEditInfo')
+      this.$router.push({
+        path: '/edit'
+      })
     },
-    beforeCreate: function() {
-      document.getElementsByTagName("body")[0].className = "add_bg"
+    _delete(item) {
+      this.deletItem = item
+      this.$refs.sure._showPopup()
+      this.$refs.interlayer._setZIndex(9999)
+      this.$refs.interlayer._showLayer()
+    },
+    _cancelDelet() {
+      this.deletItem = {
+        name: '',
+        account: '',
+        id: ''
+      }
+      this.$refs.sure._hiddenPopup()
+      this.$refs.interlayer._hiddenLayer()
+    },
+    _sureDelet() {
+      if (!this.checkTock()) {
+        return false
+      }
+      if (!this.ryan) {
+        this.$parent._open('请填写验证码')
+        return false
+      }
+      delAccount(this.token, this.deletItem.id, this.ryan).then((res) => {
+        this.ryan = ''
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.nowAccount = false
+          this._getAccount()
+          this._cancelDelet()
+          this.$parent._open('删除成功')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
     }
+  },
+  components: {
+    popup,
+    interlayer,
+    MAgent
+  },
+  beforeCreate: function() {
+    document.getElementsByTagName("body")[0].className = "add_bg"
   }
+}
 
 </script>
 <style type="text/css" scoped>
