@@ -1,8 +1,13 @@
 html {
   --main-color: #ff6b4e;
+  --btn-color: #fff;
+  --sbb-bg: #FFB723;
+  --sbb-font: #d94d37;
+  --service-bg: #dfe1e5;
   font-size: 14px;
   /*font-family: PingFang SC, STHeitiSC-Light, Helvetica-Light, arial, sans-serif;*/
   user-select: none;
+  background-size: cover;
   font-family: 微软雅黑 !important;
   overflow-x: hidden;
 }
@@ -15,13 +20,8 @@ body {
   -webkit-text-size-adjust: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   line-height: 1;
-  background: url('http://p70pqu6ys.bkt.clouddn.com/bg.jpg') no-repeat;
   background-size: cover;
   overflow: hidden;
-}
-.add_bg{
-  background: url('http://p70pqu6ys.bkt.clouddn.com/siteBg.png') no-repeat;
-  background-size: cover;
 }
 
 div,

@@ -1,3 +1,15 @@
+:root {
+  --main-color: #ff6b4e;
+  --btn-color: #fff;
+  --sbb-bg: #FFB723;
+  --sbb-font: #d94d37;
+  --service-bg: #dfe1e5;
+}
+
+#app {
+  position: relative;
+}
+
 .ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -17,7 +29,7 @@
   min-height: 200px;
   background: #fff;
   transform: translate(37.5%, 80px);
-/*  padding-bottom: 20px;*/
+  /*  padding-bottom: 20px;*/
   opacity: .95;
   position: relative;
 }
@@ -268,9 +280,11 @@
 .el-table .success-row:hover .cell {
   color: #666 !important;
 }
-.position-ibi-content:hover .height-light{
+
+.position-ibi-content:hover .height-light {
   color: #FFD236;
 }
+
 .notice-heder {
   height: 100px;
   border-bottom: 1px solid #ddd;
@@ -308,6 +322,7 @@
   background: #fff;
   border: 1px solid #FFDA5B;
 }
+
 .mg-btn {
   height: 40px;
   min-width: 90px;
@@ -316,15 +331,19 @@
   color: #333;
   font-size: 16px;
 }
-.el-table .sucess-table{
+
+.el-table .sucess-table {
   background: #9BCB14;
 }
-.nir-color{
+
+.nir-color {
   color: #FF9100;
 }
-.notice-heder-btn:hover{
+
+.notice-heder-btn:hover {
   background: rgba(255, 210, 54, 1);
 }
+
 .cb-left {
   width: 30%;
   height: 100%;
@@ -367,8 +386,8 @@
   background: #f4f4f4;
   text-indent: 10px;
   justify-content: flex-start;
-/*  overflow-x: hidden;*/
-/*  overflow: hidden;*/
+  /*  overflow-x: hidden;*/
+  /*  overflow: hidden;*/
 }
 
 .cr-box-btn {

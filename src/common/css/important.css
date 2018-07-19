@@ -1,6 +1,6 @@
 .el-select-dropdown__item.selected {
-  color: #ff6b4e !important;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
+/*  color: var(--main-color) !important;*/
 }
 
 .el-select .el-input .el-select__caret {
@@ -68,6 +68,7 @@
   border-bottom: none !important;
   font-size: 16px !important;
   color: #d94d37 !important;
+  color: var(--title-color) !important;
 }
 
 .el-menu--horizontal {
@@ -145,17 +146,17 @@
 
 .el-date-table td.today span {
   color: #ff6b4e;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
 }
 
 .el-date-table td.current:not(.disabled) span {
   background-color: #ff6b4e !important;
-  background-color: var(--main-color) !important;
+  background-color: var(--title-color) !important;
 }
 
 .available:hover {
   color: #ff6b4e !important;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
 }
 
 button:hover {
@@ -170,18 +171,18 @@ button:hover {
 
 .cell:hover {
   color: #ff6b4e !important;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
 }
 
 .el-year-table td .cell:hover,
 .el-year-table td.current:not(.disabled) .cell {
   color: #ff6b4e !important;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
 }
 
 .el-time-panel__btn.confirm {
   color: #ff6b4e !important;
-  color: var(--main-color) !important;
+  color: var(--title-color) !important;
 }
 
 .el-button--text {
@@ -208,7 +209,7 @@ button:hover {
 }
 
 .time-select-item.selected:not(.disabled) {
-  color: #ff6b4e !important;
+  color: var(--title-color) !important;
 }
 
 .el-date-table .el-date-table__row .current span {

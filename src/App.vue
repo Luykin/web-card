@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" ref='app'>
     <m-header></m-header>
     <keep-alive>
       <router-view ref='body'></router-view>
@@ -16,14 +16,30 @@ import MHeader from 'components/header/header'
 import foot from 'components/footer/footer'
 import XCanvas from 'components/canvas/canvas'
 import centerTips from 'base/centerTips/centerTips'
+import { NOWCONFIG } from 'api/appConfig'
 const header = 65
 const footer = 135
 let margin = 140
 export default {
   data() {
     return {
-      centerTips: false
+      centerTips: false,
+      rootHtml: null
     }
+  },
+  created() {
+  },
+  mounted() {
+    this.rootHtml = document.documentElement
+    this.rootHtml.style.display = 'none'
+    this.rootHtml.style.background = `url('${NOWCONFIG.bg}') no-repeat`
+    this.rootHtml.style.setProperty('--main-color', NOWCONFIG.mainColor)
+    this.rootHtml.style.setProperty('--btn-color', NOWCONFIG.btnColor)
+    this.rootHtml.style.setProperty('--title-color', NOWCONFIG.titleColor)
+    this.rootHtml.style.setProperty('--sbb-bg', NOWCONFIG.sbbBg)
+    this.rootHtml.style.setProperty('--sbb-font', NOWCONFIG.sbbFont)
+    this.rootHtml.style.setProperty('--service-bg', NOWCONFIG.serviceBg)
+    this.rootHtml.style.display = 'block'
   },
   updated() {
     this._screenAdaptation()
@@ -64,13 +80,12 @@ export default {
     XCanvas,
     centerTips
   },
-  watch:{
-    $route(newUrl, oldUrl){
-      // console.log(newUrl)
+  watch: {
+    $route(newUrl, oldUrl) {
       if (newUrl.name === 'management') {
-        document.getElementsByTagName("body")[0].className = "add_bg"
+        this.rootHtml.style.background = `url('${NOWCONFIG.agentBg}') no-repeat`
       } else {
-        document.body.removeAttribute("class","add_bg")
+        this.rootHtml.style.background = `url('${NOWCONFIG.bg}') no-repeat`
       }
     }
   }
@@ -78,10 +93,10 @@ export default {
 
 </script>
 <style>
-@import url(common/css/reset.css);
 @import url(common/css/public.css);
+@import url(common/css/reset.css);
+@import url(common/icon/iconfont.css);
 @import url(common/css/adaptation.css);
 @import url(common/css/important.css);
-@import url(common/icon/iconfont.css);
 
 </style>

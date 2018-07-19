@@ -30,7 +30,7 @@
       <div v-loading='loading'>
         <!-- loading 开始 -->
         <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
-        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips'>
+        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips' :class="{'course-border' : uaid <= 60002}">
         </div>
         <div class="select-box flex">
           <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
@@ -121,6 +121,7 @@ import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
 import { Judge } from 'common/js/judge'
+import { UAID } from 'api/config'
 const BILI = 0.8
 export default {
   mixins: [Judge],
@@ -128,6 +129,7 @@ export default {
     return {
       // 很重要，代表是否为分站的参数
       Gdomain: null,
+      uaid: null,
       judgeMust: true,
       popoverWidth: 1000,
       link: '',
@@ -165,6 +167,7 @@ export default {
     }
   },
   created() {
+    this.uaid = UAID
     this._setEnv()
     this._setPopoverWidth()
     if (this.user) {
@@ -176,21 +179,6 @@ export default {
       this._setAnnouncement(announcement)
     })
     this.$root.eventHub.$emit('canvas')
-    // 预约时间修正
-    // const myDate = new Date()
-    // if (myDate.getHours() < 23) {
-    //   if (myDate.getMinutes() < 30) {
-    //     this._startTime = myDate.getHours() + ':30'
-    //   } else {
-    //     this._startTime = (myDate.getHours() + 1) + ':00'
-    //   }
-    // } else {
-    //   if (myDate.getMinutes() < 30) {
-    //     this._startTime = myDate.getHours() + ':30'
-    //   } else {
-    //     this._startTime = myDate.getHours() + ':59'
-    //   }
-    // }
   },
   updated() {
     this.$nextTick(() => {
@@ -706,6 +694,7 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
   background: #dfe1e5;
+  background: var(--service-bg);
 }
 
 @keyframes color {
@@ -721,13 +710,18 @@ export default {
   width: 85%;
   height: auto;
   margin: 20px auto;
-  background-color: #ffe8d2;
-  border: 1px solid #EBCED1;
+  background: #ffe8d2;
+  background: var(--sbb-bg);
   line-height: 20px;
   font-size: 14px;
   border-radius: 6px;
   padding: 10px;
   color: #d94d37;
+  color: var(--sbb-font);
+}
+
+.course-border {
+  border: 1px solid #EBCED1;
 }
 
 .select-box {
@@ -794,6 +788,7 @@ export default {
 
 .need-score-sapn {
   color: #D94D37;
+  color: var(--title-color);
 }
 
 .course-btn {
@@ -876,7 +871,6 @@ export default {
   background: #ff6b4e;
   border-radius: 10px;
   color: #fff;
-  /* letter-spacing: 5px;*/
 }
 
 .el-button {
@@ -884,6 +878,7 @@ export default {
   line-height: 0px !important;
   background: rgba(255, 255, 255, 0) !important;
   color: #d94d37;
+  color: var(--title-color);
   font-size: 15px;
   border: none !important;
 }
@@ -936,7 +931,7 @@ export default {
 .red-score-sapn {
   text-indent: 2px;
   color: #D94D37;
-  /*color: var(--main-color);*/
+  color: var(--title-color);
 }
 
 .max-gray-span {
@@ -1028,6 +1023,7 @@ export default {
   right: 0;
   top: 0;
   background: #dfe1e5;
+  background: var(--service-bg);
   color: #666;
 }
 
@@ -1045,6 +1041,7 @@ export default {
 .index-bootom-height {
   height: 10px;
 }
+
 
 
 

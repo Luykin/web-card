@@ -14,7 +14,7 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">提现方式:</div>
           <div class="cbi-input-box flex disable-i">
-            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' : '微信') : '去绑定'}}
+            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' : nowAccount.account_type === 2 ? '微信' : '银行卡') : '去绑定'}}
           </div>
           <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>
@@ -67,8 +67,11 @@
             <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img"> 支付宝
             </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type!==1?'active-riw':''">
+            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type==2?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img"> 微信
+            </div>
+            <div class="r-i-warp flex cursor" @click="_choseType(3)" :class="wh_type==3?'active-riw':''">
+              <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%93%B6%E8%A1%8C%E5%8D%A1%E5%9B%BE%E6%A0%87.png" class="riw-img"> 银行卡
             </div>
           </div>
         </div>
@@ -435,10 +438,15 @@ export default {
         } else {
           item.statusA = '打款中'
         }
+        item.WAType = '人工提现'
         if (item.withdraw_account.account_type === 1) {
           item.WAType = '支付宝'
-        } else {
+        }
+        if (item.withdraw_account.account_type === 2) {
           item.WAType = '微信'
+        }
+        if (item.withdraw_account.account_type === 3) {
+          item.WAType = '银行卡'
         }
         item.createA = timeChange(item.create)
       })

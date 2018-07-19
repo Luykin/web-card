@@ -4,8 +4,8 @@
 <script type="text/javascript">
 const arryFlower = []
 const color = ['rgba(255,255,255,.3)', 'rgba(255,255,255,.4)', 'rgba(250,250,250,.5)', 'rgba(255,255,255,.6)', 'rgba(255,255,255,.7)', 'rgba(255,255,255,.8)']
-const size = [3.2, 3.4, 3.6, 3.8, 4, 4.2, 4.4, 4.6]
-const speed = 1.8
+const size = [3.3, 3.5, 3.6, 3.8, 4, 4.2, 4.3, 4.4]
+const speed = 2
 const header = 65
 const footer = 135
 const margin = 0
@@ -16,7 +16,7 @@ export default {
     return {
       ctx: false,
       bg: false,
-        allNumber: 55,
+      allNumber: 40,
       time: false
     }
   },
