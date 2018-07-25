@@ -114,6 +114,12 @@ export default new Router({
       name: 'management',
       component: () =>
         import ('components/bg-task-record/bg-task-record')
+    },
+    {
+      path: '/bar',
+      name: 'bar',
+      component: () =>
+        import ('components/bar/bar')
     }
   ]
 })

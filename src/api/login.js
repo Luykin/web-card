@@ -146,3 +146,63 @@ export function updatePassword(password, newpassword, renewpassword, token) {
       }
     })
 }
+export function getFreeServices() {
+  const url = `${PREFIX_URL}/free_services`
+  let data = {
+    uaid: UAID
+  }
+  return axios.get(url, {
+    params: Object.assign({ sign: getSign(data) }, data)
+  }).then(function(res) {
+    return Promise.resolve(res)
+  }).catch(function(error) {
+    if (error.response) {
+      return Promise.resolve({
+        data: {
+          err_code: error.response.status,
+          err_msg: error.response.status
+        }
+      })
+    } else {
+      return Promise.resolve({
+        data: {
+          err_code: -1,
+          err_msg: -1
+        }
+      })
+    }
+  })
+}
+export function addFreeTask(freeId, addition, token) {
+  const url = `${PREFIX_URL}/add_free_task`
+  let data = {
+    uaid: UAID,
+    free_service_id: freeId,
+    addition: addition,
+    token: token
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}
