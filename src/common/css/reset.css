@@ -5,11 +5,10 @@ html {
   --sbb-font: #d94d37;
   --service-bg: #dfe1e5;
   font-size: 14px;
-  /*font-family: PingFang SC, STHeitiSC-Light, Helvetica-Light, arial, sans-serif;*/
   user-select: none;
-  background-size: cover;
   font-family: 微软雅黑 !important;
   overflow-x: hidden;
+ /* background-repeat:repeat-x;*/
 }
 
 
@@ -20,7 +19,6 @@ body {
   -webkit-text-size-adjust: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   line-height: 1;
-  background-size: cover;
   overflow: hidden;
 }
 

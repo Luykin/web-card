@@ -27,18 +27,11 @@ export default {
       rootHtml: null
     }
   },
-  created() {
-  },
+  created() {},
   mounted() {
     this.rootHtml = document.documentElement
     this.rootHtml.style.display = 'none'
-    this.rootHtml.style.background = `url('${NOWCONFIG.bg}') no-repeat`
-    this.rootHtml.style.setProperty('--main-color', NOWCONFIG.mainColor)
-    this.rootHtml.style.setProperty('--btn-color', NOWCONFIG.btnColor)
-    this.rootHtml.style.setProperty('--title-color', NOWCONFIG.titleColor)
-    this.rootHtml.style.setProperty('--sbb-bg', NOWCONFIG.sbbBg)
-    this.rootHtml.style.setProperty('--sbb-font', NOWCONFIG.sbbFont)
-    this.rootHtml.style.setProperty('--service-bg', NOWCONFIG.serviceBg)
+    this.rootHtml.setAttribute('style', `background: url('${NOWCONFIG.bg}'); --main-color: ${NOWCONFIG.mainColor}; --btn-color :${NOWCONFIG.btnColor};--title-color :${NOWCONFIG.titleColor};--sbb-bg :${NOWCONFIG.sbbBg};--sbb-font :${NOWCONFIG.sbbFont};--service-bg :${NOWCONFIG.serviceBg};`)
     this.rootHtml.style.display = 'block'
   },
   updated() {
@@ -83,9 +76,9 @@ export default {
   watch: {
     $route(newUrl, oldUrl) {
       if (newUrl.name === 'management') {
-        this.rootHtml.style.background = `url('${NOWCONFIG.agentBg}') no-repeat`
+        this.rootHtml.setAttribute('style', `background: url('${NOWCONFIG.agentBg}'); --main-color: ${NOWCONFIG.mainColor}; --btn-color :${NOWCONFIG.btnColor};--title-color :${NOWCONFIG.titleColor};--sbb-bg :${NOWCONFIG.sbbBg};--sbb-font :${NOWCONFIG.sbbFont};--service-bg :${NOWCONFIG.serviceBg};`)
       } else {
-        this.rootHtml.style.background = `url('${NOWCONFIG.bg}') no-repeat`
+        this.rootHtml.setAttribute('style', `background: url('${NOWCONFIG.bg}'); --main-color: ${NOWCONFIG.mainColor}; --btn-color :${NOWCONFIG.btnColor};--title-color :${NOWCONFIG.titleColor};--sbb-bg :${NOWCONFIG.sbbBg};--sbb-font :${NOWCONFIG.sbbFont};--service-bg :${NOWCONFIG.serviceBg};`)
       }
     }
   }

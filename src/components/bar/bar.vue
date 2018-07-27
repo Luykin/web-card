@@ -1,15 +1,17 @@
 <template>
   <div id="main-body">
+    <!-- <img src="http://pbfntaxkx.bkt.clouddn.com/%E5%AD%97.png" alt="免费刷赞" class="title-img"> -->
+    <div class="free-title-img"></div>
     <div class="login-box-bar flex" v-show="step === 1">
       <div class="free-good flex">
-        <img src="http://pbfntaxkx.bkt.clouddn.com/%E7%A4%BC%E5%93%81%E5%88%B8.png" alt="免费刷赞刷粉丝" class="free-img">
-        <div class="gift-name flex ellipsis">{{giftName}}</div>
+        <img src="http://pbfntaxkx.bkt.clouddn.com/%E7%A4%BC%E5%93%81%E5%88%B8001.png" alt="免费刷赞刷粉丝" class="free-img">
+        <div class="gift-name flex ellipsis">+{{giftName}}</div>
       </div>
       <div class="free-input flex">
         <input placeholder="请输入需要刷的QQ号码" v-model="adtion" @keyup.enter="_nextStep" @keyup="_checkAdtion">
       </div>
       <div class="free-tips flex">
-        <span>填写QQ号码立即领取200名片赞</span>
+        <span>填写QQ号码立即领取{{giftName}}</span>
       </div>
       <div class="free-btn-warp flex">
         <div class="free-btn flex cursor" @click="_nextStep">下一步</div>
@@ -17,7 +19,7 @@
     </div>
     <div class="login-box-bar flex" v-show="step === 2">
       <div class="free-good flex">
-        <img src="http://pbfntaxkx.bkt.clouddn.com/%E7%A4%BC%E5%93%81%E5%88%B8.png" alt="免费刷赞刷粉丝" class="free-img">
+        <img src="http://pbfntaxkx.bkt.clouddn.com/%E7%A4%BC%E5%93%81%E5%88%B8001.png" alt="免费刷赞刷粉丝" class="free-img">
         <div class="gift-name flex ellipsis">{{giftName}}</div>
       </div>
       <div class="free-input flex">
@@ -32,7 +34,7 @@
         <div class="free-code-btn flex cursor" @click="_back()">修改</div>
       </div>
       <div class="free-input flex">
-        <input placeholder="请输入您的密码" v-model="code">
+        <input placeholder="请输入验证码" v-model="code">
         <div class="free-code-btn flex cursor" @click="_getcode">{{time}}<span v-if="time > 0">s后获取</span></div>
       </div>
       <div class="height10"></div>
@@ -87,11 +89,13 @@ export default {
     this._setTime()
     this.$root.eventHub.$emit('canvas')
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     _toDingdan() {
       this.$refs.interlayer._hiddenLayer()
+      this.showPop = false
+      this.$root.eventHub.$emit('updateOrder')
+      this.$root.eventHub.$emit('canvas', true)
       this.$router.replace({
         path: '/order'
       })
@@ -129,14 +133,10 @@ export default {
           }
           this.giftName = this.formatgift(this.gift)
         } else {
-          if (res.data.err_msg) {
-            this.$parent._open(this.$root.errorCode[res.data.err_code])
-          } else {
-            this.$parent._open('活动暂未开启')
-            this.$router.replace({
-              path: '/index'
-            })
-          }
+          this.$parent._open('活动暂未开启')
+          this.$router.replace({
+            path: '/index'
+          })
         }
       })
     },
@@ -188,7 +188,7 @@ export default {
       })
     },
     formatgift(list) {
-      let ret = '+'
+      let ret = ''
       list.forEach((item) => {
         ret += item.label
       })
@@ -276,11 +276,13 @@ export default {
 
 </script>
 <style type="text/css" scoped>
-#main-body {
-  min-width: 1920px !important;
-  background: #301860 url('http://pbfntaxkx.bkt.clouddn.com/%E8%83%8C%E6%99%AF.png') no-repeat !important;
-  background-size: cover !important;
-  padding-bottom: 340px !important;
+.free-title-img {
+  width: 1000px;
+  height: 285px;
+  background: url('http://pbfntaxkx.bkt.clouddn.com/%E5%AD%97.png') no-repeat;
+  background-size: cover;
+  transform: translate(0, 50px);
+  margin: 0px auto;
 }
 
 .code {
@@ -320,11 +322,11 @@ export default {
 }
 
 .login-box-bar {
-  transform: translate(0, 380px);
+  transform: translate(0, 50px);
   margin: 0 auto;
-  width: 550px;
+  width: 480px;
   height: auto;
-  min-height: 30.57rem;
+  min-height: 400px;
   background: rgba(35, 19, 78, .7);
   border-radius: 10px;
   flex-wrap: wrap;
@@ -335,15 +337,15 @@ export default {
 }
 
 .free-good {
-  width: 69%;
+  width: 70%;
   height: auto;
   margin: 35px 0 0;
   position: relative;
 }
 
 .free-input {
-  width: 69%;
-  height: 68px;
+  width: 70%;
+  height: 58px;
   margin: 25px 0 0;
   border-radius: 10px;
   overflow: hidden;
@@ -351,18 +353,18 @@ export default {
 
 .clone-input {
   font-size: 18px;
-  color: #999;
+  color: #f9f9f9;
   width: 0;
   flex-grow: 1;
   height: 100%;
-  background: #fff;
+  background: #B3B3B3;
   text-indent: 20px;
   border-radius: 10px;
   justify-content: flex-start;
 }
 
 .free-input input {
-  font-size: 20px;
+  font-size: 18px;
   color: #353535;
   width: 0;
   flex-grow: 1;
@@ -379,7 +381,7 @@ export default {
   background: linear-gradient(180deg, rgba(248, 46, 239, 1), rgba(74, 0, 156, 1));
   box-shadow: 0rem 0rem 0.71rem 0rem rgba(255, 255, 255, 0.38);
   border-radius: 10px;
-  font-size: 18px;
+  font-size: 16px;
   color: rgba(255, 255, 255, 1);
 }
 
@@ -390,11 +392,11 @@ export default {
 }
 
 .free-tips {
-  width: 69%;
+  width: 70%;
   height: 60px;
   justify-content: flex-start;
   color: #9196FF;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .free-btn-warp {
@@ -404,12 +406,12 @@ export default {
 }
 
 .free-btn {
-  width: 85%;
-  height: 60px;
+  width: 82%;
+  height: 58px;
   background: linear-gradient(180deg, rgba(248, 46, 239, 1), rgba(74, 0, 156, 1));
   box-shadow: 0rem 0rem 0.71rem 0rem rgba(255, 255, 255, 0.38);
   border-radius: 0.29rem;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 18px;
   color: #fff;
 }
@@ -421,7 +423,7 @@ export default {
   top: 0;
   bottom: 0;
   color: #26154D;
-  font-size: 22px;
+  font-size: 20px;
   text-indent: -90px;
   font-weight: 600;
 }
