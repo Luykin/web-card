@@ -86,6 +86,12 @@ export default new Router({
         import ('components/reflect/reflect')
     },
     {
+      path: '/reflectforbk',
+      name: 'management',
+      component: () =>
+        import ('components/reflect/reflectforbk')
+    },
+    {
       path: '/task',
       name: 'management',
       component: () =>
@@ -102,6 +108,12 @@ export default new Router({
       name: 'management',
       component: () =>
         import ('components/recharge/recharge')
+    },
+    {
+      path: '/rechargeforag',
+      name: 'management',
+      component: () =>
+        import ('components/recharge/rechargeforag')
     },
     {
       path: '/bg-money-record',

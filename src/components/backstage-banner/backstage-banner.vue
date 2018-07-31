@@ -17,18 +17,22 @@
       <div class="notice-item-left flex ellipsis">分站营业额</div>
       <div class="notice-item-right flex nir-color">{{user.agency.balance}}</div>
     </div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect', false, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div>
+    <div class="db-box flex">
+      <div class="db-btn db-btn-left flex" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值</div>
+      <div class="db-btn flex" @click="_openc('/reflectforbk')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflectforbk'}">提现</div>
+    </div>
+    <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect', false, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div> -->
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div>
+<!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div> -->
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">发票申请</div>
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div> -->
-    <!-- 		<div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->
+    <!--    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->
   </div>
 </template>
 <script type="text/javascript">
@@ -45,12 +49,17 @@ export default {
   },
   methods: {
     _openc(url, show, windowOpen) {
+      this.$root.eventHub.$emit('timeforsps')
       if (windowOpen) {
-      	if (!this.user.agency.sub_site) {
-      		this.$root.eventHub.$emit('domain')
-      	} else {
-      		window.open(window.location.origin + '/#' + url, '_brank')
-      	}
+        if (!this.user.agency.sub_site) {
+          if (!this.user.agency_level) {
+            this.$parent.$parent._open('您的代理等级不够')
+          } else {
+            this.$root.eventHub.$emit('domain')
+          }
+        } else {
+          window.open(window.location.origin + '/#' + url, '_brank')
+        }
       } else {
         if (show) {
           this.$root.eventHub.$emit('showMX', show - 1)
@@ -98,19 +107,41 @@ export default {
   padding-bottom: 10px;
 }
 
-.active-mg-btn {
-  background: #FFD236;
-}
-
 .backstage-fenge {
   width: 100%;
   height: 20px;
   background: #F4F4F4;
   margin: 20px 0;
 }
-.proxy-icon{
-	width: 20px;
-	height:auto;
-	margin: 0 5px;
+
+.proxy-icon {
+  width: 20px;
+  height: auto;
+  margin: 0 5px;
+}
+
+.db-box {
+  width: 80%;
+  height: 40px;
+  margin: 20px auto;
+}
+
+.db-btn {
+  width: 45%;
+  height: 100%;
+  background: #fff;
+  border: 1px solid #FFDA5B;
+  border-radius: 5px;
+/*  margin: 0 6%*/
+}
+.db-btn-left{
+  margin-right: 10%;
+}
+.db-btn:hover{
+  background: #FFD236;
+  cursor: pointer;
+}
+.active-mg-btn {
+  background: #FFD236;
 }
 </style>

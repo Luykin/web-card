@@ -89,7 +89,7 @@
           </div>
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex">代理折后:</div>
-            <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</div>
+            <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level? user.agency_level.discount || 1 : 1 )*10 + '折'}} = {{agencyPrice + '元'}}</div>
           </div>
           <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
         </div>

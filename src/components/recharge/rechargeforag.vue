@@ -1,7 +1,7 @@
 <template>
   <div id="main-body" ref='mainbody'>
     <div class="main-box flex" id="main-box">
-      <b-agent></b-agent>
+      <m-agent></m-agent>
       <div class="recharge-title flex">
         <div class="recharge-title-item flex cursor" @click="_chosePage(1)" :class="{'rti-active' : page === 1 }">在线支付充值</div>
         <div class="recharge-title-item flex cursor" @click="_chosePage(2)" :class="{'rti-active' : page === 2 }">银行汇款充值</div>
@@ -13,12 +13,6 @@
             <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
               <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}
             </div>
-          </div>
-        </div>
-        <div class="goods-boxA flex" v-show="!payUrl  && app && app.goods.length > 0">
-          <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item)" class="good-item cursor flex">
-            <div class="good-item-label flex ellipsis">{{item.label}}</div>
-            <div class="good-item-label flex ellipsis">{{'￥'+parseInt(item.price)}}</div>
           </div>
         </div>
         <div class="cr-item flex">
@@ -61,13 +55,12 @@
   </div>
 </template>
 <script>
-import BAgent from 'components/backstage-banner/backstage-banner'
+import MAgent from 'components/agent-banner/agent-banner'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken } from 'common/js/util'
 import { addOrder } from 'api/header'
 import QrcodeVue from 'qrcode.vue'
-import { getOrders } from 'api/score-record'
 export default {
   data() {
     return {
@@ -79,20 +72,11 @@ export default {
       code: false,
       payUrl: false,
       page: 1,
-      _timeforSPS: null,
-      timeforCumt: 0,
       tableData: [{ label: '支付宝', code: 'zh42429951', name: '张恒' },
         { label: '微信', code: 'zh42429951', name: '张恒' },
         { label: '工商银行', code: '6222021324234234', name: '张恒' }
       ]
     }
-  },
-  created() {
-    this.$root.eventHub.$on('timeforsps', () => {
-      this._clearTimeforSPS()
-    })
-    this.choseGoodId = this.app.goods[0].id || -1
-    this.choseGood = this.app.goods[0]
   },
   computed: {
     payType() {
@@ -106,11 +90,6 @@ export default {
     ])
   },
   methods: {
-    _choseGood(item) {
-      this.choseGood = item
-      this.choseGoodId = item.id
-      this.money = ''
-    },
     _openQQ() {
       window.open('http://wpa.qq.com/msgrd?v=3&uin=42428851&site=qq&menu=yes', '_brank')
     },
@@ -118,14 +97,11 @@ export default {
       this.$router.replace({
         path: '/bg-money-record'
       })
-      this.$root.eventHub.$emit('user')
-      this.$root.eventHub.$emit('updateScoreRecord')
       this.$root.eventHub.$emit('canvas', true)
     },
     _cancel() {
       this.payUrl = false
       this.money = ''
-      this._clearTimeforSPS()
     },
     _chosePage(page) {
       this.page = page
@@ -162,7 +138,6 @@ export default {
         this.$parent._open('请选择支付方式')
         return
       }
-      console.log(this.choseGoodId)
       if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
         addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
           this._afterAddOrder(res)
@@ -201,14 +176,6 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
-        this.timeforCumt = 0
-        this._timeforSPS = setInterval(() => {
-          this._surePaySuc(this.code)
-          this.timeforCumt++
-            if (this.timeforCumt >= 70) {
-              this._clearTimeforSPS()
-            }
-        }, 3000)
       } else {
         // this._hiddenSidebar()
         this.money = ''
@@ -219,26 +186,6 @@ export default {
         }
       }
     },
-    _surePaySuc(code) {
-      if (!this._timeforSPS) {
-        return false
-      } else {
-        getOrders(this.token, 11, 0, code).then((res) => {
-          if (res.data.err_code === SUCCESS_CODE) {
-            if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
-              this.$parent._open('支付成功！')
-              this._clearTimeforSPS()
-              this._sureCompletionPayment()
-            }
-          }
-        })
-      }
-    },
-    _clearTimeforSPS() {
-      clearInterval(this._timeforSPS)
-      this._timeforSPS = null
-      this.timeforCumt = 0
-    },
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
@@ -246,12 +193,9 @@ export default {
     })
   },
   components: {
-    BAgent,
+    MAgent,
     QrcodeVue
   },
-  beforeDestroy() {
-    this._clearTimeforSPS()
-  }
 }
 
 </script>
@@ -305,23 +249,14 @@ export default {
   flex-shrink: 1;
 }
 
+
 .goods-box {
   height: auto;
   width: 60%;
   flex-grow: 1;
   overflow: hidden;
   justify-content: flex-start;
-  margin: 10px 0;
-  flex-wrap: wrap;
-}
-
-.goods-boxA {
-  height: auto;
-  width: 60%;
-  flex-grow: 1;
-  overflow: hidden;
-  justify-content: flex-start;
-  margin: 20px 0 0 15%;
+  margin: 0 10px;
   flex-wrap: wrap;
 }
 
@@ -332,7 +267,7 @@ export default {
 
 .cr-box-min {
   border: 1px solid #DFDFDF;
-  margin: 0 10px 0 0;
+  margin: 0 10px;
   position: relative;
 }
 
@@ -430,33 +365,6 @@ export default {
 .my-money {
   color: #d94d37;
   text-indent: 0px;
-}
-
-.good-item {
-  box-sizing: border-box;
-  min-width: 75px;
-  max-width: 28.33%;
-  width: 75px;
-  height: 75px;
-  flex-shrink: 0;
-  flex-grow: 1;
-  background: #FFE8D2;
-  color: #D94D37;
-  margin: 5px 5% 0 0;
-  flex-wrap: wrap;
-  align-content: center;
-  border-radius: 8px;
-}
-
-.good-item-label {
-  width: 100%;
-  height: 40%;
-}
-
-.active-good {
-  /*color: red;*/
-  color: #fff;
-  background: #FF6B4E;
 }
 
 </style>

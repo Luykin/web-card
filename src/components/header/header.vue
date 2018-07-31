@@ -17,7 +17,7 @@
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management'" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none" v-show="user">
@@ -48,7 +48,7 @@
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
               </el-menu-item> -->
-              <el-menu-item index="/backstage" v-show="user.is_agency && user.agency_level">
+              <el-menu-item index="/backstage" v-show="user.is_agency">
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">代理后台</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
@@ -99,7 +99,7 @@
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user" class='disable'>
+            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002">
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
@@ -322,6 +322,7 @@ export default {
     return {
       BuyDomainData: null,
       nowconfig: null,
+      uaid: null,
       money: '',
       companyName: '',
       applicant: '',
@@ -347,12 +348,13 @@ export default {
       dialogText: '',
       dialogTitle: '',
       _timeforSPS: null,
-      _timeforCumt: 0,
+      timeforCumt: 0,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
   created() {
+    this.uaid = UAID
     this.nowconfig = NOWCONFIG
     this.$root.eventHub.$on('user', (location) => {
       this._updataUser(location)
@@ -770,11 +772,11 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
-        this._timeforCumt = 0
+        this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           this._surePaySuc(this.code)
-          this._timeforCumt++
-            if (this._timeforCumt >= 70) {
+          this.timeforCumt++
+            if (this.timeforCumt >= 70) {
               this._clearTimeforSPS()
             }
         }, 3000)
@@ -806,7 +808,7 @@ export default {
     _clearTimeforSPS() {
       clearInterval(this._timeforSPS)
       this._timeforSPS = null
-      this._timeforCumt = 0
+      this.timeforCumt = 0
     },
     _sureCompletionPayment() {
       this._hiddenSidebar()
@@ -995,6 +997,9 @@ export default {
     interlayer,
     popup,
     QrcodeVue
+  },
+  beforeDestroy() {
+    this._clearTimeforSPS()
   }
 }
 
@@ -1053,6 +1058,7 @@ export default {
 .disable:hover {
   pointer-events: none;
 }
+
 
 
 /*start ---改写我的账户下拉窗 2018.04.27*/
@@ -1119,6 +1125,7 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
 
 
 /*end ---改写我的账户下拉窗*/
