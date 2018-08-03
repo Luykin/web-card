@@ -11,7 +11,7 @@
         <div class="nav-ul flex">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
             <!-- <el-menu-item index="/official">主页</el-menu-item> -->
-            <el-menu-item index="/index">{{env}}</el-menu-item>
+            <el-menu-item index="/index" v-show="$route.name != 'management'">{{env}}</el-menu-item>
             <el-menu-item index="/order" v-show="user && $route.name != 'management'">我的订单</el-menu-item>
             <!-- <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item> -->
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
@@ -20,7 +20,7 @@
             <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
-            <el-submenu index="/none" v-show="user">
+            <el-submenu index="/none/cont1" v-show="user && $route.name != 'management'">
               <template slot="title">我的账户</template>
               <el-menu-item index="/none" class='phone-item disable flex agent-item' v-show="proxyRank && user" disabled>
                 <!-- {{proxyRank}} -->
@@ -48,7 +48,7 @@
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
               </el-menu-item> -->
-              <el-menu-item index="/backstage" v-show="user.is_agency">
+              <el-menu-item index="/backstage" v-show="user.is_agency && user.agency && user.agency.level> -1">
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">代理后台</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
@@ -74,6 +74,34 @@
                 </div>
               </el-menu-item>
             </el-submenu>
+            <el-submenu index="/none/cont2" v-show="user && $route.name == 'management'">
+              <template slot="title">我的账户</template>
+              <el-menu-item index="/none" class='phone-item disable flex agent-item' v-show="proxyRank && user" disabled>
+                <div class="agent-ul-warp flex cursor">
+                  代理等级: {{proxyRank}}
+                  <img :src="proxyIcon" v-if="proxyIcon" class="proxy-icon">
+                </div>
+                <div class="agent-border-bootom cursor"></div>
+              </el-menu-item>
+              <el-menu-item index="/none" class='phone-item flex' v-show="user" disabled>
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">我的账户</div>
+                  <div class="agent-ul-li-right flex ellipsis">{{userPhone}}</div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/backstage" v-show="user.is_agency && user.agency && user.agency.level> -1">
+                <div class="agent-ul-li flex cursor">
+                  <div class="agent-ul-li-left flex ellipsis">代理后台</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/none/zux" class=' flex' v-show="user" disabled>
+                <div class="agent-ul-li flex cursor" @click="toZX()">
+                  <div class="agent-ul-li-left flex ellipsis">注销</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
+            </el-submenu>
             <el-menu-item index="/login" v-show="!user">登录帐号</el-menu-item>
           </el-menu>
         </div>
@@ -86,7 +114,7 @@
             <!-- <el-menu-item index="/official">
               <i class="iconfont icon-tijiaodingdan"></i>主页
             </el-menu-item> -->
-            <el-menu-item index="/index">
+            <el-menu-item index="/old-index">
               <i class="iconfont icon-tijiaodingdan"></i>{{env}}
             </el-menu-item>
             <el-menu-item index="/order" v-show="user">
@@ -429,8 +457,10 @@ export default {
     ])
   },
   methods: {
+    toZX() {
+      window.location.href = NOWCONFIG.seo + '/login'
+    },
     _changeExists() {
-      // console.log(0)
       if (this.exists === 1) {
         return
       }
@@ -681,7 +711,7 @@ export default {
       }
     },
     checkTock() {
-      if (!this.user) {
+      if (!this.user && !this.token) {
         this.$parent._open('请登录')
         this.$router.replace({
           path: '/login'
@@ -865,8 +895,11 @@ export default {
         e.stopPropagation()
       }
       if (data) {
-        // console.log(data)
         this.BuyDomainData = data
+      }
+      if (this.BuyDomainData.pay_type) {
+        this.activePayType = this.BuyDomainData.pay_type
+        this._addSubSiteTask()
       }
       this.$nextTick(() => {
         this.popup = true
@@ -1061,6 +1094,9 @@ export default {
 
 
 
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1125,6 +1161,9 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
 
 
 

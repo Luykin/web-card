@@ -103,6 +103,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import BAgent from 'components/backstage-banner/backstage-banner'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken } from 'common/js/util'
+import { NOWCONFIG } from 'api/appConfig'
 const BILI = 0.8
 export default {
   data() {
@@ -130,11 +131,21 @@ export default {
     }
   },
   created() {
+    const query = this.$route.query
+    if (query.token && query.tokenTime && query.sgin) {
+      if (query.sgin == navigator.userAgent.slice(-10)) {
+        this.setToken(query.token)
+        this.setTokenTime(query.tokenTime)
+      } else {
+        window.location.href = NOWCONFIG.seo
+      }
+    }
     if (!this.app) {
       this._getAppInfo(this)
     } else {
       this._initNet()
     }
+    this._updataUser()
   },
   computed: {
     placeholder() {
@@ -183,6 +194,22 @@ export default {
   //   })
   // },
   methods: {
+    _updataUser() {
+      if (!this.checkTock()) {
+        return false
+      }
+      getUserInfo(this.token).then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.setUser(res.data.data)
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
     _setBG() {
       let pd = this.$refs.pickerD.$el.children[0]
       let ps = this.$refs.pickerS.$el.children[0]
@@ -215,7 +242,6 @@ export default {
       getAppInfo().then((res) => {
         if (res.data.err_code === SUCCESS_CODE && res.data.data) {
           if (res.data.data.score_rate) {
-            // this.setScorerate(res.data.data.score_rate)
             this.setApp(res.data.data)
             this._initNet()
           }
@@ -244,9 +270,6 @@ export default {
       }
     },
     _initNet() {
-      // this.$nextTick(() => {
-      //   console.log(this.$refs.picker)
-      // })
       if (this.app.service_categories.length > 0) {
         this.activeCategory = this.app.service_categories[0].id
         this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
@@ -290,12 +313,12 @@ export default {
       }
     },
     _choseShuoShuo(category) {
-    	// console.log(category)
+      // console.log(category)
       if (category !== 2 && category !== 4) {
         return
       }
       if (!this.link) {
-      	this._closeCourse()
+        this._closeCourse()
         this.$parent._open('请输入QQ号')
         return
       }
@@ -328,20 +351,11 @@ export default {
       }
     },
     checkTock() {
-      if (!this.user) {
-        this.$parent._open('请登录')
-        this.$router.replace({
-          path: '/login'
-        })
-        return false
-      }
       if (!testToken(this.tokenTime)) {
         this.setUser(false)
         this.setToken(false)
         this.setTokenTime(false)
-        this.$router.replace({
-          path: '/login'
-        })
+        window.location.href = NOWCONFIG.seo + '/login'
         return false
       }
       return true
@@ -634,6 +648,7 @@ export default {
 .cr-box-max {
   padding: 1%;
   border: 1px solid #DFDFDF;
+  text-indent: 0px;
 }
 
 .cr-box-min {

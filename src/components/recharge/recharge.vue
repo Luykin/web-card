@@ -63,6 +63,7 @@
 <script>
 import BAgent from 'components/backstage-banner/backstage-banner'
 import { mapGetters, mapMutations } from 'vuex'
+import { getAppInfo } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken } from 'common/js/util'
 import { addOrder } from 'api/header'
@@ -81,9 +82,8 @@ export default {
       page: 1,
       _timeforSPS: null,
       timeforCumt: 0,
-      tableData: [{ label: '支付宝', code: 'zh42429951', name: '张恒' },
-        { label: '微信', code: 'zh42429951', name: '张恒' },
-        { label: '工商银行', code: '6222021324234234', name: '张恒' }
+      tableData: [
+        { label: '中国农业银行', code: '6228480478794701878', name: '张恒' }
       ]
     }
   },
@@ -93,6 +93,7 @@ export default {
     })
     this.choseGoodId = this.app.goods[0].id || -1
     this.choseGood = this.app.goods[0]
+    this._getAppInfo()
   },
   computed: {
     payType() {
@@ -106,6 +107,26 @@ export default {
     ])
   },
   methods: {
+    _getAppInfo(that) {
+      getAppInfo().then((res) => {
+        if (res.data.err_code === SUCCESS_CODE && res.data.data) {
+          if (res.data.data.score_rate) {
+            this.setApp(res.data.data)
+            this._initNet()
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _initNet() {
+      this.choseGoodId = this.app.goods[0].id || -1
+      this.choseGood = this.app.goods[0]
+    },
     _choseGood(item) {
       this.choseGood = item
       this.choseGoodId = item.id
@@ -203,6 +224,7 @@ export default {
         this.payUrl = res.data.data.pay_url
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
+          this.payUrl = false
           this._surePaySuc(this.code)
           this.timeforCumt++
             if (this.timeforCumt >= 70) {
@@ -242,6 +264,7 @@ export default {
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
+      setApp: 'SET_APP',
       setTokenTime: 'SET_TOKENTIME'
     })
   },

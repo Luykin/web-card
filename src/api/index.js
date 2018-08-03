@@ -58,11 +58,11 @@ export function addTask(score, point, token, serviceid, addition, targetid, subl
   }
   console.log(data)
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
-  .then(function(res) {
-    return Promise.resolve(res)
-  })
-  .catch(function(error) {
-    if (error.response) {
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
         // console.log(error.response.data)
         console.log(error.response.status)
         // console.log(error.response.headers)
@@ -88,13 +88,13 @@ export function getUserInfo(token) {
     token: token
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
-  })
-  .then(function(res) {
-    return Promise.resolve(res)
-  })
-  .catch(function(error) {
-    if (error.response) {
+      params: Object.assign({ sign: getSign(data) }, data)
+    })
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
         // console.log(error.response.data)
         console.log(error.response.status)
         // console.log(error.response.headers)
@@ -121,11 +121,11 @@ export function getShuoshuoList(qq, token) {
     token: token
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
-  .then(function(res) {
-    return Promise.resolve(res)
-  })
-  .catch(function(error) {
-    if (error.response) {
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
         // console.log(error.response.data)
         console.log(error.response.status)
         // console.log(error.response.headers)
@@ -152,7 +152,38 @@ export function getsubsite(sub_domain) {
     sub_domain: sub_domain
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
-  .then(function(res) {
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}
+export function latestTasks() {
+  const url = `${PREFIX_URL}/latest_tasks`
+  let data = {
+    page: 0,
+    num: 10,
+  }
+  return axios.get(url, {
+    params: Object.assign({ sign: getSign(data) }, data)
+  }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
     if (error.response) {
@@ -197,31 +228,31 @@ export function addSubSiteTask(token, buydata) {
     data = Object.assign({ appointment_time: buydata.appointment_time }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
-  .then(function(res) {
-    return Promise.resolve(res)
-  }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 //合并下单
-export function addSiteTask(token, buydata){
+export function addSiteTask(token, buydata) {
   const url = `${PREFIX_URL}/add_site_task`
   let data = {
     token: token,
@@ -242,27 +273,27 @@ export function addSiteTask(token, buydata){
     data = Object.assign({ appointment_time: buydata.appointment_time }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
-  .then(function(res) {
-    return Promise.resolve(res)
-  }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 
 }

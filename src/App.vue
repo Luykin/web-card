@@ -16,7 +16,8 @@ import MHeader from 'components/header/header'
 import foot from 'components/footer/footer'
 import XCanvas from 'components/canvas/canvas'
 import centerTips from 'base/centerTips/centerTips'
-import { NOWCONFIG } from 'api/appConfig'
+import { NOWCONFIG, changeIndex } from 'api/appConfig'
+import { UAID } from 'api/config'
 const header = 65
 const footer = 135
 let margin = 140
@@ -27,7 +28,8 @@ export default {
       rootHtml: null
     }
   },
-  created() {},
+  created() {
+  },
   mounted() {
     this.rootHtml = document.documentElement
     this.rootHtml.style.display = 'none'
@@ -89,6 +91,7 @@ export default {
 @import url(common/css/public.css);
 @import url(common/css/reset.css);
 @import url(common/icon/iconfont.css);
+@import url(common/icon_add/iconfont.css);
 @import url(common/css/adaptation.css);
 @import url(common/css/important.css);
 

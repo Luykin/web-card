@@ -31,8 +31,8 @@
           </el-table-column>
           <el-table-column prop="status" label="状态">
           </el-table-column>
-          <el-table-column prop="time" label="预计完成">
-          </el-table-column>
+<!--           <el-table-column prop="time" label="预计完成">
+          </el-table-column> -->
           <el-table-column prop="appointment_time" label="预约时间">
           </el-table-column>
           <el-table-column prop="createA" label="提交时间">

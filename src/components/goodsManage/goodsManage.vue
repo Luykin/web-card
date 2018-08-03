@@ -16,7 +16,7 @@
           <el-table :data="agencyService" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
             <el-table-column prop="label" label="商品类型">
             </el-table-column>
-            <el-table-column prop="origin_price" label="成本">
+            <el-table-column prop="real_origin_price" label="折后成本">
             </el-table-column>
             <el-table-column prop="price" label="销售金额">
             </el-table-column>
@@ -51,9 +51,9 @@
           </div>
         </div>
         <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">成本价：</div>
+          <div class="aib-label flex ellipsis">折后成本价：</div>
           <div class="flex aib-input-warp">
-            <span v-if="nowRow">{{nowRow.origin_price}}</span>
+            <span v-if="nowRow">{{nowRow.real_origin_price}}</span>
           </div>
         </div>
         <div class="flex agree-input-box">
@@ -62,7 +62,7 @@
             <!-- <span v-if="nowRow">{{nowRow.price}}</span> -->
             <input type="text" placeholder="请填写销售价格" class="aib-ipnput" @keyup="_rectifyMoney" v-model="money" ref='aibinput'>
           </div>
-          <div class="tishi">注：销售定价不可低于成本价</div>
+          <div class="tishi">注：销售定价不可低于折后成本价</div>
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">是否上架：</div>
@@ -183,7 +183,7 @@ export default {
     },
     _setAgencySure() {
       this._chekStaus()
-      if (!this.money || this.money < this.nowRow.origin_price) {
+      if (!this.money || this.money < this.nowRow.real_origin_price) {
         this.$parent._open('销售价需大于成本价')
         return false
       }

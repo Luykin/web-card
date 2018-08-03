@@ -11,7 +11,12 @@ const appConfig = {
     'titleColor': '#d94d37',
     'sbbBg': '#ffe8d2',
     'sbbFont': '#d94d37',
-    'serviceBg': '#dfe1e5'
+    'serviceBg': '#dfe1e5',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png'
   },
   '60002': {
     'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
@@ -24,7 +29,12 @@ const appConfig = {
     'titleColor': '#d94d37',
     'sbbBg': '#ffe8d2',
     'sbbFont': '#d94d37',
-    'serviceBg': '#dfe1e5'
+    'serviceBg': '#dfe1e5',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png'
   },
   '60003': {
     'logo': 'http://pbfntaxkx.bkt.clouddn.com/%E9%80%A0%E6%98%9F%E7%8C%ABlogo.png',
@@ -37,7 +47,12 @@ const appConfig = {
     'titleColor': '#FB7726',
     'sbbBg': '#FFD185',
     'sbbFont': '#C87D00',
-    'serviceBg': '#F0EEEA'
+    'serviceBg': '#F0EEEA',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png'
   },
   '60004': {
     'logo': 'http://pbfntaxkx.bkt.clouddn.com/%E7%BD%91%E7%BA%A2%E6%A2%A6%E5%B7%A5%E5%8E%82logo.png',
@@ -50,7 +65,12 @@ const appConfig = {
     'titleColor': '#006DFB',
     'sbbBg': '#63AEDE',
     'sbbFont': '#fff',
-    'serviceBg': '#DEEEF7'
+    'serviceBg': '#DEEEF7',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png'
   },
   '60005': {
     'logo': 'http://p7o5mvmp4.bkt.clouddn.com/%E8%B6%A3%E8%B5%9Elogo.png',
@@ -63,7 +83,35 @@ const appConfig = {
     'titleColor': '#DB472F',
     'sbbBg': '#FFE5C8',
     'sbbFont': '#DA472F',
-    'serviceBg': '#F0EEEA'
+    'serviceBg': '#F0EEEA',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png'
   },
+  '60006': {
+    'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
+    'bg': 'http://p7o5mvmp4.bkt.clouddn.com/wallhaven-660526.jpg',
+    'agentBg': 'http://p70pqu6ys.bkt.clouddn.com/siteBg.png',
+    'seo': null,
+    'number': '渝ICP备18002374号-6',
+    'mainColor': '#FFA800',
+    'btnColor': '#fff',
+    'titleColor': '#FFA800',
+    'sbbBg': '#ffe8d2',
+    'sbbFont': '#d94d37',
+    'serviceBg': '#dfe1e5',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/1533290398.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/1533290682.png'
+  }
+}
+export function changeIndex(uaid, index) {
+  console.log(index)
+  appConfig[uaid].index = index
+  console.log(appConfig[uaid])
 }
 export const NOWCONFIG = appConfig[UAID]

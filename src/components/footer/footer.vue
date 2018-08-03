@@ -9,14 +9,17 @@
         <div class="footer-right-item flex" v-if="name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E8%81%94%E7%B3%BB%E4%BA%BA.png" alt="联系人" class="footer-right-icon"> {{name}}
         </div>
-        <div class="footer-right-item flex" v-if="!name">
+        <!--         <div class="footer-right-item flex" v-if="!name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%94%B5%E8%AF%9D.png" alt="电话" class="footer-right-icon"> {{phone}}
-        </div>
+        </div> -->
         <div class="footer-right-item flex">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%82%AE%E4%BB%B6.png" alt="邮件" class="footer-right-icon"> {{emil}}
         </div>
         <div class="footer-right-item flex" v-if="!name">
           <img src="http://p70pqu6ys.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1.png" alt="微信" class="footer-right-icon"> {{wx}}
+        </div>
+        <div class="footer-right-item flex" v-if="!name">
+          <img src="http://p70pqu6ys.bkt.clouddn.com/QQ.png" alt="QQ" class="footer-right-icon"> {{nowconfig.customerQQ}}
         </div>
       </div>
     </div>
@@ -26,9 +29,9 @@
     <div class="h-footer-box flex sh-phone">联系邮箱：{{emil}}</div>
     <div class="border-f sh-phone"></div>
     <div class="h-footer-box flex sh-phone" v-show="!hid">商务联系：钟先生</div>
-    <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：raynor@melonblock.com</div>
+    <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：{{emil}}</div>
     <div class="h-footer-title flex sh-phone" v-show="!hid">商务联系</div>
-    <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">42428851</span></div>
+    <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">{{nowconfig.customerQQ}}</span></div>
   </footer>
 </template>
 <script type="text/javascript">
@@ -37,7 +40,7 @@ export default {
   data() {
     return {
       name: false,
-      emil: 'zhangheng@melonblock.com',
+      emil: '',
       phone: '13212399922',
       wx: 'fans10005',
       hid: null,
@@ -46,6 +49,7 @@ export default {
   },
   created() {
     this.nowconfig = NOWCONFIG
+    this.emil = NOWCONFIG.customeremil
     const that = this
     this.$root.eventHub.$on('footername', (footer) => {
       that.name = footer
@@ -153,6 +157,7 @@ export default {
 
 
 
+
 /*.max-length{
   width: 200px;
   }*/
@@ -188,6 +193,7 @@ export default {
 .c-y {
   color: #F0C030;
 }
+
 
 
 

@@ -1,18 +1,27 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+// import { NOWCONFIG } from 'api/appConfig'
 
 Vue.use(Router)
 
-export default new Router({
+// const config = NOWCONFIG
+
+const routerconst = new Router({
   routes: [{
       path: '/',
       redirect: '/index'
     },
     {
+      path: '/old-index',
+      name: 'old-index',
+      component: () =>
+        import (`components/index/index`)
+    },
+    {
       path: '/index',
       name: 'index',
       component: () =>
-        import ('components/index/index')
+        import (`components/index/new-index`)
     },
     {
       path: '/modify-password',
@@ -135,3 +144,4 @@ export default new Router({
     }
   ]
 })
+export default routerconst

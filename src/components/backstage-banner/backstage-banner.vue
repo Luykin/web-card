@@ -25,7 +25,7 @@
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
-<!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div> -->
+    <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div> -->
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
@@ -37,6 +37,7 @@
 </template>
 <script type="text/javascript">
 import { mapGetters } from 'vuex'
+import { NOWCONFIG } from 'api/appConfig'
 export default {
   data() {
     return {
@@ -52,7 +53,7 @@ export default {
       this.$root.eventHub.$emit('timeforsps')
       if (windowOpen) {
         if (!this.user.agency.sub_site) {
-          if (!this.user.agency_level) {
+          if (this.user.agency.level <= 0) {
             this.$parent.$parent._open('您的代理等级不够')
           } else {
             this.$root.eventHub.$emit('domain')
@@ -70,7 +71,7 @@ export default {
       }
     },
     _openQQ() {
-      window.open('http://wpa.qq.com/msgrd?v=3&uin=42428851&site=qq&menu=yes', '_brank')
+      window.open(`http://wpa.qq.com/msgrd?v=3&uin=${NOWCONFIG.customerQQ}&site=qq&menu=yes`, '_brank')
     }
   },
   computed: {
@@ -96,6 +97,7 @@ export default {
 
 </script>
 <style type="text/css" scoped>
+
 .notice {
   position: absolute;
   right: 0;
@@ -132,16 +134,20 @@ export default {
   background: #fff;
   border: 1px solid #FFDA5B;
   border-radius: 5px;
-/*  margin: 0 6%*/
+  /*  margin: 0 6%*/
 }
-.db-btn-left{
+
+.db-btn-left {
   margin-right: 10%;
 }
-.db-btn:hover{
+
+.db-btn:hover {
   background: #FFD236;
   cursor: pointer;
 }
+
 .active-mg-btn {
   background: #FFD236;
 }
+
 </style>
