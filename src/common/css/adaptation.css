@@ -45,6 +45,7 @@
     opacity: 0 !important;
     padding: 0 !important;
     margin: 0 !important;
+    min-height: 0 !important;
     z-index: -999 !important;
   }
   .new-footer {
@@ -62,6 +63,9 @@
   }
   .cq-right {
     width: 60%;
+  }
+  .back-title{
+    text-indent: 20px;
   }
 }
 
@@ -86,7 +90,7 @@
     opacity: 0;
   }
   .new-footer {
-    height: 240px;
+    height: 200px;
     width: 90%;
     padding: 15px 5%;
     background: #fff;
@@ -115,9 +119,23 @@
   .business-item {
     height: 70px;
   }
-  .agreement-content {
-    max-height: 350px;
+  .goods-boxA{
+    width: 77% !important;
+    margin: 20px 0 0 23% !important;
   }
+  .agreement-content{
+    width: 96% !important;
+  }
+  .r-i-warp{
+    margin: 0 8px 0 0 !important;
+  }
+  .none-bg{
+    transform: translate(-12%, 0);
+    width: 100% !important;
+  }
+/*  .aib-input-warp{
+    width: 100% !important;
+  }*/
   .agent-body-privilege-one {
     flex-wrap: wrap !important;
     padding: 0 2% !important;
@@ -140,6 +158,7 @@
     font-size: 13px !important;
   }
   .agree-label {
+    min-width: 0px !important;
     font-size: 13px !important;
     justify-content: flex-end !important;
   }
@@ -158,6 +177,41 @@
     max-width: 21%;
     flex-grow: 1;
     margin: 20px 0;
+  }
+  .sp-tips{
+    margin: 0 20px 0 10px !important;
+  }
+  .good-item{
+    min-width: 100px;
+  }
+  .rbta-input-warp{
+    width: 90% !important;
+  }
+  .titps-domain{
+    margin: 0 auto;
+    width: 90% !important;
+    line-height: 20px;
+  }
+  .cb-right{
+    width: 95% !important;
+  }
+  .income-box-item{
+    width: 35% !important;
+    padding-bottom: 35% !important;
+    margin: 10px !important;
+  }
+  .income-box{
+    flex-wrap: wrap;
+  }
+  .edit-logo{
+    min-width: 140px;
+    padding-top: 50px !important;
+  }
+  .edit-content{
+    width: 100% !important;
+  }
+  .edit-box{
+    padding-top: 10px !important;
   }
 }
 

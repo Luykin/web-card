@@ -17,7 +17,7 @@
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002 && !showDL" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none/cont1" v-show="user && $route.name != 'management'">
@@ -114,10 +114,10 @@
             <!-- <el-menu-item index="/official">
               <i class="iconfont icon-tijiaodingdan"></i>主页
             </el-menu-item> -->
-            <el-menu-item index="/old-index">
+            <el-menu-item index="/old-index" v-show="!$root.pageData">
               <i class="iconfont icon-tijiaodingdan"></i>{{env}}
             </el-menu-item>
-            <el-menu-item index="/order" v-show="user">
+            <el-menu-item index="/order" v-show="user && !$root.pageData">
               <i class="iconfont icon-unie64a"></i> 我的订单
             </el-menu-item>
             <!--           <el-menu-item index="/score-record" v-show="user">
@@ -127,9 +127,49 @@
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002">
+            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && !$root.pageData && uaid !== 60002 && !showDL">
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
+            </el-menu-item>
+            <el-menu-item index="/backstage" v-show="showDL">
+              <i class="iconfont icon-dailishang"></i>
+              <div class="log-out">代理后台</div>
+            </el-menu-item>
+            <el-menu-item index="/recharge" v-show="showDL && $root.pageData === 1">
+              <i class="iconfont icon-chongzhi"></i>
+              <div class="log-out">充值</div>
+            </el-menu-item>
+            <el-menu-item index="/reflectforbk" v-show="showDL && $root.pageData === 1">
+              <i class="iconfont icon-yuejietixian"></i>
+              <div class="log-out">提现</div>
+            </el-menu-item>
+            <el-menu-item index="/none/management" v-show="showDL && $root.pageData" class='disable'>
+              <i class="iconfont icon-icon-test"></i>
+              <div class="log-out" @click="_emit('headerToDl','/management')">分站管理</div>
+            </el-menu-item>
+            <el-menu-item index="/bg-task-record" v-show="showDL && $root.pageData === 1">
+              <i class="iconfont icon-renwu"></i>
+              <div class="log-out">任务列表</div>
+            </el-menu-item>
+            <el-menu-item index="/bg-money-record" v-show="showDL && $root.pageData === 1">
+              <i class="iconfont icon-1"></i>
+              <div class="log-out">充值记录</div>
+            </el-menu-item>
+            <el-menu-item index="/goodsManage" v-show="showDL && $root.pageData === 2">
+              <i class="iconfont icon-shangpin"></i>
+              <div class="log-out">商品管理</div>
+            </el-menu-item>
+            <el-menu-item index="/task" v-show="showDL && $root.pageData === 2">
+              <i class="iconfont icon-jilu"></i>
+              <div class="log-out">分站任务</div>
+            </el-menu-item>
+            <el-menu-item index="/none/kefu" v-show="showDL && $root.pageData === 1" class='disable'>
+              <i class="iconfont icon-kefu"></i>
+              <div class="log-out" @click="_emit('openqq',false)">客服帮助</div>
+            </el-menu-item>
+            <el-menu-item index="/none/fapiao" v-show="showDL && $root.pageData === 1" class='disable'>
+              <i class="iconfont icon-fapiao"></i>
+              <div class="log-out" @click="_emit('openqq',false)">发票申请</div>
             </el-menu-item>
             <el-submenu v-show="user" index="5">
               <template slot="title">
@@ -399,6 +439,12 @@ export default {
     this.$root.eventHub.$on('domain', () => {
       this._setDomain()
     })
+    // this.$root.eventHub.$on('loaddl', (data) => {
+    //   this.LoadDL = !data
+    // })
+    // this.$root.eventHub.$on('loadfz', (data) => {
+    //   this.LoadFZ = !data
+    // })
     this.$root.eventHub.$on('logo', (src) => {
       this._setLogo(src)
       this._FENZAN()
@@ -410,6 +456,9 @@ export default {
     this.activePayType = 'wx'
   },
   computed: {
+    showDL() {
+      return this.user.is_agency && this.user.agency && this.user.agency.level > -1
+    },
     choseGood() {
       if (this.choseGoodId > -1) {
         let ret = false
@@ -457,6 +506,9 @@ export default {
     ])
   },
   methods: {
+    _emit(name, info) {
+      this.$root.eventHub.$emit(name, info)
+    },
     toZX() {
       window.location.href = NOWCONFIG.seo + '/login'
     },
@@ -1097,6 +1149,14 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1161,6 +1221,14 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -1240,7 +1308,7 @@ export default {
   width: 82%;
   height: auto;
   min-height: 20px;
-  /*  max-height: 500px;*/
+  max-height: 450px;
   margin: 20px auto 100px;
   font-size: 15px;
   line-height: 26px;

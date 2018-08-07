@@ -28,8 +28,7 @@ export default {
       rootHtml: null
     }
   },
-  created() {
-  },
+  created() {},
   mounted() {
     this.rootHtml = document.documentElement
     this.rootHtml.style.display = 'none'
@@ -92,6 +91,7 @@ export default {
 @import url(common/css/reset.css);
 @import url(common/icon/iconfont.css);
 @import url(common/icon_add/iconfont.css);
+@import url(common/icon_phone/iconfont.css);
 @import url(common/css/adaptation.css);
 @import url(common/css/important.css);
 

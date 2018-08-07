@@ -116,7 +116,7 @@ export default {
   },
   created() {
     this.$root.eventHub.$emit('user')
-    // this.$root.eventHub.$emit('siteInit')
+    // this.$root.eventHub.$emit('loadfz')
     this.$root.eventHub.$on('siteInit', () => {
       this._siteInit()
     })

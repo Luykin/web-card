@@ -7,7 +7,7 @@
       <!--  右侧边栏end -->
       <!--       <div class="partition"></div> -->
       <div class="goods-table" v-if="tableData">
-        <div class="income-box flex" v-if="siteInfo">
+        <div class="income-box flex shpc" v-if="siteInfo">
           <div class="income-box-item cursor">
             <div class="position-ibi-content flex">
               <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%8A%E6%97%A5%E6%94%B6%E7%9B%8A.png" class="pic-img">

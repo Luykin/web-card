@@ -2,30 +2,33 @@
   <div id="main-body" ref='mainbody' @click="_mainBody">
     <div class="main-box flex" id="main-box" v-if="user">
       <b-agent></b-agent>
-      <div class="back-servce-box">
+      <div class="back-servce-box shpc">
         <div class="service-item flex title-bsb">业务选择</div>
         <div v-for="item in app.service_categories" class="service-item flex cursor" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
           {{item.label}}
           <i class="active-icon el-icon-d-arrow-right shpc"></i>
         </div>
       </div>
-      <div class="segmenting-line"></div>
+      <div class="segmenting-line shpc"></div>
       <div class="back-servce-info" v-loading='loading'>
-        <!-- <div class="course" v-if="showService && nowServices">{{nowServices.tips}}</div> -->
-        <!--         <div class="cr-item flex">
-          <div class="cr-box-tit ellipsis flex">分站名称:</div>
-          <div class="cr-box-min flex">{{user.agency.sub_site.site_name}}</div>
-          <div class="cr-box-btn mg-btn flex cursor" @click="toEdit">分站编辑</div>
-        </div> -->
+        <div class="main-box-header flex sh-phone">
+          <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
+            <img :src="item.icon" class="mbh-icon" v-if="item.icon">
+            <div v-else class="mbh-icon"></div>
+            <div class="mbh-label flex">{{item.label}}</div>
+          </div>
+        </div>
         <div v-if="nowServices">
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">首页公告:</div>
-            <div class="cr-box-max flex" v-html="nowServices.tips">
+            <!-- <div class="cr-box-tit ellipsis flex back-title">首页公告:</div> -->
+            <div class="cr-box-max flex sp-tips">
+              <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
+              <div v-html="nowServices.tips"></div>
             </div>
           </div>
           <div class="cr-st-line"></div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">商品选择:</div>
+            <div class="cr-box-tit ellipsis flex back-title">商品选择:</div>
             <div class="cr-box-min flex margin-right cursor" @click.stop="_choseservce">
               {{nowServices.label}}
               <div class="select-servce flex" v-show="showSC">
@@ -35,7 +38,7 @@
             </div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">{{nowServices.form || '链接输入'}}:</div>
+            <div class="cr-box-tit ellipsis flex back-title">{{nowServices.form || '链接输入'}}:</div>
             <div class="cr-box-min flex margin-right">
               <div class="flex input-defult">
                 <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
@@ -64,7 +67,7 @@
               < 10 ? '获取说说': '查看教程'}} </el-button>
           </div>
           <div class="cr-item flex" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
-            <div class="cr-box-tit ellipsis flex">预约时间:</div>
+            <div class="cr-box-tit ellipsis flex back-title">预约时间:</div>
             <div class="cr-box-min flex margin-right over-hidden">
               <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd' ref='pickerD'>
               </el-date-picker>
@@ -74,7 +77,7 @@
             </div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">商品数量:</div>
+            <div class="cr-box-tit ellipsis flex back-title">商品数量:</div>
             <div class="cr-box-min flex margin-right">
               <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
                 <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
@@ -84,14 +87,16 @@
             </div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">所需金额:</div>
+            <div class="cr-box-tit ellipsis flex back-title">所需金额:</div>
             <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">代理折后:</div>
+            <div class="cr-box-tit ellipsis flex back-title">代理折后:</div>
             <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level? user.agency_level.discount || 1 : 1 )*10 + '折'}} = {{agencyPrice + '元'}}</div>
           </div>
-          <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
+          <div class="chose-box ellipsis flex" v-if="suosuo">{{suosuo}}</div>
+          <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
+          <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0">提交订单</div>
         </div>
       </div>
     </div>
@@ -127,7 +132,9 @@ export default {
       position: 'right',
       closeName: '关闭',
       popoverWidth: 950,
-      nowServicesCategory: ''
+      nowServicesCategory: '',
+      targetid: null,
+      suosuo: null,
     }
   },
   created() {
@@ -145,7 +152,18 @@ export default {
     } else {
       this._initNet()
     }
+    // this.$root.eventHub.$emit('loaddl')
+    // this.$root.eventHub.$emit('loadfz', true)
     this._updataUser()
+    this._setPopoverWidth()
+  },
+  updated() {
+    this.$nextTick(() => {
+      if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
+        this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
+        this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
+      }
+    })
   },
   computed: {
     placeholder() {
@@ -194,6 +212,13 @@ export default {
   //   })
   // },
   methods: {
+    _choseSayList(item) {
+      this.$refs.quantityInput.click()
+      if (item) {
+        this.targetid = item.tid
+        this.suosuo = item.content
+      }
+    },
     _updataUser() {
       if (!this.checkTock()) {
         return false
@@ -267,6 +292,22 @@ export default {
           this.popoverWidth = 240
         }
         this.position = 'right-start'
+      }
+    },
+    browserRedirect() {
+      const sUserAgent = navigator.userAgent.toLowerCase()
+      const bIsIpad = sUserAgent.match(/ipad/i) == "ipad"
+      const bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os"
+      const bIsMidp = sUserAgent.match(/midp/i) == "midp"
+      const bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4"
+      const bIsUc = sUserAgent.match(/ucweb/i) == "ucweb"
+      const bIsAndroid = sUserAgent.match(/android/i) == "android"
+      const bIsCE = sUserAgent.match(/windows ce/i) == "windows ce"
+      const bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile"
+      if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+        return false
+      } else {
+        return true
       }
     },
     _initNet() {
@@ -537,7 +578,7 @@ export default {
         this.$root.eventHub.$emit('updateOrder')
         this.$root.eventHub.$emit('canvas', true)
         this.$router.replace({
-          path: '/order'
+          path: '/bg-task-record'
         })
         if (!this.checkTock()) {
           return false
@@ -576,6 +617,110 @@ export default {
 
 </script>
 <style type="text/css" scoped>
+.mbh-item {
+  height: 65px;
+  min-width: 60px;
+  max-width: 70px;
+  flex-grow: 1;
+  width: auto;
+  flex-wrap: wrap;
+  align-content: center;
+  position: relative;
+}
+
+
+
+
+
+
+
+
+/*.activeCategory {
+  background: #ff6b4e;
+  background: var(--main-color);
+}*/
+
+@keyframes activeCategory {
+  0% {
+    background: #dcdcdc;
+  }
+  100% {
+    background: #ff9430;
+  }
+}
+
+@keyframes labelColor {
+  0% {
+    color: #666;
+  }
+  100% {
+    color: #fff;
+  }
+}
+
+.mbh-item:hover {
+  cursor: pointer;
+}
+
+.mbh-item:hover .mbh-label {
+  animation: color .2s ease 1 forwards;
+}
+
+.activeCategory .mbh-label {
+  color: #fff;
+  /*animation: labelColor .35s ease 1 forwards;*/
+}
+
+.activeCategory:hover .mbh-label {
+  animation: none;
+  color: #fff !important;
+}
+
+.chose-box {
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+  margin: 0 auto -20px;
+  text-indent: 20px;
+  color: #FF9C1A;
+}
+
+.mbh-icon {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 12%;
+  transform: translate(-50%, 0);
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+}
+
+.mbh-label {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 12%;
+  transform: translate(-50%, 0);
+  width: 100%;
+  flex-shrink: 0;
+  color: #666;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.main-box-header {
+  width: 100%;
+  width: calc(100% + 10px);
+  margin-left: -10px;
+  min-height: 65px;
+  height: auto;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  background: #dfe1e5;
+  background: var(--service-bg);
+}
+
 .main-box {
   justify-content: flex-start;
   align-items: flex-start;
@@ -591,7 +736,7 @@ export default {
 }
 
 .back-servce-info {
-  padding-left: 20px;
+  padding-left: 10px;
   width: 0;
   flex-grow: 1;
   height: auto;
@@ -608,6 +753,7 @@ export default {
 }
 
 .cr-box-tit {
+  justify-content: flex-start;
   flex-shrink: 0;
 }
 
@@ -620,10 +766,31 @@ export default {
   position: relative;
 }
 
+.weihu-btn {
+  /*margin-left: 6%;*/
+  width: 90px;
+  padding: 0 5%;
+  height: 45px;
+  margin: 40px auto -20px;
+  background: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, .2);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, .2);
+  color: #fff;
+  font-size: 14px;
+  cursor: no-drop;
+}
+
+
 .activeCategory {
   border-left: 5px solid rgba(255, 210, 54, 1);
   text-indent: -4px;
   background: #F4F4F4;
+}
+
+.sh-phone .activeCategory {
+  text-indent: 0;
+  border-left: none;
+  background: #FF9C1A;
 }
 
 .active-icon {
@@ -647,14 +814,20 @@ export default {
 
 .cr-box-max {
   padding: 1%;
+  margin: 0 20px 0 30px;
   border: 1px solid #DFDFDF;
   text-indent: 0px;
 }
 
 .cr-box-min {
+  width: 0;
   border: 1px solid #DFDFDF;
   margin: 0 20px 0 10px;
   position: relative;
+}
+
+.i-ipnput {
+  min-width: 0;
 }
 
 .select-servce {
@@ -784,8 +957,8 @@ export default {
   line-height: 0px !important;
   background: #FFD236 !important;
   color: #353535;
-  font-size: 15px;
-  padding: 0;
+  font-size: 1rem;
+  padding: 0 10px;
   border: none !important;
   margin-right: 20px;
 }
@@ -829,6 +1002,13 @@ export default {
 
 .over-hidden {
   overflow: hidden;
+}
+
+.course-img-icon {
+  width: 65px;
+  height: auto;
+  margin: 0 5px;
+  transform: translate(-10%, 0);
 }
 
 </style>

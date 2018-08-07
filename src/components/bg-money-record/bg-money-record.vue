@@ -50,6 +50,7 @@ export default {
       this._getOrders()
     })
     this._getOrders()
+    // this.$root.eventHub.$emit('loaddl')
     this.$root.eventHub.$emit('canvas')
   },
   computed: {

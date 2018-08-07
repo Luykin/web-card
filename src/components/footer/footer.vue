@@ -24,12 +24,13 @@
       </div>
     </div>
     <div class="new-footer-bottom flex shpc">© Melon Tech Design. all rights reserved. Powered by Melon Tech.. <a href="http://www.miitbeian.gov.cn" class="footer-to-gx" target="_blank">{{nowconfig.number}}</a></div>
-    <div class="h-footer-title flex sh-phone">商务合作</div>
+    <div class="h-footer-title flex sh-phone">联系我们</div>
     <!-- <div class="h-footer-box flex sh-phone">商务联系：{{name}}</div> -->
     <div class="h-footer-box flex sh-phone">联系邮箱：{{emil}}</div>
+    <div class="h-footer-box flex sh-phone">客服微信：{{wx}}</div>
     <div class="border-f sh-phone"></div>
-    <div class="h-footer-box flex sh-phone" v-show="!hid">商务联系：钟先生</div>
-    <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：{{emil}}</div>
+<!--     <div class="h-footer-box flex sh-phone" v-show="!hid">商务联系：钟先生</div>
+    <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：{{emil}}</div> -->
     <div class="h-footer-title flex sh-phone" v-show="!hid">商务联系</div>
     <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">{{nowconfig.customerQQ}}</span></div>
   </footer>

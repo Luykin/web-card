@@ -4,7 +4,7 @@
       <b-agent></b-agent>
       <div class="configure-box flex">
         <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">我的提现账户:</div>
+          <div class="cbi-name flex ellipsis">提现账户:</div>
           <div class="cbi-input-box flex disable-i">
             <span>{{nowAccount ? nowAccount.account :  '去绑定'}}</span>
           </div>
@@ -29,10 +29,11 @@
           <div class="cbi-name flex ellipsis">提现金额:</div>
           <div class="cbi-input-box flex disable-i">
             <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
-            <div class="poundage flex">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div>
+            <div class="poundage flex shpc">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div>
           </div>
           <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
         </div>
+        <div class="phone-poundage sh-phone">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div>
       </div>
       <div class="show-line"></div>
       <div class="goods-table">
@@ -62,15 +63,15 @@
       <div class="recharge-box-title-agent flex">绑定提现账户</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">提现方式：</div>
+          <div class="aib-label flex ellipsis shpc">提现方式：</div>
           <div class="flex aib-input-warp none-bg">
-            <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img"> 支付宝
             </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type==2?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(2)" :class="wh_type==2?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img"> 微信
             </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(3)" :class="wh_type==3?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(3)" :class="wh_type==3?'active-riw':''">
               <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%93%B6%E8%A1%8C%E5%8D%A1%E5%9B%BE%E6%A0%87.png" class="riw-img"> 银行卡
             </div>
           </div>
@@ -722,7 +723,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   min-width: 80px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .cbi-input-box {
@@ -799,7 +800,7 @@ export default {
   color: #353535;
   border-radius: 5px;
   min-width: 70px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .edit-input {
@@ -873,6 +874,7 @@ export default {
 .aib-label {
   height: 100%;
   width: 20%;
+  min-width: 90px;
 }
 
 .aib-input-warp {
@@ -941,6 +943,7 @@ export default {
 
 .btn-yan {
   width: 25%;
+  padding: 0 2%;
   height: 70%;
   background: #FFD236;
   color: #353535;
@@ -1004,5 +1007,10 @@ export default {
   margin-bottom: 20px;
   text-indent: 2px;
 }
-
+.phone-poundage{
+  width: 100%;
+  height: 40px;
+  line-height: 20px;
+  color: #FF9100;
+}
 </style>

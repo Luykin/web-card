@@ -175,8 +175,8 @@ export default {
       activeCategory: false,
       activePayType: null,
       showService: false,
-      targetid: false,
-      suosuo: false,
+      targetid: null,
+      suosuo: null,
       lodingS: false,
       scorerate: false, // 一元购买多少积分
       pc: true,
@@ -214,15 +214,15 @@ export default {
     })
     this.$root.eventHub.$emit('canvas')
   },
-  updated() {
-    this.$nextTick(() => {
-      if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
-        this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
-        this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
-      }
-    })
-    this.pcOrphone()
-  },
+  // updated() {
+  //   this.$nextTick(() => {
+  //     if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
+  //       this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
+  //       this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
+  //     }
+  //   })
+  //   // this.pcOrphone()
+  // },
   computed: {
     // nowServices() {
     //   let nowServer = {
@@ -278,13 +278,6 @@ export default {
     ])
   },
   methods: {
-    pcOrphone() {
-      if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
-        this.$router.replace({
-          path: '/old-index'
-        })
-      } else {}
-    },
     _latestTasks() {
       latestTasks().then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
@@ -1262,6 +1255,7 @@ export default {
 .goods-boxA {
   height: auto;
   width: 88%;
+  padding-left: 5px;
   flex-grow: 1;
   overflow: hidden;
   justify-content: flex-start;

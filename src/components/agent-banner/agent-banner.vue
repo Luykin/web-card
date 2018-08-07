@@ -39,7 +39,10 @@ export default {
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
   },
-  created() {},
+  created() {
+    // this.$root.eventHub.$emit('loaddl', true)
+    // this.$root.eventHub.$emit('loadfz')
+  },
   methods: {
     _openc(url, show) {
       if (show) {

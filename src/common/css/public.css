@@ -81,7 +81,7 @@
   flex-grow: 1;
   font-size: 15px;
   /*text-indent: 15px;*/
-  min-width: 200px;
+  min-width: 120px;
   color: #333 !important;
 }
 
@@ -415,5 +415,5 @@
   width: 15%;
   height: 100%;
   min-width: 60px;
-  font-size: 15px;
+  font-size: 1rem;
 }

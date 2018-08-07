@@ -4,7 +4,7 @@
       <div class="edit-logo" :style="siteLogo">
         <input type="file" name="selectLogo" class="file-input" ref="fileInput" @change='_uplodeQiniu'>
         <div class="jindu flex">{{Process}}</div>
-        <div class="zushi">注：推荐尺寸150*45图片，不能超过1M。</div>
+        <div class="zushi shpc">注：推荐尺寸150*45图片，不能超过1M。</div>
       </div>
       <div class="cr-item flex">
         <div class="cr-box-tit ellipsis flex">分站名称:</div>
@@ -402,6 +402,7 @@ export default {
 
 .cr-box-max {
   min-height: 100px;
+  width: 60%;
   height: auto;
   margin: 0 10px;
   border-radius: 5px;
@@ -421,7 +422,7 @@ export default {
   max-width: 80px;
   height: 100%;
   margin: 0 3%;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .file-input {

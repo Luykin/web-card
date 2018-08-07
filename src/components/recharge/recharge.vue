@@ -31,7 +31,7 @@
         <div class="btn-back flex cursor" @click="_addOrder">确认充值</div>
       </div>
       <div class="content-qr flex" v-show="payUrl && page === 1">
-        <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
+        <div class="code-div flex ellipsis">订单号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
         </div>
         <div class="qrcode-box flex">
           <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
@@ -224,7 +224,7 @@ export default {
         this.payUrl = res.data.data.pay_url
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
-          this.payUrl = false
+          // this.payUrl = false
           this._surePaySuc(this.code)
           this.timeforCumt++
             if (this.timeforCumt >= 70) {
@@ -248,6 +248,7 @@ export default {
         getOrders(this.token, 11, 0, code).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {
             if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
+              this.payUrl = false
               this.$parent._open('支付成功！')
               this._clearTimeforSPS()
               this._sureCompletionPayment()
@@ -285,7 +286,9 @@ export default {
   padding-bottom: 20px;
   justify-content: flex-start;
 }
-
+.cr-box-tit{
+  min-width: 70px;
+}
 .recharge-title {
   height: 55px;
   width: 100%;
@@ -294,6 +297,7 @@ export default {
 }
 
 .recharge-title-item {
+  min-width: 120px;
   width: 20%;
   height: 100%;
 }
@@ -457,7 +461,7 @@ export default {
 
 .good-item {
   box-sizing: border-box;
-  min-width: 75px;
+/*  min-width: 100px;*/
   max-width: 28.33%;
   width: 75px;
   height: 75px;

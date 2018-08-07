@@ -105,10 +105,11 @@
             <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
           </div> -->
           <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
-            <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+ consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</span>
+            <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理所需积分{{' : '+ consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</span>
           </div>
         </div>
-        <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService">提交订单</div>
+        <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
+        <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0">提交订单</div>
         <div class="index-bootom-height"></div>
         <!-- loading 结束 -->
       </div>
@@ -175,20 +176,22 @@ export default {
         this.$root.eventHub.$emit('user')
       })
     }
+    // this.$root.eventHub.$emit('loaddl', true)
+    // this.$root.eventHub.$emit('loadfz', true)
     this.$root.eventHub.$on('announcement', (announcement) => {
       this._setAnnouncement(announcement)
     })
     this.$root.eventHub.$emit('canvas')
   },
-  updated() {
-    this.$nextTick(() => {
-      if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
-        this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
-        this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
-      }
-    })
-    this.pcOrphone()
-  },
+  // updated() {
+  //   this.$nextTick(() => {
+  //     if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
+  //       this.$refs.pcCourse.style.width = `${BILI * window.screen.height}px`
+  //       this.$refs.pcCourse.style.height = `${BILI * window.screen.height}px`
+  //     }
+  //   })
+  //   // this.pcOrphone()
+  // },
   computed: {
     nowServices() {
       let nowServer = {
@@ -770,6 +773,26 @@ export default {
   border-bottom: 1px solid #ff9430;
 }
 
+
+.weihu-btn {
+  /*margin-left: 6%;*/
+  max-width: 60px;
+  min-width: 30px;
+  height: 45px;
+  padding: 0 5%;
+  flex-grow: 0;
+  word-spacing: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  background: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, .2);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, .2);
+  color: #fff;
+  font-size: 14px;
+  margin: 20px 5% 20px 6%;
+  cursor: no-drop;
+}
+
 .rule-hints {
   width: 90%;
   flex-grow: 1;
@@ -1049,6 +1072,8 @@ export default {
 .index-bootom-height {
   height: 10px;
 }
+
+
 
 
 

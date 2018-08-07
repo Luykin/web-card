@@ -722,7 +722,7 @@ export default {
   height: 100%;
   justify-content: flex-start;
   min-width: 80px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .cbi-input-box {
@@ -799,7 +799,7 @@ export default {
   color: #353535;
   border-radius: 5px;
   min-width: 70px;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .edit-input {
@@ -873,6 +873,7 @@ export default {
 .aib-label {
   height: 100%;
   width: 20%;
+  min-width: 90px;
 }
 
 .aib-input-warp {
@@ -941,6 +942,7 @@ export default {
 
 .btn-yan {
   width: 25%;
+  padding: 0 2%;
   height: 70%;
   background: #FFD236;
   color: #353535;
@@ -1004,5 +1006,10 @@ export default {
   margin-bottom: 20px;
   text-indent: 2px;
 }
-
+.phone-poundage{
+  width: 100%;
+  height: 40px;
+  line-height: 20px;
+  color: #FF9100;
+}
 </style>

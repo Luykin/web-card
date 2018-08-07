@@ -46,7 +46,14 @@ export default {
     }
   },
   created() {
-    // console.log('132321')
+    // this.$root.eventHub.$emit('loaddl')
+    // this.$root.eventHub.$emit('loadfz', true)
+    this.$root.eventHub.$on('headerToDl', (data) => {
+      this._openc(data, 1, true)
+    })
+    this.$root.eventHub.$on('openqq', (data) => {
+      this._openQQ()
+    })
   },
   methods: {
     _openc(url, show, windowOpen) {
@@ -97,7 +104,6 @@ export default {
 
 </script>
 <style type="text/css" scoped>
-
 .notice {
   position: absolute;
   right: 0;

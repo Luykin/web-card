@@ -21,8 +21,8 @@
         <i class="iconfont icon-fasongyoujian"></i>
         <input type="text" placeholder="验证码" class="i-ipnput code" id="code-input" v-model="code" @keyup.enter="_register">
         <div class="flex getcode">
-          <div class="flex getcode-btn cursor" @click="_getcode">{{time}}
-            <span v-if="time > 0">s后重新获取</span>
+          <div class="flex getcode-btn cursor ellipsis" @click="_getcode">{{time}}
+            <span v-if="time > 0">s后获取</span>
           </div>
         </div>
       </label>

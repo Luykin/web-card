@@ -20,6 +20,7 @@ new Vue({
   data: {
     eventHub: new Vue(),
     judge: null,
+    pageData: null,// 1为后台管理，2为分站管理
     errorCode: {
       '404': '资源不存在',
       '405': '系统繁忙',

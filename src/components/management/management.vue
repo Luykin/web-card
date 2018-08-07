@@ -3,7 +3,7 @@
     <div class="main-box" id="main-box" v-if="user">
       <m-agent></m-agent>
       <div class="configure-box flex" v-show="!showMingXi">
-        <div class="cb-left flex">
+        <div class="cb-left flex shpc">
           <div class="cb-left-logo" :style="siteLogo"></div>
         </div>
         <div class="cb-right" v-if="user.agency">
@@ -117,6 +117,8 @@
       }
     },
     created() {
+      // this.$root.eventHub.$emit('loaddl')
+      // this.$root.eventHub.$emit('loadfz')
       this.$root.eventHub.$emit('user')
       this.$root.eventHub.$on('showMX', (res) => {
         this._checkMX(res)
