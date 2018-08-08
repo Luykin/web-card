@@ -10,8 +10,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
-/* eslint-disable no-new */
-new Vue({
+
+const app = new Vue({
   el: '#app',
   router,
   store,
@@ -20,7 +20,7 @@ new Vue({
   data: {
     eventHub: new Vue(),
     judge: null,
-    pageData: null,// 1为后台管理，2为分站管理
+    pageData: null, // 1为后台管理，2为分站管理
     errorCode: {
       '404': '资源不存在',
       '405': '系统繁忙',
@@ -48,3 +48,6 @@ new Vue({
     }
   }
 })
+export function setpageData(value) {
+  app.pageData = value
+}

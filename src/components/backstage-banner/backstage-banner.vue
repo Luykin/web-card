@@ -33,14 +33,17 @@
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div> -->
     <!--    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->
+    <iframe :src="qqurl" width="0" height="0" v-if="qqurl" class="pay-iframe" @load="_closeSelf"></iframe>
   </div>
 </template>
 <script type="text/javascript">
 import { mapGetters } from 'vuex'
 import { NOWCONFIG } from 'api/appConfig'
+import { isPhone } from 'common/js/util'
 export default {
   data() {
     return {
+      qqurl: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -56,6 +59,12 @@ export default {
     })
   },
   methods: {
+    _closeSelf() {
+      const close = setTimeout(() => {
+        this.qqurl = null
+        clearTimeout(close)
+      },10000)
+    },
     _openc(url, show, windowOpen) {
       this.$root.eventHub.$emit('timeforsps')
       if (windowOpen) {
@@ -78,7 +87,16 @@ export default {
       }
     },
     _openQQ() {
-      window.open(`http://wpa.qq.com/msgrd?v=3&uin=${NOWCONFIG.customerQQ}&site=qq&menu=yes`, '_brank')
+      this.$parent.$parent._open('正在打开QQ,请稍候')
+      if (this.qqurl) {
+        this.qqurl = null
+      }
+      if (isPhone()) {
+        this.qqurl = 'http://qm.qq.com/cgi-bin/qm/qr?k=5DQm1DPl08H41RVOoQhgLesBwmnzLkgD'
+        // window.location.href = 'http://qm.qq.com/cgi-bin/qm/qr?k=5DQm1DPl08H41RVOoQhgLesBwmnzLkgD'
+      } else {
+        window.open(`https://wpa.qq.com/msgrd?v=3&uin=${NOWCONFIG.customerQQ}`, '_brank')
+      }
     }
   },
   computed: {
@@ -154,6 +172,11 @@ export default {
 
 .active-mg-btn {
   background: #FFD236;
+}
+
+.pay-iframe {
+  z-index: -1;
+  opacity: 0;
 }
 
 </style>

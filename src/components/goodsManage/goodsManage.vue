@@ -29,7 +29,7 @@
             </el-table-column>
             <el-table-column prop="behaviorA" label="商品状态">
             </el-table-column>
-            <el-table-column label="">
+            <el-table-column label=""  width="120">
               <template slot-scope="scope">
                 <!--  <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button> -->
                 <div class="good-btn flex cursor" @click="showPop(scope.row)" v-show="scope.row.behavior > 0">调整价格</div>
@@ -51,7 +51,7 @@
           </div>
         </div>
         <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">折后成本价：</div>
+          <div class="aib-label flex ellipsis">成本价：</div>
           <div class="flex aib-input-warp">
             <span v-if="nowRow">{{nowRow.real_origin_price}}</span>
           </div>
@@ -277,11 +277,11 @@ export default {
       this.$refs.popup._showPopup()
       this.$refs.interlayer._setZIndex(9999)
       this.$refs.interlayer._showLayer()
-      this.$nextTick(() => {
-        if (this.$refs.aibinput) {
-          this.$refs.aibinput.focus()
-        }
-      })
+      // this.$nextTick(() => {
+      //   if (this.$refs.aibinput) {
+      //     this.$refs.aibinput.focus()
+      //   }
+      // })
     },
     _showWH() {
       this.$parent._open('该商品临时维护，请关注平台公告')
@@ -613,7 +613,7 @@ export default {
   min-height: 20px;
   /*  max-height: 500px;*/
   margin: 20px auto 20px;
-  font-size: 15px;
+  font-size: 1rem;
   line-height: 26px;
   font-weight: normal;
   overflow-y: scroll;
@@ -633,7 +633,7 @@ export default {
 
 .aib-label {
   height: 100%;
-  width: 20%;
+  width: 25%;
 }
 
 .aib-input-warp {

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { setpageData } from '../main.js'
 // import { NOWCONFIG } from 'api/appConfig'
 
 Vue.use(Router)
@@ -82,7 +83,7 @@ const routerconst = new Router({
     {
       path: '/edit',
       name: 'management',
-      meta: { managementbg: true, management: true },
+      meta: { managementag: true, management: true },
       component: () =>
         import ('components/edit/edit')
     },
@@ -181,21 +182,16 @@ routerconst.beforeEach((to, from, next) => {
   }
 })
 routerconst.afterEach((to, from) => {
+  // console.log(this)
   if (to.matched.some(record => record.meta.management)) {
     if (to.matched.some(record => record.meta.managementbg)) {
-      if (this.a) {
-        this.a.app.pageData = 1
-      }
+      setpageData(1)
     }
     if (to.matched.some(record => record.meta.managementag)) {
-      if (this.a) {
-        this.a.app.pageData = 2
-      }
+      setpageData(2)
     }
   } else {
-    if (this.a) {
-      this.a.app.pageData = null
-    }
+    setpageData(null)
   }
 })
 export default routerconst

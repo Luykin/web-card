@@ -327,7 +327,7 @@
   width: 100%;
   margin-top: -15%;
   color: #353535;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .proxy-icon {

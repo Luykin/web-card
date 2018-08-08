@@ -31,14 +31,16 @@
             <div class="cr-box-tit ellipsis flex back-title">商品选择:</div>
             <div class="cr-box-min flex margin-right cursor" @click.stop="_choseservce">
               {{nowServices.label}}
-              <div class="select-servce flex" v-show="showSC">
-                <div class="select-servce-item flex" v-for="item in showService" @click="_nowServce(item)">{{item.label}}</div>
-              </div>
+              <el-collapse-transition>
+                <div class="select-servce flex" v-show="showSC">
+                  <div class="select-servce-item flex" v-for="item in showService" @click="_nowServce(item)">{{item.label}}</div>
+                </div>
+              </el-collapse-transition>
               <i class="el-icon-d-caret cr-box-icon"></i>
             </div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex back-title">{{nowServices.form || '链接输入'}}:</div>
+            <div class="cr-box-tit ellipsis flex back-title">任务信息:</div>
             <div class="cr-box-min flex margin-right">
               <div class="flex input-defult">
                 <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
@@ -63,7 +65,7 @@
                 <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
               </div>
             </el-popover>
-            <el-button v-popover:popover4 @click.stop="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">{{nowServices.category > 0&&nowServices.category
+            <el-button v-popover:popover4 @click.stop="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))" class="btn-zsy">{{nowServices.category > 0&&nowServices.category
               < 10 ? '获取说说': '查看教程'}} </el-button>
           </div>
           <div class="cr-item flex" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
@@ -100,6 +102,7 @@
         </div>
       </div>
     </div>
+    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
   </div>
 </template>
 <script type="text/javascript">
@@ -109,6 +112,7 @@ import BAgent from 'components/backstage-banner/backstage-banner'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken } from 'common/js/util'
 import { NOWCONFIG } from 'api/appConfig'
+import interlayer from 'base/interlayer/interlayer'
 const BILI = 0.8
 export default {
   data() {
@@ -152,6 +156,9 @@ export default {
     } else {
       this._initNet()
     }
+    this.$root.eventHub.$on('closeCourse', () => {
+      this._closeCourse()
+    })
     // this.$root.eventHub.$emit('loaddl')
     // this.$root.eventHub.$emit('loadfz', true)
     this._updataUser()
@@ -212,6 +219,10 @@ export default {
   //   })
   // },
   methods: {
+    _interlayerHide() {
+      this._closeCourse()
+      this.$refs.interlayer._hiddenLayer()
+    },
     _choseSayList(item) {
       this.$refs.quantityInput.click()
       if (item) {
@@ -262,6 +273,7 @@ export default {
     },
     _closeCourse() {
       this.$refs.elbutton.$el.click()
+      this.$refs.interlayer._hiddenLayer()
     },
     _getAppInfo(that) {
       getAppInfo().then((res) => {
@@ -354,7 +366,7 @@ export default {
       }
     },
     _choseShuoShuo(category) {
-      // console.log(category)
+      this.$refs.interlayer._showLayer()
       if (category !== 2 && category !== 4) {
         return
       }
@@ -611,12 +623,19 @@ export default {
     })
   },
   components: {
-    BAgent
+    BAgent,
+    interlayer
   },
 }
 
 </script>
 <style type="text/css" scoped>
+.cr-box-max {
+  height: auto;
+  align-content: center;
+  align-items: center;
+}
+
 .mbh-item {
   height: 65px;
   min-width: 60px;
@@ -627,6 +646,12 @@ export default {
   align-content: center;
   position: relative;
 }
+
+
+
+
+
+
 
 
 
@@ -1008,7 +1033,7 @@ export default {
   width: 65px;
   height: auto;
   margin: 0 5px;
-  transform: translate(-10%, 0);
+  transform: translate(-10%, -10%);
 }
 
 </style>

@@ -74,7 +74,6 @@
     width: 100%;
   }
   .notice {
-    display: none;
     opacity: 0;
   }
   .title-img {
@@ -212,6 +211,13 @@
   }
   .edit-box{
     padding-top: 10px !important;
+  }
+  .btn-zsy{
+    width: auto !important;
+    font-size: 13px !important;
+  }
+  .aib-label{
+    font-size: 13px !important;
   }
 }
 

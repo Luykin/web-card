@@ -177,7 +177,8 @@
               </template>
               <el-menu-item index="/none" class='phone-item disable' v-show="proxyRank">{{proxyRank}}</el-menu-item>
               <el-menu-item index="/none" class='phone-item disable'>{{userPhone}}</el-menu-item>
-              <!--               <el-menu-item index="/none" class='phone-item disable'><i class="iconfont icon-jifen"></i>我的积分<span class="green-text">{{user.score}}</span></el-menu-item> -->
+              <el-menu-item index="/none" class='phone-item disable' v-if="showDL && $root.pageData">我的余额：{{user.score}}</el-menu-item>
+              <el-menu-item index="/none" class='phone-item disable' v-if="showDL && $root.pageData">分站营业额：{{user.agency.balance}}</el-menu-item>
               <el-menu-item index="/modify-password">修改密码</el-menu-item>
               <el-menu-item index="/none" class='disable'>
                 <div class="log-out log-out-min" @click="_logout($event)">注销</div>
@@ -439,11 +440,8 @@ export default {
     this.$root.eventHub.$on('domain', () => {
       this._setDomain()
     })
-    // this.$root.eventHub.$on('loaddl', (data) => {
-    //   this.LoadDL = !data
-    // })
-    // this.$root.eventHub.$on('loadfz', (data) => {
-    //   this.LoadFZ = !data
+    // this.$root.eventHub.$on('layer', (data) => {
+    //   this._interlayer(data)
     // })
     this.$root.eventHub.$on('logo', (src) => {
       this._setLogo(src)
@@ -507,6 +505,9 @@ export default {
   },
   methods: {
     _emit(name, info) {
+      if (this.sidebar) {
+        this._hiddenSidebar()
+      }
       this.$root.eventHub.$emit(name, info)
     },
     toZX() {
@@ -630,6 +631,13 @@ export default {
         this.$refs.interlayer._setZIndex(1500)
       }
     },
+    // _interlayer(value) {
+    //   if (value) {
+    //     this.$refs.interlayer._showLayer()
+    //   } else {
+    //     this.$refs.interlayer._hiddenLayer()
+    //   }
+    // },
     _formatUserPhone(phone) {
       const start = phone.slice(0, 3)
       const end = phone.slice(-4)
@@ -908,6 +916,9 @@ export default {
       this.$router.replace({
         path: '/login'
       })
+      if (this.sidebar) {
+        this._hiddenSidebar()
+      }
       this.$root.eventHub.$emit('canvas', true)
     },
     _toIndex() {
@@ -1035,6 +1046,7 @@ export default {
         this.$refs.sidebar._hiddenSidebar()
         this.$refs.interlayer._hiddenLayer()
       }
+      // this.$root.eventHub.$emit('closeCourse')
     },
     handleSelect(key, keyPath) {
       this.$root.eventHub.$emit('canvas')
@@ -1157,6 +1169,8 @@ export default {
 
 
 
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1221,6 +1235,8 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
 
 
 

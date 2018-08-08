@@ -27,7 +27,7 @@
             <input type="text" :placeholder="'请输入充值金额（元）'" class="recharge-input" v-model="money" ref='input' @keyup="_rectifyMoney" @focus='_inputFocus' @blur='_inputBlur' :class="{'inputFocus' : inputFocus}" @keyup.enter="_addOrder" autocomplete='off' autofocus='on'>
           </div>
         </div>
-        <div class="min-tips-text flex">最小充值金额为{{Math.ceil(app.min_recharge)}}元。</div>
+        <div class="min-tips-text flex">最小充值金额为{{app.min_recharge}}元。</div>
         <div class="btn-back flex cursor" @click="_addOrder">确认充值</div>
       </div>
       <div class="content-qr flex" v-show="payUrl && page === 1">
@@ -58,6 +58,7 @@
         </el-table>
       </div>
     </div>
+    <iframe :src="payUrl" width="0" height="0" v-if="payUrl && ifreamPayurl" class="pay-iframe"></iframe>
   </div>
 </template>
 <script>
@@ -69,6 +70,7 @@ import { testToken } from 'common/js/util'
 import { addOrder } from 'api/header'
 import QrcodeVue from 'qrcode.vue'
 import { getOrders } from 'api/score-record'
+import { isPhone } from 'common/js/util'
 export default {
   data() {
     return {
@@ -81,6 +83,7 @@ export default {
       payUrl: false,
       page: 1,
       _timeforSPS: null,
+      ifreamPayurl: null,
       timeforCumt: 0,
       tableData: [
         { label: '中国农业银行', code: '6228480478794701878', name: '张恒' }
@@ -144,7 +147,8 @@ export default {
       this.$root.eventHub.$emit('canvas', true)
     },
     _cancel() {
-      this.payUrl = false
+      this.payUrl = null
+      this.ifreamPayurl = null
       this.money = ''
       this._clearTimeforSPS()
     },
@@ -201,8 +205,8 @@ export default {
             // this._hiddenSidebar()
             return false
           }
-          if (this.money < Math.ceil(this.app.min_recharge)) {
-            this.$parent._open(`最小充值${Math.ceil(this.app.min_recharge)}元`)
+          if (this.money < this.app.min_recharge) {
+            this.$parent._open(`最小充值${this.app.min_recharge}元`)
             return
           }
           if (!this.activePayType) {
@@ -222,6 +226,9 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
+        if (isPhone()) {
+          this.ifreamPayurl = true
+        }
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           // this.payUrl = false
@@ -248,7 +255,8 @@ export default {
         getOrders(this.token, 11, 0, code).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {
             if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
-              this.payUrl = false
+              this.payUrl = null
+              this.ifreamPayurl = null
               this.$parent._open('支付成功！')
               this._clearTimeforSPS()
               this._sureCompletionPayment()
@@ -286,9 +294,11 @@ export default {
   padding-bottom: 20px;
   justify-content: flex-start;
 }
-.cr-box-tit{
+
+.cr-box-tit {
   min-width: 70px;
 }
+
 .recharge-title {
   height: 55px;
   width: 100%;
@@ -459,7 +469,7 @@ export default {
 
 .good-item {
   box-sizing: border-box;
-/*  min-width: 100px;*/
+  /*  min-width: 100px;*/
   max-width: 28.33%;
   width: 75px;
   height: 75px;
