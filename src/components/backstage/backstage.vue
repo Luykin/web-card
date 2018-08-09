@@ -138,7 +138,7 @@ export default {
       popoverWidth: 950,
       nowServicesCategory: '',
       targetid: null,
-      suosuo: null,
+      suosuo: null
     }
   },
   created() {
@@ -159,10 +159,13 @@ export default {
     this.$root.eventHub.$on('closeCourse', () => {
       this._closeCourse()
     })
-    // this.$root.eventHub.$emit('loaddl')
-    // this.$root.eventHub.$emit('loadfz', true)
     this._updataUser()
     this._setPopoverWidth()
+  },
+  mounted() {
+    if (this.user.agency && this.user.agency.level < 1) {
+      this.$root.eventHub.$emit('dialogTableVisible')
+    }
   },
   updated() {
     this.$nextTick(() => {
@@ -646,6 +649,9 @@ export default {
   align-content: center;
   position: relative;
 }
+
+
+
 
 
 

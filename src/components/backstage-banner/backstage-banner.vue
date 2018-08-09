@@ -28,6 +28,8 @@
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div> -->
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
+    <div class="backstage-fenge"></div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_dialogTableVisible">代理介绍</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">发票申请</div>
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
@@ -59,6 +61,9 @@ export default {
     })
   },
   methods: {
+    _dialogTableVisible() {
+      this.$root.eventHub.$emit('dialogTableVisible')
+    },
     _closeSelf() {
       const close = setTimeout(() => {
         this.qqurl = null
@@ -122,6 +127,9 @@ export default {
 
 </script>
 <style type="text/css" scoped>
+/*#main-body{
+  padding-bottom: 200px !important;
+}*/
 .notice {
   position: absolute;
   right: 0;

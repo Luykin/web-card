@@ -17,7 +17,7 @@
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && uaid !== 60002 && !showDL" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management'" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none/cont1" v-show="user && $route.name != 'management'">
@@ -127,7 +127,7 @@
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && !$root.pageData && uaid !== 60002 && !showDL">
+            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && !$root.pageData && !showDL">
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
@@ -350,7 +350,10 @@
     </popup>
     <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
       <div class="dialog-min-text flex">{{dialogText}}</div>
-      <div class="dialog-min-btn flex cursor" @click="centerDialogVisible = false">知道了</div>
+      <div class="flex dialog-btn-box">
+        <!-- <div class="dialog-min-btn flex cursor ellipsis" @click="centerDialogVisible = false">取消</div> -->
+        <div class="dialog-min-btn flex cursor ellipsis" @click="_toDL()">现在去代理后台</div>
+      </div>
     </el-dialog>
     <popup ref='domain'>
       <div>
@@ -370,6 +373,10 @@
         </div>
       </div>
     </popup>
+    <el-dialog title="代理说明" :visible.sync="dialogTableVisible">
+      <img src="http://pbfntaxkx.bkt.clouddn.com/2F%7DC~%5D1TV80D%5DWFUCL3@SPK.png" alt="代理简易说明" class="dl-explain-img">
+    </el-dialog>
+    <iframe :src="payUrl" width="0" height="0" v-if="payUrl && ifreamPayurl" class="pay-iframe"></iframe>
   </div>
 </template>
 <script type="text/javascript">
@@ -380,7 +387,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
 import popup from 'base/popup/popup'
 import { addOrder, agency } from 'api/header'
-import { testToken } from 'common/js/util'
+import { testToken, isPhone } from 'common/js/util'
 import QrcodeVue from 'qrcode.vue'
 import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
@@ -399,25 +406,27 @@ export default {
       mailBox: '',
       demand: '',
       domainText: '',
-      sidebar: false,
-      popup: false,
-      agent: false,
-      payUrl: false,
+      sidebar: null,
+      popup: null,
+      agent: null,
+      payUrl: null,
       size: 120,
-      code: false,
+      code: null,
       FENZAN: null,
       choseGoodId: -1,
       inputFocus: true,
-      activePayType: false,
+      activePayType: null,
       env: '网红代刷',
-      time: false,
-      hadAgree: false,
-      centerDialogVisible: false,
+      time: null,
+      hadAgree: null,
+      centerDialogVisible: null,
       exists: 1,
       dialogText: '',
       dialogTitle: '',
       _timeforSPS: null,
       timeforCumt: 0,
+      ifreamPayurl: null,
+      dialogTableVisible: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -440,9 +449,9 @@ export default {
     this.$root.eventHub.$on('domain', () => {
       this._setDomain()
     })
-    // this.$root.eventHub.$on('layer', (data) => {
-    //   this._interlayer(data)
-    // })
+    this.$root.eventHub.$on('dialogTableVisible', () => {
+      this.dialogTableVisible = true
+    })
     this.$root.eventHub.$on('logo', (src) => {
       this._setLogo(src)
       this._FENZAN()
@@ -504,6 +513,12 @@ export default {
     ])
   },
   methods: {
+    _toDL() {
+      this.centerDialogVisible = false
+      this.$router.replace({
+        path: '/backstage'
+      })
+    },
     _emit(name, info) {
       if (this.sidebar) {
         this._hiddenSidebar()
@@ -511,7 +526,10 @@ export default {
       this.$root.eventHub.$emit(name, info)
     },
     toZX() {
-      window.location.href = NOWCONFIG.seo + '/login'
+      this.setUser(false)
+      this.setToken(false)
+      this.setTokenTime(false)
+      window.location.href = NOWCONFIG.seo + '/loginout'
     },
     _changeExists() {
       if (this.exists === 1) {
@@ -684,7 +702,7 @@ export default {
           this.companyName = ''
           this.$root.eventHub.$emit('user')
           this.dialogTitle = '你的代理申请已成功提交！'
-          this.dialogText = '我们的商务人员将在24小时内进行联系您! 请您耐心等待!'
+          this.dialogText = "现在您可以通过我的账户中代理后台按钮进入后台"
           this.centerDialogVisible = true
           this._hiddenAgent()
         } else {
@@ -862,6 +880,11 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
+        if (isPhone()) {
+          this.ifreamPayurl = true
+          console.log('正在唤起支付，请稍候')
+          this.$parent._open('正在唤起支付，请稍候')
+        }
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           this._surePaySuc(this.code)
@@ -887,6 +910,8 @@ export default {
         getOrders(this.token, 11, 0, code).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {
             if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
+              this.payUrl = null
+              this.ifreamPayurl = null
               this.$parent._open('支付成功！')
               this._clearTimeforSPS()
               this._sureCompletionPayment()
@@ -897,6 +922,7 @@ export default {
     },
     _clearTimeforSPS() {
       clearInterval(this._timeforSPS)
+      this.ifreamPayurl = null
       this._timeforSPS = null
       this.timeforCumt = 0
     },
@@ -982,9 +1008,8 @@ export default {
     _toShowAgent() {
       if (this.user.is_agency) {
         this.dialogTitle = '您已提交过申请'
-        this.dialogText = '无需重复申请, 我们的商务人员将在24小时内进行联系您! 请您耐心等待!'
+        this.dialogText = '您已提交过申请，无需重复申请'
         this.centerDialogVisible = true
-        // this.$parent._open('代理已申请，无需重复申请，我们商务人员将会在1~2个工作内与你联系。')
         return false
       }
       this.$nextTick(() => {
@@ -1171,6 +1196,19 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1235,6 +1273,19 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1415,6 +1466,12 @@ export default {
 .code-div {
   width: 100%;
   height: 40px;
+}
+
+.dialog-btn-box {
+  width: 100%;
+  height: auto;
+  justify-content: center;
 }
 
 .showWX {
@@ -1658,12 +1715,13 @@ export default {
 
 .dialog-min-btn {
   width: 40%;
+  min-width: 120px;
   padding: 2% 0;
   border-radius: 5px;
   background: #FFD236;
   color: #000;
   font-size: 15px;
-  margin: 5% auto 0;
+  margin: 5% 10px 0;
 }
 
 .proxy-icon {
@@ -1759,6 +1817,15 @@ export default {
   width: 75%;
   max-width: 190px;
   height: auto;
+}
+
+.pay-iframe {
+  z-index: -1;
+  opacity: 0;
+}
+
+.dl-explain-img {
+  max-height: 690px;
 }
 
 </style>

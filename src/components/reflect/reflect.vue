@@ -6,7 +6,7 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">我的提现账户:</div>
           <div class="cbi-input-box flex disable-i">
-            <span>{{nowAccount ? nowAccount.account :  '去绑定'}}</span>
+            <span>{{nowAccount ? nowAccount.account :  '您还没有绑定提现账户哦'}}</span>
           </div>
           <div class="cbi-btn flex cursor" @click="showPop" v-show="!nowAccount">去绑定</div>
           <div class="cbi-btn flex cursor" @click="_delete(nowAccount)" v-show="nowAccount">解绑</div>
@@ -14,7 +14,7 @@
         <div class="configure-box-item flex">
           <div class="cbi-name flex ellipsis">提现方式:</div>
           <div class="cbi-input-box flex disable-i">
-            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' : nowAccount.account_type === 2 ? '微信' : '银行卡') : '去绑定'}}
+            {{nowAccount ? (nowAccount.account_type === 1 ? '支付宝' : nowAccount.account_type === 2 ? '微信' : '银行卡') : '还未绑定'}}
           </div>
           <div class="cbi-btn flex cursor" style="opacity:0;"></div>
         </div>

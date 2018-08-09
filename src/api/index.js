@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
-import { getSign } from 'common/js/util'
+import { getSign, isPhone } from 'common/js/util'
 
 export function getServiceCategory() {
   const url = `${PREFIX_URL}/service_category`
@@ -271,6 +271,11 @@ export function addSiteTask(token, buydata) {
   }
   if (buydata.appointment_time) {
     data = Object.assign({ appointment_time: buydata.appointment_time }, data)
+  }
+  if (isPhone()) {
+    data = Object.assign({ device: 'phone' }, data)
+  } else {
+    data = Object.assign({ device: 'pc' }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

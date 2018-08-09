@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
-import { getSign } from 'common/js/util'
+import { getSign, isPhone } from 'common/js/util'
 
 export function addOrder(token, score, paytype, price, id) {
   const url = `${PREFIX_URL}/add_order`
@@ -14,6 +14,11 @@ export function addOrder(token, score, paytype, price, id) {
   }
   if (id || id === 0) {
     data = Object.assign({ good_id: id }, data)
+  }
+  if (isPhone()) {
+    data = Object.assign({ device: 'phone' }, data)
+  } else {
+    data = Object.assign({ device: 'pc' }, data)
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {

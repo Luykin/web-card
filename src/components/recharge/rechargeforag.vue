@@ -19,6 +19,7 @@
           <div v-for="item in app.goods" :class="{'active-good': choseGoodId === item.id && !money}" @click="_choseGood(item)" class="good-item cursor flex">
             <div class="good-item-label flex ellipsis">{{item.label}}</div>
             <div class="good-item-label flex ellipsis">{{'￥'+parseInt(item.price)}}</div>
+            <div class="biaoqian-good flex" v-if="item.image">{{item.image}}</div>
           </div>
         </div>
         <div class="cr-item flex">
@@ -187,7 +188,7 @@ export default {
         this.$parent._open('请选择支付方式')
         return
       }
-      console.log(this.choseGoodId)
+      // console.log(this.choseGoodId)
       if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
         addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
           this._afterAddOrder(res)
@@ -205,8 +206,8 @@ export default {
             // this._hiddenSidebar()
             return false
           }
-          if (this.money < this.app.min_recharge) {
-            this.$parent._open(`最小充值${this.app.min_recharge}元`)
+          if (this.money < Math.ceil(this.app.min_recharge)) {
+            this.$parent._open(`最小充值${Math.ceil(this.app.min_recharge)}元`)
             return
           }
           if (!this.activePayType) {
@@ -354,7 +355,6 @@ export default {
   height: auto;
   width: 60%;
   flex-grow: 1;
-  overflow: hidden;
   justify-content: flex-start;
   margin: 20px 0 0 15%;
   flex-wrap: wrap;
@@ -469,7 +469,6 @@ export default {
 
 .good-item {
   box-sizing: border-box;
-  /*  min-width: 100px;*/
   max-width: 28.33%;
   width: 75px;
   height: 75px;
@@ -481,6 +480,7 @@ export default {
   flex-wrap: wrap;
   align-content: center;
   border-radius: 8px;
+  position: relative;
 }
 
 .good-item-label {
@@ -494,4 +494,19 @@ export default {
   background: #FF6B4E;
 }
 
+.pay-iframe {
+  z-index: -1;
+  opacity: 0;
+}
+.biaoqian-good {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #66BB6A;
+  color: #fff;
+  width: 50px;
+  height: 20px;
+  border-radius: 20px;
+  transform: translate(20%, -40%);
+}
 </style>

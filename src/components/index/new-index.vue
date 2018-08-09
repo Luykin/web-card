@@ -10,6 +10,11 @@
       </div>
     </div>
     <div class="operating-table">
+      <!-- 申请代理广告位 -->
+      <div class="agent-advertisement cursor" @click="_toDL()">
+        <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%AB%8B%E5%8D%B3%E4%BD%93%E9%AA%8C-%E5%8F%8D.png" alt="获取分站特权" class="btnfor-agentadver">
+      </div>
+      <!-- end申请代理广告位 -->
       <div class="servece-table">
         <div v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()" class="servece-table-item flex cursor">
           <img :src="item.icon" class="mbh-icon" v-if="item.icon">
@@ -111,7 +116,8 @@
         </div>
       </div>
       <div class="horse-race-lamp">
-        <div class="notice-down">
+        <!-- APP下载或定制广告位 -->
+        <div class="notice-down" v-if="!nowconfig.custom_advertisement">
           <div class="notice-title flex">APP下载</div>
           <div class="qr-down-warp flex">
             <img :src="nowconfig.down_ios" alt="快手刷粉" v-show='downLink == 0' class="qr-down">
@@ -125,6 +131,17 @@
               <img src="http://p8sxtcg6t.bkt.clouddn.com/android.png" alt="Android快手刷粉" class="qdb-img">Android</div>
           </div>
         </div>
+        <!-- 九顿去水印定制 -->
+        <div class="notice-down" v-if="nowconfig.custom_advertisement">
+          <div class="notice-title flex">{{nowconfig.custom_advertisement.title}}</div>
+          <div class="qr-down-warp flex qdw-center">
+            <img :src="nowconfig.custom_advertisement.qrcode" alt="短视频去水印小程序" class="qr-down-xcx">
+            <div class="xcx-info flex">打开微信扫一扫识别小程序码</div>
+            <div class="xcx-info flex">微信小程序搜索 一键去水印</div>
+            <div class="flex xcx-btn cursor" @click="_openJD(nowconfig.custom_advertisement.url)">点击前往网页版</div>
+          </div>
+        </div>
+        <!--End  APP下载或定制广告位  End-->
         <div class="new-task">
           <div class="notice-title flex">最新订单</div>
           <div v-if="latestTasks" class="record-warp">
@@ -278,6 +295,28 @@ export default {
     ])
   },
   methods: {
+    _openJD(url) {
+      window.open(url, '_brank')
+    },
+    _toDL() {
+      if (!this.user) {
+        this.$parent._open('请先登录哦')
+        this.$router.replace({
+          path: '/login'
+        })
+        return false
+      }
+      if (this.user.is_agency && this.user.agency && this.user.agency.level > -1) {
+        // this.$parent._open('您已经是代理了哦')
+        this.$router.replace({
+          path: '/backstage'
+        })
+      } else {
+        this.$router.replace({
+          path: '/agent'
+        })
+      }
+    },
     _latestTasks() {
       latestTasks().then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
@@ -1111,6 +1150,40 @@ export default {
   position: relative;
 }
 
+.agent-advertisement {
+  width: 300px;
+  height: 210px;
+  border-radius: 100px;
+  position: absolute;
+  bottom: 0;
+  right: 250px;
+  z-index: 99;
+  transform: translate(0, 40%);
+  background: url('http://p70pqu6ys.bkt.clouddn.com/%E5%BC%B9%E7%AA%97%E5%B9%BF%E5%91%8A.png') no-repeat;
+  background-size: 100% 100%;
+  overflow: hidden;
+}
+
+.btnfor-agentadver {
+  position: absolute;
+  left: 50%;
+  top: 72.5%;
+  transform: translate(-49.2%, 0);
+  animation: btnforagent .4s linear infinite;
+}
+
+@keyframes btnforagent {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .servece-table {
   position: absolute;
   top: 0;
@@ -1170,12 +1243,25 @@ export default {
   height: 120px;
 }
 
+.qr-down-xcx {
+  width: 140px;
+  height: 140px;
+}
+
+.xcx-info {
+  width: 100%;
+  height: 25px;
+}
+
 .qr-down-warp {
   width: 100%;
   height: 265px;
   margin-top: 40px;
   flex-wrap: wrap;
-  /*align-items: flex-start;*/
+}
+
+.qdw-center {
+  align-content: center;
 }
 
 .zi-warp {
@@ -1345,20 +1431,29 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
 /*//2018.08.01 加入最新任务跑马灯*/
 
 @keyframes affiche {
   0% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate(-50%, 0);
+    transform: translate3d(-50%, 0, 0);
   }
   50.0001% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translate(-50%, 0);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -1399,7 +1494,7 @@ export default {
   margin: 0 auto;
   margin-top: 50px;
   overflow: hidden;
-  /*	background: #000;*/
+  /*  background: #000;*/
 }
 
 .record {
@@ -1447,18 +1542,27 @@ export default {
   transform: translate(-10%, -10%);
 }
 
+.xcx-btn {
+  width: 85%;
+  height: 40px;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #1848D8;
+  color: #fff;
+}
+
 @keyframes record {
   0% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate(0, -50%);
+    transform: translate3d(0, -50%, 0);
   }
   50.0001% {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translate(0, -50%);
+    transform: translate3d(0, -50%, 0);
   }
 }
 
