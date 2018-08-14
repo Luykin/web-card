@@ -449,3 +449,30 @@ export function subDomains(sub_domain) {
     }
   })
 }
+export function getAgencyLevel() {
+  const url = `${PREFIX_URL}/agency_level`
+  let data = {}
+  return axios.get(url, {
+      params: Object.assign({ sign: getSign(data) }, data)
+    })
+    .then(function(res) {
+      return Promise.resolve(res)
+    })
+    .catch(function(error) {
+      if (error.response) {
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}

@@ -1,4 +1,5 @@
 'use strict'
+
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
@@ -10,9 +11,28 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const QiniuPlugin = require('./upload-qiniu-webpack-plugin')
+const DeleteqiniuPlugin = require('./delete-qiniu-webpack-plugin')
+// console.log(JSON.stringify(DeleteqiniuPlugin))
 const env = require('../config/prod.env')
+const _config = require('../src/api/config');
+const uaid_qiniu_prefix = _config.UAID + _config.QINIU_PREFIX
+
 const Version = new Date().getTime()
+const qiniuPlugin = new QiniuPlugin({
+  ACCESS_KEY: "pnT5pT10yrAsQuUbl1QlIxw3OBSbGsxQA7dhama4",
+  SECRET_KEY: "nwXCPezSMnt5f2plL1qz-BukvX2RYQLjavpLv0Xl",
+  bucket: "wangzhantu",
+  path: '[hash]',
+  prefix: uaid_qiniu_prefix
+})
+const deleteqiniuPlugin = new DeleteqiniuPlugin({
+  ACCESS_KEY: "pnT5pT10yrAsQuUbl1QlIxw3OBSbGsxQA7dhama4",
+  SECRET_KEY: "nwXCPezSMnt5f2plL1qz-BukvX2RYQLjavpLv0Xl",
+  bucket: "wangzhantu",
+  prefix: uaid_qiniu_prefix
+})
+
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({
@@ -24,11 +44,14 @@ const webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath('js/[name].[chunkhash]' + Version + '.js'),
-    chunkFilename: utils.assetsPath('js/[id].[chunkhash]' + Version + '.js')
+    filename: utils.assetsPath('js/[name].[hash]' + Version + '.js'),
+    chunkFilename: utils.assetsPath('js/[id].[hash]' + Version + '.js'),
+    publicPath: "http://cdn.xingkwh.com/" + uaid_qiniu_prefix + "[hash]/"
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    qiniuPlugin,
+    deleteqiniuPlugin,
     new webpack.DefinePlugin({
       'process.env': env
     }),
@@ -128,7 +151,7 @@ if (config.build.productionGzip) {
         ')$'
       ),
       threshold: 10240,
-      minRatio: 0.8
+      minRatio: 0.9
     })
   )
 }

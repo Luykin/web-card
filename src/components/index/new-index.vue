@@ -11,7 +11,7 @@
     </div>
     <div class="operating-table">
       <!-- 申请代理广告位 -->
-      <div class="agent-advertisement cursor" @click="_toDL()">
+      <div class="agent-advertisement cursor" @click="_toDL()" v-if="nowconfig.agent_switch">
         <img src="http://p70pqu6ys.bkt.clouddn.com/%E7%AB%8B%E5%8D%B3%E4%BD%93%E9%AA%8C-%E5%8F%8D.png" alt="获取分站特权" class="btnfor-agentadver">
       </div>
       <!-- end申请代理广告位 -->
@@ -23,7 +23,7 @@
       </div>
       <div class="servece-table-detail">
         <div class="std-header flex">
-          <div v-for="item in showService" class="std-header-item flex ellipsis cursor" @click="_changeService(item)" :class="{'active-service': item.id == nowServices.id}">
+          <div v-for="item in showService" class="std-header-item flex cursor" @click="_changeService(item)" :class="{'active-service': item.id == nowServices.id}">
             <div class="shi-label">
               <div class="flex behover" v-show="item.behavior == 0">维护中</div>
               {{item.label}}
@@ -1089,6 +1089,8 @@ export default {
   height: 100%;
   flex-shrink: 1;
   flex-grow: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .std-header-item:hover {
@@ -1169,7 +1171,7 @@ export default {
   left: 50%;
   top: 72.5%;
   transform: translate(-49.2%, 0);
-  animation: btnforagent .4s linear infinite;
+  animation: btnforagent .7s linear infinite;
 }
 
 @keyframes btnforagent {
@@ -1178,6 +1180,9 @@ export default {
   }
   50% {
     opacity: 0;
+  }
+  51% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
@@ -1418,6 +1423,8 @@ export default {
   border: 1px solid #FF6B4E;
   color: #FF6B4E;
 }
+
+
 
 
 

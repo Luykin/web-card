@@ -223,8 +223,12 @@ button:hover {
 .el-dialog__wrapper .el-dialog--center {
   min-width: 290px !important;
 }
-.el-dialog__wrapper{
-  overflow: hidden !important;
+.el-dialog{
+  max-width: 680px;
+  min-width: 350px;
+}
+.el-dialog__header{
+  display: none;
 }
 
 .el-menu--horizontal .el-menu .el-menu-item,

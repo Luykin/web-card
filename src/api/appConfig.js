@@ -4,7 +4,7 @@ const appConfig = {
     'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
     'bg': 'http://p70pqu6ys.bkt.clouddn.com/bg.jpg',
     'agentBg': 'http://p70pqu6ys.bkt.clouddn.com/siteBg.png',
-    'seo': 'http://www.7shuiguo.cn',
+    'seo': 'http://www.xkfans.com',
     'number': '渝ICP备18002374号-3',
     'mainColor': '#ff6b4e',
     'btnColor': '#fff',
@@ -18,6 +18,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60002': {
     'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
@@ -37,6 +38,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60003': {
     'logo': 'http://pbfntaxkx.bkt.clouddn.com/%E9%80%A0%E6%98%9F%E7%8C%ABlogo.png',
@@ -56,6 +58,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60004': {
     'logo': 'http://pbfntaxkx.bkt.clouddn.com/%E7%BD%91%E7%BA%A2%E6%A2%A6%E5%B7%A5%E5%8E%82logo.png',
@@ -75,6 +78,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60005': {
     'logo': 'http://p7o5mvmp4.bkt.clouddn.com/%E8%B6%A3%E8%B5%9Elogo.png',
@@ -94,6 +98,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60006': {
     'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
@@ -113,6 +118,7 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/1533290398.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/1533290682.png',
     'custom_advertisement': null,
+    'agent_switch': true,
   },
   '60007': {
     'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
@@ -132,11 +138,32 @@ const appConfig = {
     'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
     'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
     'custom_advertisement': {
-        title: '短视频去水印',
-        qrcode: 'http://pbfntaxkx.bkt.clouddn.com/jiudun_qsy.jpg',
-        url: 'http://douyin.cqxcx.net'
-    }
-  }
+      title: '短视频去水印',
+      qrcode: 'http://pbfntaxkx.bkt.clouddn.com/jiudun_qsy.jpg',
+      url: 'http://douyin.cqxcx.net'
+    },
+    'agent_switch': true,
+  },
+  '60008': {
+    'logo': 'http://p8sxtcg6t.bkt.clouddn.com/defual.png',
+    'bg': 'http://p70pqu6ys.bkt.clouddn.com/bg.jpg',
+    'agentBg': 'http://p70pqu6ys.bkt.clouddn.com/siteBg.png',
+    'seo': null,
+    'number': '渝ICP备18002374号-5',
+    'mainColor': '#ff6b4e',
+    'btnColor': '#fff',
+    'titleColor': '#d94d37',
+    'sbbBg': '#ffe8d2',
+    'sbbFont': '#d94d37',
+    'serviceBg': '#dfe1e5',
+    'index': 'new-index',
+    'customerQQ': '3272175455',
+    'customeremil': 'service@melonblock.com',
+    'down_ios': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%88%B7%E8%B5%9EiOS.png',
+    'down_android': 'http://p7o5mvmp4.bkt.clouddn.com/%E5%BF%AB%E6%89%8B%E5%AE%89%E5%8D%93.png',
+    'custom_advertisement': null,
+    'agent_switch': null,
+  },
 }
 export function changeIndex(uaid, index) {
   appConfig[uaid].index = index

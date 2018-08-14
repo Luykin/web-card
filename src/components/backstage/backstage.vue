@@ -75,7 +75,7 @@
               </el-date-picker>
               <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp' ref='pickerS'>
               </el-time-select>
-              <<img src="../../assets/logo.png" alt="" @load="_setBG" v-show='false'>
+              <img src="../../assets/logo.png" alt="" @load="_setBG" v-show='false'>
             </div>
           </div>
           <div class="cr-item flex">
@@ -90,7 +90,7 @@
           </div>
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex back-title">所需金额:</div>
-            <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{nowServices.price + '单价'}}= {{consumeMoney + '元'}}</div>
+            <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(nowServices.price) + '单价'}}= {{consumeMoney + '元'}}</div>
           </div>
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex back-title">代理折后:</div>
@@ -162,11 +162,11 @@ export default {
     this._updataUser()
     this._setPopoverWidth()
   },
-  mounted() {
-    if (this.user.agency && this.user.agency.level < 1) {
-      this.$root.eventHub.$emit('dialogTableVisible')
-    }
-  },
+  // mounted() {
+  //   if (this.user.agency && this.user.agency.level < 1) {
+  //     this.$root.eventHub.$emit('dialogTableVisible')
+  //   }
+  // },
   updated() {
     this.$nextTick(() => {
       if (this.$refs.pcCourse && (this.$refs.pcCourse.style.width !== `${BILI * window.screen.height}px`)) {
@@ -240,6 +240,9 @@ export default {
       getUserInfo(this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(res.data.data)
+          if (this.user.agency && this.user.agency.level < 1) {
+            this.$root.eventHub.$emit('dialogTableVisible')
+          }
         } else {
           if (res.data.err_msg) {
             this.$parent._open(this.$root.errorCode[res.data.err_code])
@@ -649,6 +652,7 @@ export default {
   align-content: center;
   position: relative;
 }
+
 
 
 

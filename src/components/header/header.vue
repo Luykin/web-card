@@ -17,7 +17,7 @@
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management'" class="disable">
+            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && nowconfig.agent_switch" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
             </el-menu-item>
             <el-submenu index="/none/cont1" v-show="user && $route.name != 'management'">
@@ -373,21 +373,26 @@
         </div>
       </div>
     </popup>
-    <el-dialog title="代理说明" :visible.sync="dialogTableVisible">
-      <img src="http://pbfntaxkx.bkt.clouddn.com/2F%7DC~%5D1TV80D%5DWFUCL3@SPK.png" alt="代理简易说明" class="dl-explain-img">
+    <el-dialog :visible.sync="dialogTableVisible" style="margin-top: -14vh">
+      <div class="dl-explain-warp">
+        <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%A3%E7%90%86%E7%89%B9%E6%9D%83%E8%AF%B4%E6%98%8E.png" alt="代理简易说明" class="dl-explain-img">
+        <div class="dl-agencylevel flex">
+          <div v-for="item in agencyLevel" v-show="item.level>0" class="dl-aglevel-item flex">{{Math.ceil(item.money)}}元</div>
+        </div>
+      </div>
     </el-dialog>
     <iframe :src="payUrl" width="0" height="0" v-if="payUrl && ifreamPayurl" class="pay-iframe"></iframe>
   </div>
 </template>
 <script type="text/javascript">
-import { setDomain, setSiteinfo, subDomains } from 'api/site'
+import { setDomain, setSiteinfo, subDomains, getAgencyLevel } from 'api/site'
 import { getOrders } from 'api/score-record'
 import sidebar from 'components/sidebar/sidebar'
 import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
 import popup from 'base/popup/popup'
 import { addOrder, agency } from 'api/header'
-import { testToken, isPhone } from 'common/js/util'
+import { testToken, isPhone, compare } from 'common/js/util'
 import QrcodeVue from 'qrcode.vue'
 import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
@@ -399,13 +404,6 @@ export default {
       BuyDomainData: null,
       nowconfig: null,
       uaid: null,
-      money: '',
-      companyName: '',
-      applicant: '',
-      telephone: '',
-      mailBox: '',
-      demand: '',
-      domainText: '',
       sidebar: null,
       popup: null,
       agent: null,
@@ -423,10 +421,18 @@ export default {
       exists: 1,
       dialogText: '',
       dialogTitle: '',
+      money: '',
+      companyName: '',
+      applicant: '',
+      telephone: '',
+      mailBox: '',
+      demand: '',
+      domainText: '',
       _timeforSPS: null,
       timeforCumt: 0,
       ifreamPayurl: null,
       dialogTableVisible: null,
+      agencyLevel: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -434,6 +440,7 @@ export default {
   created() {
     this.uaid = UAID
     this.nowconfig = NOWCONFIG
+    this._headerInit()
     this.$root.eventHub.$on('user', (location) => {
       this._updataUser(location)
     })
@@ -513,6 +520,22 @@ export default {
     ])
   },
   methods: {
+    _headerInit() {
+      getAgencyLevel().then((res) => {
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.agencyLevel = this._sortAL(res.data.data, 'level')
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _sortAL(list, value) {
+      return list.sort(compare(value))
+    },
     _toDL() {
       this.centerDialogVisible = false
       this.$router.replace({
@@ -1209,6 +1232,13 @@ export default {
 
 
 
+
+
+
+
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1273,6 +1303,13 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
+
+
+
+
 
 
 
@@ -1825,7 +1862,27 @@ export default {
 }
 
 .dl-explain-img {
-  max-height: 690px;
+  width: 100%;
+}
+
+.dl-explain-warp {
+  position: relative;
+}
+
+.dl-agencylevel {
+  width: 50%;
+  height: 5%;
+  position: absolute;
+  bottom: 3%;
+  left: 57%;
+  transform: translate(-50%, 0);
+}
+
+.dl-aglevel-item {
+  width: 0;
+  flex-grow: 1;
+  font-size: 12px;
+  color: #353535;
 }
 
 </style>
