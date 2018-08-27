@@ -28,7 +28,7 @@
         </el-table-column>
         <el-table-column prop="point" label="数量">
         </el-table-column>
-        <el-table-column prop="price" label="订单价格">
+        <el-table-column prop="score" label="订单价格">
         </el-table-column>
         <el-table-column prop="status" label="状态">
         </el-table-column>
@@ -52,7 +52,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import { testToken, timeChange } from 'common/js/util'
 import { SUCCESS_CODE } from 'api/config'
 import { Judge } from 'common/js/judge'
-const NUM = 11
+const NUM = 10
 export default {
   mixins: [Judge],
   data() {

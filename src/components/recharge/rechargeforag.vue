@@ -32,12 +32,12 @@
         <div class="btn-back flex cursor" @click="_addOrder">确认充值</div>
       </div>
       <div class="content-qr flex" v-show="payUrl && page === 1">
-        <div class="code-div flex ellipsis">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
+        <div class="code-div flex ellipsis">订单号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
         </div>
         <div class="qrcode-box flex">
-          <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
+          <img ref="payImg">
         </div>
-        <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
+        <div class="showWX flex">{{wxPayTips ? wxPayTips : '请用' + payType + '扫描二维码支付'}}</div>
         <div class="recharge-btn-box-after flex">
           <div class="recharge-btn-sure-after flex sure cursor" @click="_sureCompletionPayment">确定已完成支付</div>
           <div class="recharge-btn-sure-after flex cancel cursor" @click="_cancel">我再考虑考虑</div>
@@ -59,19 +59,20 @@
         </el-table>
       </div>
     </div>
-    <iframe :src="payUrl" width="0" height="0" v-if="payUrl && ifreamPayurl" class="pay-iframe"></iframe>
+    <!--     <a id='links' href="#" style='display:none;'></a>
+    <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe> -->
   </div>
 </template>
 <script>
+import QRCode from 'qrcode'
 import MAgent from 'components/agent-banner/agent-banner'
 import { mapGetters, mapMutations } from 'vuex'
 import { getAppInfo } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken } from 'common/js/util'
 import { addOrder } from 'api/header'
-import QrcodeVue from 'qrcode.vue'
 import { getOrders } from 'api/score-record'
-import { isPhone } from 'common/js/util'
+import { isPhone, isWx } from 'common/js/util'
 export default {
   data() {
     return {
@@ -79,13 +80,14 @@ export default {
       money: '',
       choseGoodId: -1,
       choseGood: false,
-      size: 180,
       code: false,
       payUrl: false,
       page: 1,
+      newPage: null,
       _timeforSPS: null,
-      ifreamPayurl: null,
       timeforCumt: 0,
+      ifreamPayurl: null,
+      wxPayTips: null,
       tableData: [
         { label: '中国农业银行', code: '6228480478794701878', name: '张恒' }
       ]
@@ -98,6 +100,9 @@ export default {
     this.choseGoodId = this.app.goods[0].id || -1
     this.choseGood = this.app.goods[0]
     this._getAppInfo()
+    if (isWx()) {
+      this.wxPayTips = '请长按识别二维码唤起支付'
+    }
   },
   computed: {
     payType() {
@@ -190,6 +195,9 @@ export default {
       }
       // console.log(this.choseGoodId)
       if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
+        if (isPhone()) {
+          this.newPage = window.open('about:blank', "_blank")
+        }
         addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
           this._afterAddOrder(res)
         })
@@ -214,6 +222,9 @@ export default {
             this.$parent._open('请选择支付方式')
             return
           }
+          if (isPhone() && !isWx()) {
+            this.newPage = window.open('about:blank', "_blank")
+          }
           addOrder(this.token, this.money, this.activePayType, this.money).then((res) => {
             this._afterAddOrder(res)
           })
@@ -224,12 +235,21 @@ export default {
     },
     _afterAddOrder(res) {
       if (res.data.err_code === SUCCESS_CODE) {
-        // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
-        if (isPhone()) {
-          this.ifreamPayurl = true
+        if (isPhone() && !isWx()) {
+          this.newPage.location.href = this.payUrl
         }
+        const opts = {
+          type: 'image/jpeg'
+        }
+        QRCode.toDataURL(this.payUrl, opts, (err, url) => {
+          if (err) {
+            this.$parent._open(err)
+          } else {
+            this.$refs.payImg.src = url
+          }
+        })
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           // this.payUrl = false
@@ -253,7 +273,7 @@ export default {
       if (!this._timeforSPS) {
         return false
       } else {
-        getOrders(this.token, 11, 0, code).then((res) => {
+        getOrders(this.token, 10, 0, code).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {
             if (res.data.data.data[0] && res.data.data.data[0].status == 2) {
               this.payUrl = null
@@ -279,8 +299,7 @@ export default {
     })
   },
   components: {
-    MAgent,
-    QrcodeVue
+    MAgent
   },
   beforeDestroy() {
     this._clearTimeforSPS()
@@ -319,6 +338,8 @@ export default {
 
 .pay-item {
   box-sizing: border-box;
+  /* max-width: 29.3%;
+  width: 29.3%;*/
   width: 120px;
   height: 45px;
   flex-shrink: 0;
@@ -380,9 +401,16 @@ export default {
 }
 
 .qrcode-box {
-  width: 100%;
+  width: 190px;
+  height: 190px;
+  margin: 0 50%;
   flex-shrink: 0;
   height: auto;
+}
+
+.qrcode-box img {
+  width: 100%;
+  height: 100%;
 }
 
 .showWX {
@@ -408,7 +436,8 @@ export default {
   width: 100%;
   color: #FF9100;
   justify-content: flex-start;
-  text-indent: 25px;
+  /*text-indent: 25px;*/
+  padding-left: 15%;
 }
 
 .recharge-input {
@@ -495,9 +524,12 @@ export default {
 }
 
 .pay-iframe {
-  z-index: -1;
+  visibility: hidden;
   opacity: 0;
+  width: 1px;
+  height: 1px;
 }
+
 .biaoqian-good {
   position: absolute;
   right: 0;
@@ -509,4 +541,5 @@ export default {
   border-radius: 20px;
   transform: translate(20%, -40%);
 }
+
 </style>

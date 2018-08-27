@@ -155,6 +155,18 @@ const routerconst = new Router({
       name: 'bar',
       component: () =>
         import ('components/bar/bar')
+    },
+    {
+      path: '/secret-books',
+      name: 'management',
+      component: () =>
+        import ('components/secret-books/secret-books')
+    },
+    {
+      path: '/secret-books-detail',
+      name: 'management',
+      component: () =>
+        import ('components/secret-books/secret-books-detail')
     }
   ]
 })
@@ -168,6 +180,7 @@ function pcOrphone() {
 }
 routerconst.beforeEach((to, from, next) => {
   // 主页跳转逻辑
+  console.log(to)
   if (to.matched.some(record => record.meta.index)) {
     const index = pcOrphone()
     if (to.path !== index) {

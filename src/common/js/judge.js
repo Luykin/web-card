@@ -1,5 +1,7 @@
 import { getsubsite } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
+import punycode from 'punycode'
+
 export const Judge = {
   created() {
     if (!this.$root.judge || this.judgeMust) {
@@ -17,7 +19,8 @@ export const Judge = {
         let start = window.location.href.indexOf('://')
         let end = window.location.href.indexOf('.xkfans.com')
         let domain = window.location.href.slice(start + 3, end)
-        domain = domain + '.xkfans.com'
+        // punycode.toUnicode('xn--44qr78f77h.xkfans.com')
+        domain = punycode.toUnicode(domain + '.xkfans.com')
         const that = this
         getsubsite(domain).then((res) => {
           if (res.data.err_code === SUCCESS_CODE) {

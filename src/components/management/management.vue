@@ -24,11 +24,11 @@
             </div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">商户联系:</div>
+            <div class="cr-box-tit ellipsis flex">联系微信:</div>
             <div class="cr-box-min flex margin-right">{{user.agency.sub_site.contact}}</div>
           </div>
           <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex">联系邮箱:</div>
+            <div class="cr-box-tit ellipsis flex">联系QQ:</div>
             <div class="cr-box-min flex margin-right">{{user.agency.sub_site.email}}</div>
           </div>
           <!-- ,联系邮箱：{{user.agency.sub_site.email}} -->

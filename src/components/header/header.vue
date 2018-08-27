@@ -202,9 +202,9 @@
             <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
             </div>
             <div class="qrcode-box flex">
-              <qrcode-vue :value="payUrl" :size="size" level="H"></qrcode-vue>
+              <img ref="payImg">
             </div>
-            <div class="showWX flex">请用{{payType}}扫描二维码支付</div>
+            <div class="showWX flex">{{wxPayTips ? wxPayTips : '请用' + payType + '扫描二维码支付'}}</div>
           </div>
           <div class="recharge-btn-box-after flex">
             <div class="recharge-btn-sure-after flex sure cursor" @click="_sureCompletionPayment">确定已完成支付</div>
@@ -381,7 +381,8 @@
         </div>
       </div>
     </el-dialog>
-    <iframe :src="payUrl" width="0" height="0" v-if="payUrl && ifreamPayurl" class="pay-iframe"></iframe>
+    <a id='links' href="#" style='display:none;'></a>
+    <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe>
   </div>
 </template>
 <script type="text/javascript">
@@ -392,8 +393,9 @@ import { mapGetters, mapMutations } from 'vuex'
 import interlayer from 'base/interlayer/interlayer'
 import popup from 'base/popup/popup'
 import { addOrder, agency } from 'api/header'
-import { testToken, isPhone, compare } from 'common/js/util'
-import QrcodeVue from 'qrcode.vue'
+import { testToken, isPhone, compare, isWx } from 'common/js/util'
+// import QrcodeVue from 'qrcode.vue'
+import QRCode from 'qrcode'
 import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import { UAID } from 'api/config'
@@ -414,7 +416,7 @@ export default {
       choseGoodId: -1,
       inputFocus: true,
       activePayType: null,
-      env: '网红代刷',
+      env: '网红打造',
       time: null,
       hadAgree: null,
       centerDialogVisible: null,
@@ -431,8 +433,10 @@ export default {
       _timeforSPS: null,
       timeforCumt: 0,
       ifreamPayurl: null,
+      newPage: null,
       dialogTableVisible: null,
       agencyLevel: null,
+      wxPayTips: null,
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
     }
@@ -468,6 +472,9 @@ export default {
     this.telephone = this.user.phone || ''
     // this.choseGoodId = this.app.goods[0].id || -1
     this.activePayType = 'wx'
+    if (isWx()) {
+      this.wxPayTips = '请长按识别二维码唤起支付'
+    }
   },
   computed: {
     showDL() {
@@ -569,6 +576,9 @@ export default {
         return false
       }
       this.BuyDomainData.pay_type = this.activePayType
+      if (isPhone() && !isWx()) {
+        this.newPage = window.open('about:blank', "_blank")
+      }
       addSiteTask(this.token, this.BuyDomainData).then((res) => {
         this._afterAddOrder(res)
       })
@@ -609,8 +619,8 @@ export default {
       const siteName = '分站名称'
       const siteFix = '分站名称后缀'
       const siteAnnouncement = '分站公告，请到分站管理后台编辑'
-      const sitFooter = '分站联系人'
-      const sitFooterEmail = '分站联系邮箱'
+      const sitFooter = 'fans10005'
+      const sitFooterEmail = '32721755455'
       setSiteinfo(this.token, logoUrl, siteName, siteFix, siteAnnouncement, sitFooter, sitFooterEmail).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           this.$root.eventHub.$emit('user', 'management')
@@ -859,6 +869,7 @@ export default {
         this.$parent._open('请选择支付方式')
         return
       }
+      // this.newPage = window.open()
       if (this.choseGoodId >= 0 && this.choseGood && this.activePayType) {
         addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
           this._afterAddOrder(res)
@@ -903,11 +914,19 @@ export default {
         // new QRCode(document.getElementById("qrcode"), res.data.data.pay_url)
         this.code = res.data.data.code
         this.payUrl = res.data.data.pay_url
-        if (isPhone()) {
-          this.ifreamPayurl = true
-          console.log('正在唤起支付，请稍候')
-          this.$parent._open('正在唤起支付，请稍候')
+        if (isPhone() && !isWx()) {
+          this.newPage.location.href = this.payUrl
         }
+        const opts = {
+          type: 'image/jpeg'
+        }
+        QRCode.toDataURL(this.payUrl, opts)
+          .then(url => {
+            this.$refs.payImg.src = url
+          })
+          .catch(err => {
+            console.error(err)
+          })
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           this._surePaySuc(this.code)
@@ -1140,8 +1159,7 @@ export default {
   components: {
     sidebar,
     interlayer,
-    popup,
-    QrcodeVue
+    popup
   },
   beforeDestroy() {
     this._clearTimeforSPS()
@@ -1203,6 +1221,13 @@ export default {
 .disable:hover {
   pointer-events: none;
 }
+
+
+
+
+
+
+
 
 
 
@@ -1303,6 +1328,13 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
+
+
+
+
 
 
 
@@ -1555,9 +1587,16 @@ export default {
 }
 
 .qrcode-box {
-  width: 100%;
+  width: 190px;
+  height: 190px;
+  margin: 0 50%;
   flex-shrink: 0;
   height: auto;
+}
+
+.qrcode-box img {
+  width: 100%;
+  height: 100%;
 }
 
 .logo-class {
@@ -1857,8 +1896,11 @@ export default {
 }
 
 .pay-iframe {
-  z-index: -1;
+  visibility: hidden;
   opacity: 0;
+  width: 1px;
+  height: 1px;
+  border: none;
 }
 
 .dl-explain-img {

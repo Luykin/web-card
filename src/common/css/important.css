@@ -257,3 +257,10 @@ button:hover {
 .el-table__body-wrapper .el-table__body tbody .sucess-table:hover > td{
   background:  #9BCB74 !important;
 }
+.el-breadcrumb__inner:hover{
+  color: red !important;
+}
+.ql-editor{
+  min-height: 30px !important;
+  white-space: nowrap !important;
+}

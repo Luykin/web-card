@@ -23,11 +23,15 @@
     </div>
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/reflect', false, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/reflect'}">提现</div> -->
     <div class="backstage-fenge"></div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/backstage'}">代理后台</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/backstage')" v-bind:class="{'active-mg-btn' : $route.path == '/backstage'}">代理后台</div>
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/recharge')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/recharge'}">充值余额</div> -->
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
+    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
+    <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/secret-books')" v-bind:class="{'active-mg-btn' : ($route.path == '/secret-books') || ($route.path == '/secret-books-detail')}">
+      <div class="tag-notic-btn flex ellipsis">轻松上推荐</div>
+      上推荐教学秘籍
+    </div> -->
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_dialogTableVisible">代理介绍</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
@@ -35,7 +39,7 @@
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div> -->
     <!--    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->
-    <iframe :src="qqurl" width="0" height="0" v-if="qqurl" class="pay-iframe" @load="_closeSelf"></iframe>
+    <iframe :src="qqurl" v-if="qqurl" class="pay-iframe" @load="_closeSelf" seamless></iframe>
   </div>
 </template>
 <script type="text/javascript">
@@ -51,8 +55,6 @@ export default {
     }
   },
   created() {
-    // this.$root.eventHub.$emit('loaddl')
-    // this.$root.eventHub.$emit('loadfz', true)
     this.$root.eventHub.$on('headerToDl', (data) => {
       this._openc(data, 1, true)
     })
@@ -68,10 +70,16 @@ export default {
       const close = setTimeout(() => {
         this.qqurl = null
         clearTimeout(close)
-      },10000)
+      }, 10000)
     },
     _openc(url, show, windowOpen) {
       this.$root.eventHub.$emit('timeforsps')
+      if (url == '/bg-task-record') {
+        this.$root.eventHub.$emit('updateOrder')
+      }
+      if (url == '/bg-money-record') {
+        this.$root.eventHub.$emit('updateScoreRecord')
+      }
       if (windowOpen) {
         if (!this.user.agency.sub_site) {
           if (this.user.agency.level <= 0) {
@@ -126,10 +134,30 @@ export default {
 }
 
 </script>
+<style type="text/css" media="screen">
+#main-body {
+  min-height: 820px !important;
+}
+
+</style>
 <style type="text/css" scoped>
-/*#main-body{
-  padding-bottom: 200px !important;
-}*/
+.notice-heder-btn {
+  position: relative;
+}
+
+.tag-notic-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  background: red;
+  color: #fff;
+  height: 18px;
+  font-size: 8px;
+  border-radius: 2px;
+  transform: translate(0, -50%);
+}
+
 .notice {
   position: absolute;
   right: 0;
@@ -185,6 +213,9 @@ export default {
 .pay-iframe {
   z-index: -1;
   opacity: 0;
+  width: 1px;
+  height: 1px;
+  border: none;
 }
 
 </style>

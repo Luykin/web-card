@@ -219,6 +219,9 @@
   .aib-label{
     font-size: 13px !important;
   }
+  .secret-list-item{
+    width: 98% !important;
+  }
 }
 
 @media screen and (min-width:1900px) {

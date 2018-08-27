@@ -86,7 +86,7 @@
   import { testToken, timeChange } from 'common/js/util'
   import { SUCCESS_CODE } from 'api/config'
   import MAgent from 'components/agent-banner/agent-banner'
-  const NUM = 11
+  const NUM = 10
   export default {
     data() {
       return {

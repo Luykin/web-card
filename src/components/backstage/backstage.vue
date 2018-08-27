@@ -15,7 +15,7 @@
           <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
             <img :src="item.icon" class="mbh-icon" v-if="item.icon">
             <div v-else class="mbh-icon"></div>
-            <div class="mbh-label flex">{{item.label}}</div>
+            <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
           </div>
         </div>
         <div v-if="nowServices">
@@ -25,6 +25,16 @@
               <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
               <div v-html="nowServices.tips"></div>
             </div>
+          </div>
+          <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
+            <div class="comment-box-descrpt flex">请先添加自定义评论，评论可以分为多条，总字数不能超过100字。</div>
+            <el-tag :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false" @close="handleClose(tag)" type="warning">
+              {{tag}}
+            </el-tag>
+            <div class="tag-input-warp" v-if="inputVisible && totleTga < 99">
+              <input class="tag-input" v-model="inputValue" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm" @keyup.enter="handleInputConfirm" ref="saveTagInput">
+            </div>
+            <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
           </div>
           <div class="cr-st-line"></div>
           <div class="cr-item flex">
@@ -81,11 +91,11 @@
           <div class="cr-item flex">
             <div class="cr-box-tit ellipsis flex back-title">商品数量:</div>
             <div class="cr-box-min flex margin-right">
-              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
+              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
                 <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
               </div>
-              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
-              <div class="num-tips flex" v-show='nowServices.submit_category != 2'>注: 下单数量范围：{{nowServices.min_num}} ~ {{nowServices.max_num}}</div>
+              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
+              <div class="num-tips flex" v-show='nowServices.submit_category != 2 && !nowServices.fix_num'>注: 下单数量范围：{{nowServices.min_num}} ~ {{nowServices.max_num}}</div>
             </div>
           </div>
           <div class="cr-item flex">
@@ -138,7 +148,11 @@ export default {
       popoverWidth: 950,
       nowServicesCategory: '',
       targetid: null,
-      suosuo: null
+      suosuo: null,
+      totleTga: 0,
+      dynamicTags: [],
+      inputVisible: null,
+      inputValue: '',
     }
   },
   created() {
@@ -151,6 +165,7 @@ export default {
         window.location.href = NOWCONFIG.seo
       }
     }
+    this._updataUser(query.token, query.tokenTime)
     if (!this.app) {
       this._getAppInfo(this)
     } else {
@@ -159,7 +174,7 @@ export default {
     this.$root.eventHub.$on('closeCourse', () => {
       this._closeCourse()
     })
-    this._updataUser()
+    // this._updataUser()
     this._setPopoverWidth()
   },
   // mounted() {
@@ -181,16 +196,16 @@ export default {
     },
     consumeMoney() {
       if (this.nowServices.price) {
-        return (this.quantity || 0) * this.nowServices.price
+        return Math.round((this.quantity || 0) * this.nowServices.price)
       } else {
         return false
       }
     },
     agencyPrice() {
       if (this.user.agency_level) {
-        return Math.floor((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1) * 100) / 100
+        return Math.round((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1) * 100) / 100
       } else {
-        return Math.floor(((this.quantity || 0) * this.nowServices.price) * 100) / 100
+        return Math.round(((this.quantity || 0) * this.nowServices.price) * 100) / 100
       }
     },
     // nowServices() {
@@ -233,11 +248,8 @@ export default {
         this.suosuo = item.content
       }
     },
-    _updataUser() {
-      if (!this.checkTock()) {
-        return false
-      }
-      getUserInfo(this.token).then((res) => {
+    _updataUser(token) {
+      getUserInfo(token || this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
           this.setUser(res.data.data)
           if (this.user.agency && this.user.agency.level < 1) {
@@ -267,6 +279,9 @@ export default {
       this._clear()
       if (this.nowServices.submit_category === 2) {
         this.quantity = this.nowServices.min_num
+      }
+      if (this.nowServices.fix_num) {
+        this.quantity = this.nowServices.fix_num
       }
     },
     _choseservce() {
@@ -352,6 +367,9 @@ export default {
         this.nowServicesCategory = this.nowServices.category
         if (this.nowServices.submit_category === 2) {
           this.quantity = this.nowServices.min_num
+        }
+        if (this.nowServices.fix_num) {
+          this.quantity = this.nowServices.fix_num
         }
       }
       if (!this.pc) {
@@ -449,13 +467,16 @@ export default {
         this.lodingChose = false
         this.loading = false
         if (res.data.err_code === SUCCESS_CODE) {
-          const services = res.data.data
+          const services = that._formatService(res.data.data)
           that.services[that.activeCategory] = services
           that.showService = services
           that.nowServices = that.showService[0]
           that.nowServicesCategory = that.nowServices.category
           if (that.nowServices.submit_category === 2) {
             that.quantity = that.nowServices.min_num
+          }
+          if (that.nowServices.fix_num) {
+            that.quantity = that.nowServices.fix_num
           }
           // if (res.data.data) {
           //   that.choseServiceValue = that.showService[0] ? that.showService[0].id : ''
@@ -468,6 +489,14 @@ export default {
           }
         }
       })
+    },
+    _formatService(list) {
+      list.forEach((item) => {
+        if (item.max_num === item.min_num) {
+          item.fix_num = item.min_num
+        }
+      })
+      return list
     },
     _rectifyMoney() {
       if (isNaN(this.quantity) || this.quantity.indexOf('.') > -1 || this.quantity <= 0) {
@@ -531,6 +560,13 @@ export default {
         const M = parseInt(this.orderTimeS.slice(maohao + 1)) * 60
         this.sublimeTime = this.orderTimeD / 1000 + H + M
       }
+      if (category === 143) {
+        // 抖音自定义评论
+        if (this.dynamicTags.length <= 0) {
+          this.$parent._open('请添加评论')
+          return false
+        }
+      }
       // let data = {
       //   services: this.nowServices,
       //   point: this.quantity,
@@ -579,6 +615,16 @@ export default {
         })
         return true
       }
+      if (category === 143) {
+        let dynamicTags = ''
+        this.dynamicTags.forEach((item) => {
+          dynamicTags = dynamicTags + item + '#'
+        })
+        addTask(price, this.quantity, this.token, this.nowServices.id, this.link, false, false, dynamicTags).then((res) => {
+          this._afterAddtask(res)
+        })
+        return true
+      }
       addTask(price, this.quantity, this.token, this.nowServices.id, this.link).then((res) => {
         this._afterAddtask(res)
       })
@@ -621,6 +667,38 @@ export default {
         }
       }
     },
+    _comTotleTga() {
+      let totle = 0
+      this.dynamicTags.forEach((item) => {
+        totle = totle + item.length
+      })
+      this.totleTga = totle
+    },
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      this._comTotleTga()
+    },
+
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.focus()
+      });
+    },
+
+    handleInputConfirm() {
+      let inputValue = this.inputValue
+      if (inputValue) {
+        if (inputValue.length + this.totleTga >= 100) {
+          this.$parent._open('评论总字数不能超过100')
+        } else {
+          this.dynamicTags.push(inputValue)
+        }
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+      this._comTotleTga()
+    },
     ...mapMutations({
       setToken: 'SET_TOKEN',
       setUser: 'SET_USER',
@@ -636,6 +714,8 @@ export default {
 
 </script>
 <style type="text/css" scoped>
+/*@import 'common/css/backstage.css'*/
+
 .cr-box-max {
   height: auto;
   align-content: center;
@@ -652,28 +732,6 @@ export default {
   align-content: center;
   position: relative;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*.activeCategory {
-  background: #ff6b4e;
-  background: var(--main-color);
-}*/
 
 @keyframes activeCategory {
   0% {
@@ -1046,4 +1104,87 @@ export default {
   transform: translate(-10%, -10%);
 }
 
+
+
+
+
+/* 抖音自定义评论 */
+
+.comment-box {
+  width: 83%;
+  height: auto;
+  margin: 20px auto;
+  overflow: hidden;
+  padding: 1% 2%;
+  background: #f4f4f4;
+  border-radius: 10px;
+  line-height: 20px;
+  color: #353535;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.el-tag+.el-tag {
+  margin: 5px;
+  overflow: hidden;
+  /*  position: relative;*/
+}
+
+.add-newcoment {
+  width: 100px;
+  height: 30px;
+  font-size: 12px;
+  border-radius: 10px;
+  background: #FFD236;
+  color: #333;
+  margin: 5px;
+}
+
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
+
+.tag-input-warp {
+  width: 100px;
+  background-color: rgba(230, 162, 60, .1);
+  color: #f56c6c;
+  padding: 0 10px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  color: #409EFF;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid rgba(230, 162, 60, .2);
+  white-space: nowrap;
+  margin: 5px;
+}
+
+.tag-input-warp input {
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);
+  color: #e6a23c;
+}
+
+.comment-box-descrpt {
+  width: 100%;
+  height: 40px;
+  justify-content: flex-start;
+}
+
 </style>
+<!-- <style type="text/css" scoped src="common/css/backstage.css">
+</style> -->

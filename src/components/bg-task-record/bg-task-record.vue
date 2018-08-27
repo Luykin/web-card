@@ -27,11 +27,11 @@
           </el-table-column>
           <el-table-column prop="point" label="数量">
           </el-table-column>
-          <el-table-column prop="price" label="价格">
+          <el-table-column prop="score" label="价格">
           </el-table-column>
           <el-table-column prop="status" label="状态">
           </el-table-column>
-<!--           <el-table-column prop="time" label="预计完成">
+          <!--           <el-table-column prop="time" label="预计完成">
           </el-table-column> -->
           <el-table-column prop="appointment_time" label="预约时间">
           </el-table-column>
@@ -52,7 +52,7 @@ import { getTasks, custom } from 'api/order'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken, timeChange } from 'common/js/util'
-const NUM = 11
+const NUM = 10
 export default {
   data() {
     return {
@@ -371,15 +371,18 @@ export default {
 .i-chose {
   justify-content: flex-start;
 }
+
 .goods-table {
   width: 96%;
   margin: 0 auto;
   overflow: hidden;
 }
-.order-btn{
-	background: rgba(255, 210, 54, 1);
-	color: #353535;
-	margin: 20px 10px;
-	height: 40px;
+
+.order-btn {
+  background: rgba(255, 210, 54, 1);
+  color: #353535;
+  margin: 20px 10px;
+  height: 40px;
 }
+
 </style>

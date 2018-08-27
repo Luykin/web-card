@@ -23,7 +23,7 @@
         <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
           <img :src="item.icon" class="mbh-icon" v-if="item.icon">
           <div v-else class="mbh-icon"></div>
-          <div class="mbh-label flex">{{item.label}}</div>
+          <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
           <!-- <waveCanvas :cWidth="70" :cHeight="65" :cid='item.id' :ref="item.id" :id='item.id'></waveCanvas> -->
         </div>
       </div>
@@ -31,6 +31,19 @@
         <!-- loading 开始 -->
         <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
         <div class="course" v-if="showService && nowServices" v-html='nowServices.tips' :class="{'course-border' : uaid <= 60002}">
+        </div>
+        <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
+          <div class="comment-box-descrpt flex">请先添加自定义评论，评论可以分为多条，总字数不能超过100字。</div>
+          <el-tag :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false" @close="handleClose(tag)" type="danger">
+            {{tag}}
+          </el-tag>
+          <!--             <el-input class="input-new-tag" v-if="true" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+            </el-input> -->
+          <div class="tag-input-warp" v-if="inputVisible && totleTga < 99">
+            <input class="tag-input" v-model="inputValue" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm" @keyup.enter="handleInputConfirm" ref="saveTagInput">
+          </div>
+          <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
+          <!--             <el-button v-else class="button-new-tag" size="small" @click="showInput">+增加新评论</el-button> -->
         </div>
         <div class="select-box flex">
           <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
@@ -76,11 +89,11 @@
           </div>
           <div class="select-item" v-if="showService">
             <div class="select-item-label flex ellipsis">数量</div>
-            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2">
+            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
               <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
             </div>
-            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2">{{quantity}} (固定数量)</div>
+            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
           </div>
           <div class="select-item" v-if="showService">
             <div class="select-item-label flex ellipsis">业务</div>
@@ -123,6 +136,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
 import { Judge } from 'common/js/judge'
 import { UAID } from 'api/config'
+import { NOWCONFIG } from 'api/appConfig'
 const BILI = 0.8
 export default {
   mixins: [Judge],
@@ -159,6 +173,10 @@ export default {
       closeName: '关闭',
       // _startTime: '00:00',
       downLink: '0',
+      totleTga: 0,
+      dynamicTags: [],
+      inputVisible: null,
+      inputValue: '',
       rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
       pickerOptions: {
         disabledDate(time) {
@@ -168,6 +186,18 @@ export default {
     }
   },
   created() {
+    const query = this.$route.query
+    if (query.token && query.tokenTime && query.sgin) {
+      if (query.sgin == navigator.userAgent.slice(-10)) {
+        this.setToken(query.token)
+        this.setTokenTime(query.tokenTime)
+        this.$root.eventHub.$emit('user')
+      } else {
+        if (NOWCONFIG.seo) {
+          window.location.href = NOWCONFIG.seo
+        }
+      }
+    }
     this.uaid = UAID
     this._setEnv()
     this._setPopoverWidth()
@@ -206,6 +236,9 @@ export default {
       }
       if (nowServer.submit_category === 2) {
         this.quantity = nowServer.min_num
+      }
+      if (nowServer.fix_num) {
+        this.quantity = nowServer.fix_num
       }
       return nowServer
     },
@@ -362,12 +395,20 @@ export default {
         const M = parseInt(this.orderTimeS.slice(maohao + 1)) * 60
         this.sublimeTime = this.orderTimeD / 1000 + H + M
       }
+      if (category === 143) {
+        // 抖音自定义评论
+        if (this.dynamicTags.length <= 0) {
+          this.$parent._open('请添加评论')
+          return false
+        }
+      }
+      const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
       let data = {
         services: this.nowServices,
         point: this.quantity,
         service_id: this.choseServiceValue,
         price: this.agencyPrice,
-        addition: this.link
+        addition: this.link.match(reg) ? this.link.match(reg)[0] : this.link
       }
       if (this.Gdomain) {
         data = Object.assign({ sub_domain: this.Gdomain }, data)
@@ -377,6 +418,13 @@ export default {
       }
       if (category === 24 || category === 25) {
         data = Object.assign({ target_id: false, appointment_time: this.sublimeTime }, data)
+      }
+      if (category === 143) {
+        let dynamicTags = ''
+        this.dynamicTags.forEach((item) => {
+          dynamicTags = dynamicTags + item + '#'
+        })
+        data = Object.assign({ comment: dynamicTags }, data)
       }
       this.$root.eventHub.$emit('showPopup', data)
     },
@@ -593,7 +641,7 @@ export default {
         this.lodingChose = false
         this.loading = false
         if (res.data.err_code === SUCCESS_CODE) {
-          const services = res.data.data
+          const services = this._formatService(res.data.data)
           that.services[that.activeCategory] = services
           that.showService = services
           if (res.data.data) {
@@ -607,6 +655,46 @@ export default {
           }
         }
       })
+    },
+    _formatService(list) {
+      list.forEach((item) => {
+        if (item.max_num === item.min_num) {
+          item.fix_num = item.min_num
+        }
+      })
+      return list
+    },
+    _comTotleTga() {
+      let totle = 0
+      this.dynamicTags.forEach((item) => {
+        totle = totle + item.length
+      })
+      this.totleTga = totle
+    },
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      this._comTotleTga()
+    },
+
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.focus()
+      });
+    },
+
+    handleInputConfirm() {
+      let inputValue = this.inputValue
+      if (inputValue) {
+        if (inputValue.length + this.totleTga >= 100) {
+          this.$parent._open('评论总字数不能超过100')
+        } else {
+          this.dynamicTags.push(inputValue)
+        }
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+      this._comTotleTga()
     },
     ...mapMutations({
       setToken: 'SET_TOKEN',
@@ -1080,6 +1168,17 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* 60002 加入下载框*/
 
 .notice-down {
@@ -1141,6 +1240,91 @@ export default {
   left: 0px;
   bottom: 0px;
   z-index: 100;
+}
+
+
+
+
+
+
+
+/* 抖音自定义评论 */
+
+.comment-box {
+  width: 83%;
+  height: auto;
+  margin: 20px auto;
+  overflow: hidden;
+  padding: 1% 2%;
+  background: var(--sbb-bg);
+  border-radius: 10px;
+  line-height: 20px;
+  color: #d94d37;
+  color: var(--sbb-font);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.el-tag+.el-tag {
+  margin: 5px;
+  overflow: hidden;
+  /*  position: relative;*/
+}
+
+.add-newcoment {
+  width: 100px;
+  height: 30px;
+  font-size: 12px;
+  border-radius: 10px;
+  background: #ff6b4e;
+  background: var(--main-color);
+  color: #fff;
+  margin: 5px;
+}
+
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
+
+.tag-input-warp {
+  width: 100px;
+  background-color: rgba(245, 108, 108, .1);
+  color: #f56c6c;
+  padding: 0 10px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  color: #409EFF;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid rgba(245, 108, 108, .2);
+  white-space: nowrap;
+  margin: 5px;
+}
+
+.tag-input-warp input {
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);
+  color: #f56c6c;
+}
+
+.comment-box-descrpt {
+  width: 100%;
+  height: 40px;
+  justify-content: flex-start;
 }
 
 </style>

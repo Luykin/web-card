@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import { PREFIX_URL, UAID } from './config'
-import { getSign, isPhone } from 'common/js/util'
+import { getSign, isPhone, isWx } from 'common/js/util'
 
 export function getServiceCategory() {
   const url = `${PREFIX_URL}/service_category`
@@ -40,7 +40,7 @@ export function getAppInfo() {
     return Promise.resolve(res)
   })
 }
-export function addTask(score, point, token, serviceid, addition, targetid, sublimeTime) {
+export function addTask(score, point, token, serviceid, addition, targetid, sublimeTime, comment) {
   const url = `${PREFIX_URL}/add_task`
   let data = {
     score: score,
@@ -55,6 +55,9 @@ export function addTask(score, point, token, serviceid, addition, targetid, subl
   }
   if (sublimeTime) {
     data = Object.assign({ appointment_time: sublimeTime }, data)
+  }
+  if (comment) {
+    data = Object.assign({ comment: comment }, data)
   }
   console.log(data)
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
@@ -272,7 +275,13 @@ export function addSiteTask(token, buydata) {
   if (buydata.appointment_time) {
     data = Object.assign({ appointment_time: buydata.appointment_time }, data)
   }
-  if (isPhone()) {
+  if (buydata.service_type) {
+    data = Object.assign({ service_type: buydata.service_type }, data)
+  }
+  if (buydata.comment) {
+    data = Object.assign({ comment: buydata.comment }, data)
+  }
+  if (isPhone() && !isWx()) {
     data = Object.assign({ device: 'phone' }, data)
   } else {
     data = Object.assign({ device: 'pc' }, data)
@@ -301,4 +310,64 @@ export function addSiteTask(token, buydata) {
       }
     })
 
+}
+//20180815 增加套餐
+export function getCombosCategory() {
+  const url = `${PREFIX_URL}/combos_category`
+  let data = {
+    uaid: UAID
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}
+export function getCombos(categoryid) {
+  const url = `${PREFIX_URL}/combos`
+  let data = {
+    category_id: categoryid,
+    uaid: UAID
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }

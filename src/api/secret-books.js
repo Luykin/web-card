@@ -1,30 +1,20 @@
 import axios from 'axios'
 import qs from 'qs'
+// , UAID
 import { PREFIX_URL, UAID } from './config'
-import { getSign, isPhone, isWx } from 'common/js/util'
+import { getSign } from 'common/js/util'
 
-export function addOrder(token, score, paytype, price, id) {
-  const url = `${PREFIX_URL}/add_order`
+export function getSecretBooks(token, page, num) {
+  const url = `${PREFIX_URL}/strategy_list`
   let data = {
     token: token,
-    score: score,
-    pay_type: paytype,
-    price: price,
-    uaid: UAID
-  }
-  if (id || id === 0) {
-    data = Object.assign({ good_id: id }, data)
-  }
-  if (isPhone() && !isWx()) {
-    data = Object.assign({ device: 'phone' }, data)
-  } else {
-    data = Object.assign({ device: 'pc' }, data)
+    num: num,
+    page: page
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {
       return Promise.resolve(res)
-    })
-    .catch(function(error) {
+    }).catch(function(error) {
       if (error.response) {
         // console.log(error.response.data)
         console.log(error.response.status)
@@ -45,23 +35,16 @@ export function addOrder(token, score, paytype, price, id) {
       }
     })
 }
-export function agency(token, company, proposer, phone, email, remarks) {
-  const url = `${PREFIX_URL}/agency`
+export function getSecretBooksDetail(token, id) {
+  const url = `${PREFIX_URL}/strategy`
   let data = {
     token: token,
-    company: company,
-    proposer: proposer,
-    phone: phone,
-    email: email
-  }
-  if (remarks) {
-    data = Object.assign({ remarks: remarks }, data)
+    id: id
   }
   return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
     .then(function(res) {
       return Promise.resolve(res)
-    })
-    .catch(function(error) {
+    }).catch(function(error) {
       if (error.response) {
         // console.log(error.response.data)
         console.log(error.response.status)

@@ -30,13 +30,13 @@
         </div>
       </div>
       <div class="cr-item flex">
-        <div class="cr-box-tit ellipsis flex">联系客服:</div>
+        <div class="cr-box-tit ellipsis flex">联系微信:</div>
         <div class="cr-box-min flex">
           <input type="text" v-model="sitFooter" class="edit-input" min="0" max="12">
         </div>
       </div>
       <div class="cr-item flex">
-        <div class="cr-box-tit ellipsis flex">联系邮箱:</div>
+        <div class="cr-box-tit ellipsis flex">联系QQ:</div>
         <div class="cr-box-min flex">
           <input type="text" v-model="sitFooterEmail" class="edit-input" min="0" max="20">
         </div>
@@ -491,5 +491,7 @@ export default {
   resize: none;
   font-size: 14px;
 }
-
+/*.ql-editor{
+  min-height: 30px !important;
+}*/
 </style>

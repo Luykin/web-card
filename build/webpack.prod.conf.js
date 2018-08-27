@@ -13,6 +13,8 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const QiniuPlugin = require('./upload-qiniu-webpack-plugin')
 const DeleteqiniuPlugin = require('./delete-qiniu-webpack-plugin')
+// const JsEncodePlugin = require('./JsEncodePlugin')
+
 // console.log(JSON.stringify(DeleteqiniuPlugin))
 const env = require('../config/prod.env')
 const _config = require('../src/api/config');
@@ -46,7 +48,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     path: config.build.assetsRoot,
     filename: utils.assetsPath('js/[name].[hash]' + Version + '.js'),
     chunkFilename: utils.assetsPath('js/[id].[hash]' + Version + '.js'),
-    publicPath: "http://cdn.xingkwh.com/" + uaid_qiniu_prefix + "[hash]/"
+    publicPath: "https://cdn.xingkwh.com/" + uaid_qiniu_prefix + "[hash]/"
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -55,6 +57,13 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
+    // new JsEncodePlugin({
+    //   // 生成全局变量名
+    //   global: '$',
+    //   //需要加密的js文件正则
+    //   jsReg: /^app\..+\.js$/,
+    //   assetsPath: '../dist/static'
+    // }),
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: true,

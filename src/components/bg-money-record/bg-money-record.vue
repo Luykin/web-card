@@ -31,7 +31,7 @@ import { getOrders } from 'api/score-record'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken, timeChange } from 'common/js/util'
-const NUM = 11
+const NUM = 10
 export default {
   data() {
     return {
