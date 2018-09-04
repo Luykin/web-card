@@ -4,7 +4,7 @@
       <b-agent></b-agent>
       <div class="back-servce-box shpc">
         <div class="service-item flex title-bsb">业务选择</div>
-        <div v-for="item in app.service_categories" class="service-item flex cursor" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
+        <div v-for="item in app.service_categories" class="service-item flex cursor" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()">
           {{item.label}}
           <i class="active-icon el-icon-d-arrow-right shpc"></i>
         </div>
@@ -12,18 +12,18 @@
       <div class="segmenting-line shpc"></div>
       <div class="back-servce-info" v-loading='loading'>
         <div class="main-box-header flex sh-phone">
-          <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
+          <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()">
             <img :src="item.icon" class="mbh-icon" v-if="item.icon">
             <div v-else class="mbh-icon"></div>
             <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
           </div>
         </div>
         <div v-if="nowServices">
-          <div class="cr-item flex">
+          <div class="cr-item flex" v-if="!nowServices.fan_project_service">
             <!-- <div class="cr-box-tit ellipsis flex back-title">首页公告:</div> -->
             <div class="cr-box-max flex sp-tips">
               <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
-              <div v-html="nowServices.tips"></div>
+              <div v-html="nowServices.tips || nowServices.des"></div>
             </div>
           </div>
           <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
@@ -36,8 +36,24 @@
             </div>
             <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
           </div>
+          <div class="chose-box-service-srm flex" v-if="nowServices && nowServices.fan_project_service">
+            <div class="cbss-item cursor flex" v-for="item in showService" @click="_nowServce(item)" :class="{'active-cbss-item': item.id == nowServices.id}">
+              <div class="cbss-item-title flex">
+                {{item.label}}
+                <span class="cbss-fu-title flex">{{item.seo}}</span>
+              </div>
+              <div class="course-item flex ellipsis">{{item.hour}}h上热门</div>
+              <!-- <div class="course-item flex ellipsis">{{item.exposure_rate * 100}}%</div> -->
+              <div class="course-item flex ellipsis">{{item.exposure_hour}}h持续热门曝光</div>
+              <div class="course-item flex ellipsis">点赞数{{item.like_num}}+</div>
+              <div class="course-item flex ellipsis">播放曝光{{item.exposure_num}}+</div>
+              <div class="trang">
+                <i class="iconfont icon-zhengque trang-icon"></i>
+              </div>
+            </div>
+          </div>
           <div class="cr-st-line"></div>
-          <div class="cr-item flex">
+          <div class="cr-item flex" v-show="!nowServices.fan_project_service">
             <div class="cr-box-tit ellipsis flex back-title">商品选择:</div>
             <div class="cr-box-min flex margin-right cursor" @click.stop="_choseservce">
               {{nowServices.label}}
@@ -102,13 +118,14 @@
             <div class="cr-box-tit ellipsis flex back-title">所需金额:</div>
             <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(nowServices.price) + '单价'}}= {{consumeMoney + '元'}}</div>
           </div>
-          <div class="cr-item flex">
+          <div class="cr-item flex" v-show="!nowServices.fan_project_service">
             <div class="cr-box-tit ellipsis flex back-title">代理折后:</div>
             <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level? user.agency_level.discount || 1 : 1 )*10 + '折'}} = {{agencyPrice + '元'}}</div>
           </div>
           <div class="chose-box ellipsis flex" v-if="suosuo">{{suosuo}}</div>
           <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
-          <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0">提交订单</div>
+          <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0 && nowServices.category">提交订单</div>
+          <div class="btn-back flex cursor" @click="_addFanProject(nowServices.id)" v-show="showService && nowServices.behavior !== 0 && nowServices.fan_project_service">提交方案</div>
         </div>
       </div>
     </div>
@@ -116,7 +133,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addAgencyFanProject } from 'api/index'
 import { mapGetters, mapMutations } from 'vuex'
 import BAgent from 'components/backstage-banner/backstage-banner'
 import { SUCCESS_CODE } from 'api/config'
@@ -166,11 +183,7 @@ export default {
       }
     }
     this._updataUser(query.token, query.tokenTime)
-    if (!this.app) {
-      this._getAppInfo(this)
-    } else {
-      this._initNet()
-    }
+    this._getAppInfo(this)
     this.$root.eventHub.$on('closeCourse', () => {
       this._closeCourse()
     })
@@ -202,10 +215,14 @@ export default {
       }
     },
     agencyPrice() {
-      if (this.user.agency_level) {
-        return Math.round((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1) * 100) / 100
+      if (this.nowServices.fan_project_service) {
+        return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
       } else {
-        return Math.round(((this.quantity || 0) * this.nowServices.price) * 100) / 100
+        if (this.user.agency_level) {
+          return Math.round((this.quantity || 0) * (this.nowServices.price || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
+        } else {
+          return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+        }
       }
     },
     // nowServices() {
@@ -346,10 +363,15 @@ export default {
     _initNet() {
       if (this.app.service_categories.length > 0) {
         this.activeCategory = this.app.service_categories[0].id
-        this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+        if (this.app.service_categories[0].category == 14) {
+          this._getFanProject()
+        } else {
+          this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+        }
       }
     },
-    _chose(e, id) {
+    _chose(e, item) {
+      const id = item.id
       if (this.lodingChose) {
         this.$parent._open('加载中')
         return 0
@@ -359,8 +381,12 @@ export default {
       this.suosuo = false
       this.activeCategory = id
       if (!this.services[id]) {
-        this.lodingChose = true
-        this._getServices(this, id, this.Gdomain)
+        if (item.category == 14) {
+          this._getFanProject()
+        } else {
+          this.lodingChose = true
+          this._getServices(this, id, this.Gdomain)
+        }
       } else {
         this.showService = this.services[id]
         this.nowServices = this.showService[0]
@@ -388,6 +414,38 @@ export default {
           this.choseSay = false
         }
       }
+    },
+    _getFanProject() {
+      this.loading = true
+      getFanProject().then((res) => {
+        this.lodingChose = false
+        this.loading = false
+        if (res.data.err_code === SUCCESS_CODE) {
+          const services = this._formatFanProject(res.data.data)
+          this.services[this.activeCategory] = services
+          this.showService = services
+          this.nowServices = this.showService[0]
+          this.nowServicesCategory = this.nowServices.category
+          if (res.data.data) {
+            this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
+            this.quantity = 1
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _formatFanProject(list) {
+      if (list && list.length > 0) {
+        list.forEach((item) => {
+          item.fix_num = 1
+        })
+      }
+      return list
     },
     _choseShuoShuo(category) {
       this.$refs.interlayer._showLayer()
@@ -491,11 +549,13 @@ export default {
       })
     },
     _formatService(list) {
-      list.forEach((item) => {
-        if (item.max_num === item.min_num) {
-          item.fix_num = item.min_num
-        }
-      })
+      if (list && list.length > 0) {
+        list.forEach((item) => {
+          if (item.max_num === item.min_num) {
+            item.fix_num = item.min_num
+          }
+        })
+      }
       return list
     },
     _rectifyMoney() {
@@ -617,15 +677,30 @@ export default {
       }
       if (category === 143) {
         let dynamicTags = ''
-        this.dynamicTags.forEach((item) => {
-          dynamicTags = dynamicTags + item + '#'
-        })
+        if (this.dynamicTags && this.dynamicTags.length > 0) {
+          this.dynamicTags.forEach((item) => {
+            dynamicTags = dynamicTags + item + '#'
+          })
+        }
         addTask(price, this.quantity, this.token, this.nowServices.id, this.link, false, false, dynamicTags).then((res) => {
           this._afterAddtask(res)
         })
         return true
       }
       addTask(price, this.quantity, this.token, this.nowServices.id, this.link).then((res) => {
+        this._afterAddtask(res)
+      })
+    },
+    _addFanProject() {
+      if (!this.link || this.link.indexOf('http') < 0) {
+        this.$parent._open('请正确填写')
+        return false
+      }
+      if (this.agencyPrice > this.user.score) {
+        this.$parent._open('余额不足')
+        return false
+      }
+      addAgencyFanProject(this.token, this.agencyPrice, this.nowServices.id, this.link).then((res) => {
         this._afterAddtask(res)
       })
     },
@@ -669,9 +744,11 @@ export default {
     },
     _comTotleTga() {
       let totle = 0
-      this.dynamicTags.forEach((item) => {
-        totle = totle + item.length
-      })
+      if (this.dynamicTags && this.dynamicTags.length > 0) {
+        this.dynamicTags.forEach((item) => {
+          totle = totle + item.length
+        })
+      }
       this.totleTga = totle
     },
     handleClose(tag) {
@@ -1108,6 +1185,17 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* 抖音自定义评论 */
 
 .comment-box {
@@ -1183,6 +1271,105 @@ export default {
   width: 100%;
   height: 40px;
   justify-content: flex-start;
+}
+
+.chose-box-service-srm {
+  width: 95%;
+  min-height: 245px;
+  margin: 10px auto 0;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.cbss-item {
+  width: 30%;
+  /*  min-width: 260px;*/
+  height: 245px;
+  margin: 10px 1.5%;
+  border: 2px solid rgba(221, 221, 221, 1);
+  border-radius: 10px;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.cbss-item-title {
+  width: 100%;
+  height: 30%;
+  background: #F4F4F4;
+  color: #353535;
+  font-size: 16px;
+  flex-wrap: wrap;
+  align-content: center;
+  /*  font-weight: 600;*/
+}
+.active-cbss-item .cbss-item-title{
+  color: #fff;
+}
+
+.course-item {
+  width: 100%;
+  height: 16%;
+  color: #353535;
+  justify-content: flex-start;
+  text-indent: 40px;
+  background: url(https://cdn.xingkwh.com/%E7%81%B0%E8%89%B2.png) no-repeat;
+  background-position: 12px 50%;
+  background-size: 16px;
+}
+
+.active-cbss-item .course-item{
+  background: url(https://cdn.xingkwh.com/%E9%87%91%E8%89%B2.png) no-repeat;
+  background-position: 12px 50%;
+  background-size: 16px;
+}
+.active-cbss-item {
+  border: 2px solid rgba(255, 210, 54, 1);
+}
+
+.active-cbss-item .cbss-item-title {
+  background: #FFD236;
+}
+
+.active-cbss-item .course-item {
+  color: #FF9100;
+}
+.active-cbss-item .cbss-fu-title {
+  color: #fff;
+}
+.trang {
+  opacity: 0;
+}
+
+.active-cbss-item .trang {
+  opacity: 1;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(2px, 0);
+  width: 0px;
+  height: 0px;
+  border-top: 20px solid rgba(0, 0, 0, 0);
+  border-left: 20px solid rgba(0, 0, 0, 0);
+  border-right: 20px solid #FFD236;
+  border-bottom: 20px solid #FFD236;
+}
+
+.active-cbss-item .trang-icon {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  color: #fff;
+}
+
+.cbss-fu-title {
+  width: 100%;
+  font-size: 12px;
+  margin: 10px 0;
+  color: #999;
 }
 
 </style>

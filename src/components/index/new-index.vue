@@ -22,12 +22,12 @@
             <img :src="item.icon" class="mbh-icon" v-if="item.icon">
             <div class="mbh-label flex">{{item.label}}</div>
           </div>
-          <div v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()" class="servece-table-item flex cursor">
+          <div v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()" class="servece-table-item flex cursor">
             <img :src="item.icon" class="mbh-icon" v-if="item.icon">
             <div class="mbh-label flex">{{item.label}}</div>
           </div>
         </div>
-        <div class="servece-table-detail">
+        <div class="servece-table-detail" v-loading='loading'>
           <div class="std-header flex">
             <div v-for="item in showService" class="std-header-item flex cursor" @click="_changeService(item)" :class="{'active-service': item.id == nowServices.id}">
               <div class="shi-label">
@@ -74,9 +74,37 @@
               </div>
               <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
             </div>
-            <div class="course flex" v-if="showService && nowServices" :class="{'course-border' : uaid <= 60002}">
+            <!--  下单介绍  -->
+            <div class="course flex" v-if="showService && nowServices && !nowServices.fan_project_service" :class="{'course-border' : uaid <= 60002}">
               <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
               <div v-html='nowServices.tips || nowServices.des'></div>
+            </div>
+            <div class="course flex fps-tra" v-if="showService && nowServices && nowServices.fan_project_service" style="align-items: flex-start; padding: 0;width: 78%; background: #fff; justify-content: center; border-top: 15px solid #FFE5CB; border-left: 28px solid #FFE5CB; border-right: 28px solid #FFE5CB; height: 200px; border-bottom: 15px solid #FFE5CB; position: relative; cursor: pointer;">
+              <img src="https://cdn.xingkwh.com/%E4%BE%8B%E5%AD%90.png" alt="上热门成功案例" class="shili-pic">
+              <div class="content-course-warp flex">
+                <!-- <div class="ccw-bg"></div> -->
+                <img :src="'https://cdn.xingkwh.com/'+ nowServices.id +'.png'" alt="套餐序号" class="course-ccw-bg">
+                <div class="course-ccw-info flex">
+                  <div class="course-ccw-info-title flex">{{'• '+ nowServices.label + ' •'}}</div>
+                  <div class="course-ccw-info-tips flex">{{nowServices.seo}}</div>
+                  <div class="course-ccw-info-item flex"><span class="orang-ccii">{{nowServices.hour}}h</span>上热门+<span class="orang-ccii">{{nowServices.exposure_hour}}h</span>持续曝光</div>
+                  <div class="course-ccw-info-item flex">点赞<span class="orang-ccii">{{nowServices.like_num}}+</span>播放量<span class="orang-ccii">{{nowServices.exposure_num}}+</span></div>
+                </div>
+              </div>
+              <div class="course-ccw-price flex">
+                {{consumeMoney}}
+                <div class="course-ccw-price-danwei flex">
+                  <span class="ccpd-span">元</span>
+                  <span class="ccpd-span-hen"></span>
+                  <span class="ccpd-span">次</span>
+                </div>
+              </div>
+              <!-- <div class="course-title flex">{{nowServices.label}}</div>
+              <div class="flex course-item-tips">{{nowServices.seo}}</div>
+              <div class="course-item flex">上热门：<span class="min-span-ci flex">{{nowServices.hour}}小时</span></div>
+              <div class="course-item flex">曝光时间：<span class="min-span-ci flex">{{nowServices.exposure_hour}}小时</span></div>
+              <div class="course-item flex">预计点赞数:<span class="min-span-ci flex">{{nowServices.like_num}}w+</span></div>
+              <div class="course-item flex">预计曝光量: <span class="min-span-ci flex">{{nowServices.exposure_num}}w+</span></div> -->
             </div>
             <div class="select-box flex">
               <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
@@ -93,7 +121,7 @@
               <div class="select-item" v-if="showService">
                 <div class="select-item-label flex ellipsis">
                   <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
-                  <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">
+                  <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4 || nowServices.fan_project_service))">
                     <div class="p-course-box" v-show="!pc || choseSay">
                       <div class="pcb-warp">
                         <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
@@ -112,7 +140,7 @@
                       <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
                     </div>
                   </el-popover>
-                  <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">{{nowServices.category > 0&&nowServices.category
+                  <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4 || nowServices.fan_project_service))">{{nowServices.category > 0&&nowServices.category
                     < 10 ? '获取说说列表': '查看教程'}}</el-button>
                 </div>
                 <div class="flex input-defult" v-if="nowServices">
@@ -136,7 +164,7 @@
                 <span class="need-score-sapn" v-show="nowServices.behavior == 0">服务正在维护中，请关注公告。</span>
                 <span class="need-score-sapn" v-show="nowServices.services">{{consumeMoney + '元'}}</span>
               </div>
-              <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain && ((nowServices.behavior !== 0)|| nowServices.services)">
+              <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain && ((nowServices.behavior !== 0)|| nowServices.services) && !nowServices.fan_project_service">
                 <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理折扣后所需积分{{' : '+ consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</span>
               </div>
             </div>
@@ -148,7 +176,8 @@
             </div>
             <!-- app  支付方式  end -->
             <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">提交订单</div>
-            <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0">提交订单</div>
+            <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0 && nowServices.category">提交订单</div>
+            <div class="btn flex" @click="_addFanProject(nowServices.id)" v-show="showService && nowServices.behavior !== 0 && nowServices.fan_project_service">提交方案</div>
           </div>
         </div>
       </div>
@@ -199,7 +228,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, latestTasks, getCombosCategory, getCombos } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, latestTasks, getCombosCategory, getCombos, getFanProject, addFanProject } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
@@ -218,7 +247,7 @@ export default {
       judgeMust: true,
       popoverWidth: 1000,
       link: '',
-      loading: false,
+      loading: true,
       orderTimeD: '',
       orderTimeS: '',
       quantity: '',
@@ -232,7 +261,7 @@ export default {
       showService: false,
       targetid: null,
       suosuo: null,
-      lodingS: false,
+      lodingS: true,
       scorerate: false, // 一元购买多少积分
       pc: true,
       announcement: null,
@@ -241,7 +270,6 @@ export default {
       netWorking: false,
       position: 'right',
       closeName: '关闭',
-      // _startTime: '00:00',
       downLink: '0',
       nowServices: null,
       latestTasks: null,
@@ -342,10 +370,14 @@ export default {
       }
     },
     agencyPrice() {
-      if (this.user.agency_level) {
-        return Math.round((this.quantity || 0) * (this.nowServices.price || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
-      } else {
+      if (this.nowServices.fan_project_service || this.Gdomain) {
         return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+      } else {
+        if (this.user.agency_level) {
+          return Math.round((this.quantity || 0) * (this.nowServices.price || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
+        } else {
+          return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+        }
       }
     },
     ...mapGetters([
@@ -358,9 +390,11 @@ export default {
   methods: {
     _comTotleTga() {
       let totle = 0
-      this.dynamicTags.forEach((item) => {
-        totle = totle + item.length
-      })
+      if (this.dynamicTags && this.dynamicTags.length > 0) {
+        this.dynamicTags.forEach((item) => {
+          totle = totle + item.length
+        })
+      }
       this.totleTga = totle
     },
     _openJD(url) {
@@ -504,6 +538,65 @@ export default {
         }
       })
     },
+    _getFanProject() {
+      this.loading = true
+      getFanProject().then((res) => {
+        this.lodingChose = false
+        this.loading = false
+        if (res.data.err_code === SUCCESS_CODE) {
+          this.loading = true
+          const services = this._formatFanProject(res.data.data)
+          this.services[this.activeCategory] = services
+          this.showService = services
+          if (res.data.data) {
+            this.nowServices = this.showService[0]
+            this.quantity = 1
+          }
+          this.loading = false
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _addFanProject() {
+      if (!this.user) {
+        this.$parent._open('请先登录哦')
+        return
+      }
+      if (this.proxyRank == '普通用户' || !this.user.agency_level) {
+        this.$parent._open('您还不是代理')
+        return
+      }
+      if (!this.activePayType) {
+        this.$parent._open('请选择支付方式')
+        return
+      }
+      if (!this.link || this.link.indexOf('http') < 0) {
+        this.$parent._open('请正确填写')
+        return false
+      }
+      const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
+      let data = {
+        services: this.nowServices,
+        price: this.agencyPrice,
+        fan_project_id: this.nowServices.id,
+        addition: this.link.match(reg) ? this.link.match(reg)[0] : this.link,
+        pay_type: this.activePayType
+      }
+      this.$root.eventHub.$emit('showPopup', data)
+    },
+    _formatFanProject(list) {
+      if (list && list.length > 0) {
+        list.forEach((item) => {
+          item.fix_num = 1
+        })
+      }
+      return list
+    },
     _getServices(that, id, Gdomain) {
       this.loading = true
       getServices(id, Gdomain).then((res) => {
@@ -515,7 +608,6 @@ export default {
           that.showService = services
           if (res.data.data) {
             that.nowServices = that.showService[0]
-            // that.quantity = that.nowServices.point_list ? that.nowServices.point_list[0] : ''
             if (that.nowServices.fix_num) {
               that.quantity = that.nowServices.fix_num
             } else {
@@ -532,12 +624,14 @@ export default {
       })
     },
     _formatService(list) {
-      list.forEach((item) => {
-        if (item.max_num === item.min_num) {
-          console.log(item.label)
-          item.fix_num = item.min_num
-        }
-      })
+      if (list && list.length > 0) {
+        list.forEach((item) => {
+          if (item.max_num === item.min_num) {
+            // console.log(item.label)
+            item.fix_num = item.min_num
+          }
+        })
+      }
       return list
     },
     _rectifyMoney() {
@@ -641,9 +735,11 @@ export default {
       }
       if (category === 143) {
         let dynamicTags = ''
-        this.dynamicTags.forEach((item) => {
-          dynamicTags = dynamicTags + item + '#'
-        })
+        if (this.dynamicTags && this.dynamicTags.length > 0) {
+          this.dynamicTags.forEach((item) => {
+            dynamicTags = dynamicTags + item + '#'
+          })
+        }
         data = Object.assign({ comment: dynamicTags }, data)
       }
       this.$root.eventHub.$emit('showPopup', data)
@@ -776,20 +872,19 @@ export default {
         return true
       }
     },
-    _chose(e, id) {
+    _chose(e, item) {
+      const id = item.id
       if (this.lodingChose) {
         this.$parent._open('加载中')
         return 0
       }
-      // console.log(id)
-      // if (true) {
-      //   this.lodingChose = true
-      //   this._getCombos(id)
-      //   this.quantity = 1
-      // } else {
       if (!this.services[id]) {
-        this.lodingChose = true
-        this._getServices(this, id, this.Gdomain)
+        if (item.category == 14) {
+          this._getFanProject()
+        } else {
+          this.lodingChose = true
+          this._getServices(this, id, this.Gdomain)
+        }
       } else {
         this.showService = this.services[id]
         // this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
@@ -873,8 +968,12 @@ export default {
     _initNet() {
       if (this.app.service_categories.length > 0) {
         this.activeCategory = this.app.service_categories[0].id
-        this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
-        this._getCombosCategory()
+        if (this.app.service_categories[0].category == 14) {
+          this._getFanProject()
+        } else {
+          this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+        }
+        // this._getCombosCategory()
       }
     },
     handleClose(tag) {
@@ -1277,7 +1376,7 @@ export default {
   margin: 5px 0 0;
   height: 100%;
   background: #fff;
-  overflow: hidden;
+  /*  overflow: hidden;*/
 }
 
 .servece-table-item:hover .mbh-label {
@@ -1567,6 +1666,7 @@ export default {
   color: #d94d37;
   color: var(--sbb-font);
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .course-border {
@@ -1659,76 +1759,6 @@ export default {
   flex-grow: 1;
   height: 100%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*//2018.08.01 加入最新任务跑马灯*/
 
 @keyframes affiche {
   0% {
@@ -1924,20 +1954,6 @@ export default {
   transform: translate(10px, 0);
 }
 
-
-
-
-
-
-
-
-
-
-
-/*.combos-index-item:last-child{
-  display: none;
-}*/
-
 @keyframes record {
   0% {
     transform: translate3d(0, 0, 0);
@@ -1952,25 +1968,6 @@ export default {
     transform: translate3d(0, -50%, 0);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 抖音自定义评论 */
 
 .comment-box {
   width: 83%;
@@ -2053,6 +2050,204 @@ export default {
   align-items: flex-start;
   justify-content: flex-start;
   margin-right: 5px;
+}
+
+.course-title {
+  background: #FFD8C0;
+  color: #FF6B4E;
+  font-size: 18px;
+  width: 100%;
+  height: 45px;
+  margin-bottom: 10px;
+}
+
+.course-item {
+  width: 35%;
+  height: 40px;
+  color: #FF6B4E;
+  margin: 10px 0;
+}
+
+.min-span-ci {
+  padding: 0 10px;
+  min-width: 50px;
+  height: 30px;
+  margin: 0 5px;
+  border-radius: 10px;
+  background: #FFD8C0;
+}
+
+.course-item-box {
+  width: 45%;
+  height: 100px;
+  border-radius: 10px;
+  border: 1px solid #EBCED1;
+  background: #FFE8D2;
+  box-sizing: border-box;
+  position: relative;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.num-cib {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #FFD8C0;
+}
+
+.cib-left-margin {
+  margin: 10px 5% 10px 0;
+}
+
+.cib-right-margin {
+  margin: 10px 0 10px 5%;
+}
+
+.title-cib {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 10px auto;
+}
+
+.course-item-tips {
+  width: auto;
+  padding: 0 10px;
+  margin: 0 40%;
+  height: 32px;
+  color: #FF6B4E;
+  white-space: nowrap;
+  background: #FFD8C0;
+  border-radius: 1000px;
+}
+
+.fps-tra:after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 0px;
+  z-index: 999;
+  width: 0px;
+  height: 0px;
+  border-left: 80px solid rgba(255, 255, 255, 0);
+  border-right: 80px solid #FFE5CB;
+  border-top: 102px solid rgba(255, 255, 255, 0);
+  border-bottom: 102px solid #FFE5CB;
+}
+
+.fps-tra:hover .shili-pic {
+  display: block;
+}
+
+.content-course-warp {
+  position: absolute;
+  z-index: 998;
+  background: #fff;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  top: -2px;
+  border-radius: 8px;
+  border: none;
+  justify-content: flex-start;
+}
+
+.course-ccw-bg {
+  height: 76%;
+  width: auto;
+  margin: 0 4% 0 9%;
+}
+
+.course-ccw-info {
+  width: 55%;
+  height: 100%;
+  transform: translate(-20px, 5px);
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.course-ccw-info-title {
+  width: 100%;
+  color: #FF810B;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.course-ccw-info-tips {
+  width: 70%;
+  height: 50px;
+  margin: 15px 0;
+  font-size: 18px;
+  color: #999999;
+  border-bottom: 2px solid #ddd;
+}
+
+.course-ccw-info-item {
+  width: 100%;
+  margin-bottom: 10px;
+  color: #353535;
+  font-size: 16px;
+}
+
+.course-ccw-info-item .orang-ccii {
+  display: block;
+  margin: 0 5px;
+  color: #FF7400;
+}
+
+.course-ccw-price {
+  position: absolute;
+  z-index: 1000;
+  right: 0;
+  bottom: 0;
+  transform: translate(35px, 10px);
+  height: 55%;
+  width: 160px;
+  color: #FB7D01;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.course-ccw-price-danwei {
+  width: 20%;
+  height: auto;
+  flex-wrap: wrap;
+  margin: 0 5px;
+  min-height: 10px;
+}
+
+.course-ccw-price-danwei .ccpd-span {
+  display: block;
+  width: 100%;
+  font-size: 20px;
+  color: #353535;
+  font-weight: 0;
+}
+
+.ccpd-span-hen {
+  display: block;
+  width: 80%;
+  background: #353533;
+  height: 2px;
+  margin: 6px 0 6px -5px;
+  transform: rotate(-10deg);
+}
+
+.shili-pic {
+  display: none;
+  position: absolute;
+  z-index: 1001;
+  right: 0%;
+  top: 50%;
+  width: 780px;
+  transform: translate(90%, -50%);
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 1px 1px 15px rgba(0,0,0,.5);
 }
 
 </style>

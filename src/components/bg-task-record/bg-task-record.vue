@@ -11,6 +11,29 @@
           <div class="btn flex order-btn" @click='_chose'>筛选</div>
           <div class="btn flex order-btn" @click='_reset'>重置</div>
         </div>
+        <div v-show="tableDataF && tableDataF.length > 0">
+          <el-table :data="tableDataF" style="width: 100%" v-loading="loadingF" :row-class-name="tableRowClassName">
+            <el-table-column prop="fan_project.label" label="业务">
+            </el-table-column>
+            <el-table-column prop="id" label="套餐ID">
+            </el-table-column>
+            <el-table-column prop="addition" label="链接">
+            </el-table-column>
+            <el-table-column label="">
+              <template slot-scope="scope">
+                <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态">
+            </el-table-column>
+            <el-table-column prop="createA" label="提交时间">
+            </el-table-column>
+          </el-table>
+          <div id="i-page" class="i-page flex" v-show="tableDataF && tableDataF.length > 3">
+            <el-pagination layout="prev, pager, next" :total="totalF" @current-change="handleCurrentChangeF">
+            </el-pagination>
+          </div>
+        </div>
         <el-table :data="tableData" style="width: 100%" v-loading="loading" :row-class-name="tableRowClassName">
           <el-table-column prop="label" label="业务">
           </el-table-column>
@@ -48,20 +71,24 @@
 </template>
 <script>
 import BAgent from 'components/backstage-banner/backstage-banner'
-import { getTasks, custom } from 'api/order'
+import { getTasks, custom, getFanProjectOrders } from 'api/order'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken, timeChange } from 'common/js/util'
 const NUM = 10
+const FANNUM = 3
 export default {
   data() {
     return {
       tableData: [],
+      tableDataF: [],
+      totalF: 3,
       currentPage1: 5,
       currentPage2: 5,
       currentPage3: 5,
       currentPage4: 4,
       page: 0,
+      pageF: 0,
       total: 10,
       loading: false,
       timer: false,
@@ -91,9 +118,11 @@ export default {
   created() {
     this.$root.eventHub.$on('updateOrder', () => {
       this._getTasks()
+      this._getFanOrder()
     })
     this.$nextTick(() => {
       this._getTasks()
+      this._getFanOrder()
     })
     this.$root.eventHub.$emit('canvas')
     this._orderInt()
@@ -111,9 +140,15 @@ export default {
     },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
-      this.choseItem.forEach((item) => {
+      let ret = []
+      this.choseItem.forEach((item, index, array) => {
         item.choseTitle = item.label + '订单'
+        if (item.category != 14) {
+          ret.push(item)
+        }
       })
+      this.choseItem = ret
+      ret = null
       this.choseItem.unshift({
         choseTitle: '全部订单',
         id: -1
@@ -176,6 +211,36 @@ export default {
           this.afterGetTasks(res, this)
         })
       }
+    },
+    _getFanOrder() {
+      if (!testToken(this.tokenTime) || !this.token) {
+        this.setUser(false)
+        this.setToken(false)
+        this.setTokenTime(false)
+        this.$parent._open('登录已失效')
+        this.$router.replace({
+          path: '/login'
+        })
+        return false
+      }
+      this.loadingF = true
+      getFanProjectOrders(this.token, FANNUM, this.pageF).then((res) => {
+        this.afterFanProjectOrders(res, this)
+      })
+    },
+    afterFanProjectOrders(res, that) {
+      this.loadingF = false
+      if (res.data.err_code === SUCCESS_CODE) {
+        this.totalF = res.data.data.count
+        this.tableDataF = this._normalfanprojectOrders(res.data.data.tasks)
+      }
+    },
+    _normalfanprojectOrders(list) {
+      list.forEach((item) => {
+        item.status = this.state[item.status]
+        item.createA = timeChange(item.create)
+      })
+      return list
     },
     afterGetTasks(res, that) {
       this.loading = false
@@ -350,6 +415,12 @@ export default {
     handleCurrentChange(val) {
       console.log(val - 1)
       this.page = val - 1
+      this._getTasks()
+      console.log(`当前页: ${val}`)
+    },
+    handleCurrentChangeF(val) {
+      console.log(val - 1)
+      this.pageF = val - 1
       this._getTasks()
       console.log(`当前页: ${val}`)
     },

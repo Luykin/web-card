@@ -64,7 +64,7 @@
   .cq-right {
     width: 60%;
   }
-  .back-title{
+  .back-title {
     text-indent: 20px;
   }
 }
@@ -118,21 +118,21 @@
   .business-item {
     height: 70px;
   }
-  .goods-boxA{
+  .goods-boxA {
     width: 77% !important;
     margin: 20px 0 0 23% !important;
   }
-  .agreement-content{
+  .agreement-content {
     width: 96% !important;
   }
-  .r-i-warp{
+  .r-i-warp {
     margin: 0 8px 0 0 !important;
   }
-  .none-bg{
+  .none-bg {
     transform: translate(-12%, 0);
     width: 100% !important;
   }
-/*  .aib-input-warp{
+  /*  .aib-input-warp{
     width: 100% !important;
   }*/
   .agent-body-privilege-one {
@@ -177,50 +177,53 @@
     flex-grow: 1;
     margin: 20px 0;
   }
-  .sp-tips{
+  .sp-tips {
     margin: 0 20px 0 10px !important;
   }
-  .good-item{
+  .good-item {
     min-width: 100px;
   }
-  .rbta-input-warp{
+  .rbta-input-warp {
     width: 90% !important;
   }
-  .titps-domain{
+  .titps-domain {
     margin: 0 auto;
     width: 90% !important;
     line-height: 20px;
   }
-  .cb-right{
+  .cb-right {
     width: 95% !important;
   }
-  .income-box-item{
+  .income-box-item {
     width: 35% !important;
     padding-bottom: 35% !important;
     margin: 10px !important;
   }
-  .income-box{
+  .income-box {
     flex-wrap: wrap;
   }
-  .edit-logo{
+  .edit-logo {
     min-width: 140px;
     padding-top: 50px !important;
   }
-  .edit-content{
+  .edit-content {
     width: 100% !important;
   }
-  .edit-box{
+  .edit-box {
     padding-top: 10px !important;
   }
-  .btn-zsy{
+  .btn-zsy {
     width: auto !important;
     font-size: 13px !important;
   }
-  .aib-label{
+  .aib-label {
     font-size: 13px !important;
   }
-  .secret-list-item{
+  .secret-list-item {
     width: 98% !important;
+  }
+  .cbss-item {
+    width: 94% !important;
   }
 }
 

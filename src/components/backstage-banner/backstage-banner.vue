@@ -28,10 +28,10 @@
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-task-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-task-record'}">任务列表</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/bg-money-record')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/bg-money-record'}">充值记录</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management', 1, true)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management'}">分站管理</div>
-    <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/secret-books')" v-bind:class="{'active-mg-btn' : ($route.path == '/secret-books') || ($route.path == '/secret-books-detail')}">
+        <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/secret-books')" v-bind:class="{'active-mg-btn' : ($route.path == '/secret-books') || ($route.path == '/secret-books-detail')}">
       <div class="tag-notic-btn flex ellipsis">轻松上推荐</div>
       上推荐教学秘籍
-    </div> -->
+    </div>
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_dialogTableVisible">代理介绍</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>

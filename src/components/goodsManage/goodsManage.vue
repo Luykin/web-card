@@ -288,9 +288,15 @@ export default {
     },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
-      this.choseItem.forEach((item) => {
+      let ret = []
+      this.choseItem.forEach((item, index, array) => {
         item.choseTitle = item.label
+        if (item.category != 14) {
+          ret.push(item)
+        }
       })
+      this.choseItem = ret
+      ret = null
       this.choseItem.unshift({
         choseTitle: '全部商品',
         id: -1

@@ -44,7 +44,7 @@ export default {
             that.$refs.canvas.width = window.screen.width
             that.$refs.canvas.height = document.body.offsetHeight - H
           }
-        }, 300)
+        }, 500)
       })
     },
     _windowReady() {

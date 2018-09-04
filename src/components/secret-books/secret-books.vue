@@ -5,8 +5,12 @@
       <div class="flex secret-list" v-loading='loading'>
         <div class="secret-list-first cursor" :style="_bg(firstData.image)" v-if="firstData" @click="_todetail(firstData.id)">
           <div class="tag-sli flex" :style="_bgcolor(firstData.color)">{{firstData.tag}}</div>
+          <div class="first-info-sli flex">
+            <div class="info-sli-left flex">{{firstData.label}}</div>
+            <div class="info-sli-right flex ellipsis">{{firstData.update}}</div>
+          </div>
         </div>
-        <div class="secret-list-item cursor" @click="_todetail(item.id)" v-for="(item,index) in tableData" v-if="index !== 0 && item.image">
+        <div class="secret-list-item cursor" @click="_todetail(item.id)" v-for="(item,index) in tableData" v-if="((page == 0 && index !== 0) || page != 0) && item.image">
           <div class="tag-sli flex" :style="_bgcolor(item.color)">{{item.tag}}</div>
           <div class="img-sli" :style="_bg(item.image)"></div>
           <div class="info-sli flex">
@@ -14,9 +18,9 @@
             <div class="info-sli-right flex ellipsis">{{item.update}}</div>
           </div>
         </div>
-        <!--       	<div class="secret-list-item"></div>
-      	<div class="secret-list-item"></div>
-      	<div class="secret-list-item"></div> -->
+        <!--        <div class="secret-list-item"></div>
+        <div class="secret-list-item"></div>
+        <div class="secret-list-item"></div> -->
       </div>
       <div id="i-page" class="i-page flex">
         <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange" :page-size="pageSize">
@@ -46,13 +50,13 @@ export default {
     this._getSecretBooks()
   },
   computed: {
-    // number() {
-    //   if (this.page == 0) {
-    //     return 5
-    //   } else {
-    //     return 6
-    //   }
-    // },
+    pageSize() {
+      if (this.page == 0) {
+        return 5
+      } else {
+        return 6
+      }
+    },
     ...mapGetters([
       'user',
       'token',
@@ -87,11 +91,9 @@ export default {
       return true
     },
     _todetail(id) {
-      this.$nextTick(() => {
-        this.$root.eventHub.$emit('secret-books', id)
-        this.$router.push({
-          path: `/secret-books-detail?id=${id}`
-        })
+      this.$root.eventHub.$emit('secret-books', id)
+      this.$router.push({
+        path: `/secret-books-detail?id=${id}`
       })
     },
     _getSecretBooks() {
@@ -101,7 +103,11 @@ export default {
         this.loading = null
         if (res.data.err_code === SUCCESS_CODE) {
           this.tableData = this._formatTableData(res.data.data.data)
-          this.firstData = this.tableData[0]
+          if (this.page == 0) {
+            this.firstData = this.tableData[0]
+          } else {
+            this.firstData = null
+          }
           this.total = res.data.data.total
         } else {
           if (res.data.err_msg) {
@@ -155,7 +161,7 @@ export default {
 
 .secret-list-first {
   width: 98%;
-  /*	margin-left: 2%;*/
+  /*  margin-left: 2%;*/
   margin: 10px 0 0px 2%;
   height: 350px;
   background: #000;
@@ -168,7 +174,7 @@ export default {
   width: 48%;
   margin: 10px 0 0px 2%;
   height: 280px;
-  /*	background: #000;*/
+  /*  background: #000;*/
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, .1);
@@ -214,6 +220,18 @@ export default {
 .info-sli-right {
   width: 30%;
   height: 100%;
+}
+
+.first-info-sli {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  background: rgba(255,255,255,.5);
+}
+.secret-list-first:hover .info-sli-left {
+  color: #F01818;
 }
 
 </style>

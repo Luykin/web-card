@@ -29,6 +29,112 @@ export function getServices(id, sub_domain) {
     return Promise.resolve(res)
   })
 }
+export function getFanProject() {
+  const url = `${PREFIX_URL}/fan_project`
+  let data = {
+    is_fan_project: 1
+  }
+  return axios.get(url, {
+    params: Object.assign({ sign: getSign(data) }, data)
+  }).then(function(res) {
+    return Promise.resolve(res)
+  }).catch(function(error) {
+    if (error.response) {
+      // console.log(error.response.data)
+      console.log(error.response.status)
+      // console.log(error.response.headers)
+      return Promise.resolve({
+        data: {
+          err_code: error.response.status,
+          err_msg: error.response.status
+        }
+      })
+    } else {
+      return Promise.resolve({
+        data: {
+          err_code: -1,
+          err_msg: -1
+        }
+      })
+    }
+  })
+}
+//2018.08.28 网红方案下单
+// point, service_id, uaid, price, addition, sub_domain, pay_type, target_id, appointment_time
+export function addFanProject(token, buydata) {
+  const url = `${PREFIX_URL}/add_fan_project`
+  let data = {
+    token: token,
+    fan_project_id: buydata.fan_project_id,
+    uaid: UAID,
+    price: buydata.price,
+    addition: buydata.addition,
+    pay_type: buydata.pay_type,
+  }
+  if (isPhone() && !isWx()) {
+    data = Object.assign({ device: 'phone' }, data)
+  } else {
+    data = Object.assign({ device: 'pc' }, data)
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}
+export function addAgencyFanProject(token, price, fan_project_id, addition) {
+  const url = `${PREFIX_URL}/agency_add_fan_project`
+  let data = {
+    token: token,
+    fan_project_id: fan_project_id,
+    uaid: UAID,
+    price: price,
+    addition: addition
+  }
+  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+    .then(function(res) {
+      return Promise.resolve(res)
+    }).catch(function(error) {
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
+}
+
+
 export function getAppInfo() {
   const url = `${PREFIX_URL}/app_info`
   let data = {

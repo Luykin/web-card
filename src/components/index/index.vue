@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="main-box-header flex">
-        <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item.id)" v-bind:key="item.id+Math.random()">
+        <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()">
           <img :src="item.icon" class="mbh-icon" v-if="item.icon">
           <div v-else class="mbh-icon"></div>
           <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
@@ -30,7 +30,14 @@
       <div v-loading='loading'>
         <!-- loading 开始 -->
         <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
-        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips' :class="{'course-border' : uaid <= 60002}">
+        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips || nowServices.des' :class="{'course-border' : uaid <= 60002}">
+        </div>
+        <div class="course flex" v-if="showService && nowServices && nowServices.fan_project_service" :class="{'course-border' : uaid <= 60002}" style="align-items: flex-start; padding: 0;width: 90%; flex-wrap: wrap;  background: #ffe8d2 url('http://p7o5mvmp4.bkt.clouddn.com/%E9%AB%98%E7%BA%A7%E7%89%88.png') no-repeat; background-position: 98% 98%; background-size: 60px auto;overflow: hidden;">
+          <!-- <div class="course-title flex">基础版</div> -->
+          <div class="course-item flex">上热门：<span class="min-span-ci flex">{{nowServices.hour}}小时</span></div>
+          <div class="course-item flex">曝光时间：<span class="min-span-ci flex">{{nowServices.exposure_hour}}小时</span></div>
+          <div class="course-item flex">预计点赞数:<span class="min-span-ci flex">{{nowServices.like_num}}w+</span></div>
+          <div class="course-item flex">预计曝光量: <span class="min-span-ci flex">{{nowServices.exposure_num}}w+</span></div>
         </div>
         <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
           <div class="comment-box-descrpt flex">请先添加自定义评论，评论可以分为多条，总字数不能超过100字。</div>
@@ -60,7 +67,7 @@
           <div class="select-item" v-if="showService">
             <div class="select-item-label flex ellipsis">
               <span v-if="nowServices">{{nowServices.form || '链接'}}</span>
-              <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">
+              <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4 || nowServices.fan_project_service))">
                 <div class="p-course-box" v-show="!pc || choseSay">
                   <div class="pcb-warp">
                     <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
@@ -79,7 +86,7 @@
                   <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
                 </div>
               </el-popover>
-              <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">{{nowServices.category > 0&&nowServices.category
+              <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4 || nowServices.fan_project_service))">{{nowServices.category > 0&&nowServices.category
                 < 10 ? '获取说说列表': '查看教程'}}</el-button>
             </div>
             <div class="flex input-defult" v-if="nowServices">
@@ -117,12 +124,13 @@
             <span class="rh-title">剩余积分:</span>
             <span class="score-sapn">{{user.score || 0}}</span><span class="gray-span" v-if="nowServices && nowServices.submit_category !== 2">{{'(1'+nowServices.units}}{{nowServices.label + '需要'}}{{(nowServices.rate || '0') + '积分)'}}</span>
           </div> -->
-          <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain">
+          <div class="rule-hints flex ellipsis" v-if="proxyRank != '普通用户' && user.agency_level && !Gdomain && !nowServices.fan_project_service">
             <span class="rh-title">{{proxyRank}}:</span><span class="need-score-sapn">代理所需积分{{' : '+ consumeMoney + '原价'}}{{'* ' + (user.agency_level.discount || 1)*10 + '折'}} = {{agencyPrice + '元'}}</span>
           </div>
         </div>
         <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
-        <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0">提交订单</div>
+        <div class="btn flex" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0 && nowServices.category">提交订单</div>
+        <div class="btn flex" @click="_addFanProject(nowServices.id)" v-show="showService && nowServices.behavior !== 0 && nowServices.fan_project_service">提交方案</div>
         <div class="index-bootom-height"></div>
         <!-- loading 结束 -->
       </div>
@@ -130,7 +138,7 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo } from 'api/index'
+import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addFanProject } from 'api/index'
 import { testToken } from 'common/js/util'
 import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE, modifyEnv } from 'api/config'
@@ -227,7 +235,7 @@ export default {
       let nowServer = {
         submit_category: 1
       }
-      if (this.showService) {
+      if (this.showService && this.showService.length > 0) {
         this.showService.forEach((item) => {
           if (item.id === this.choseServiceValue) {
             nowServer = item
@@ -266,10 +274,14 @@ export default {
       }
     },
     agencyPrice() {
-      if (this.user.agency_level) {
-        return Math.round((this.quantity || 0) * this.nowServices.price * (this.user.agency_level.discount || 1) * 100) / 100
+      if (this.nowServices.fan_project_service || this.Gdomain) {
+        return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
       } else {
-        return Math.round(((this.quantity || 0) * this.nowServices.price) * 100) / 100
+        if (this.user.agency_level) {
+          return Math.round((this.quantity || 0) * (this.nowServices.price || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
+        } else {
+          return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+        }
       }
     },
     ...mapGetters([
@@ -366,13 +378,14 @@ export default {
       let max = 0
       let min = 0
       // let price = 0
-      this.services[this.activeCategory].forEach((item) => {
-        if (item.id === this.choseServiceValue) {
-          max = item.max_num
-          min = item.min_num
-          // rate = item.price
-        }
-      })
+      if (this.services[this.activeCategory] && this.services[this.activeCategory].length > 0) {
+        this.services[this.activeCategory].forEach((item) => {
+          if (item.id === this.choseServiceValue) {
+            max = item.max_num
+            min = item.min_num
+          }
+        })
+      }
       if (!max) {
         this.$parent._open('后台数量限制有误')
         return false
@@ -421,10 +434,34 @@ export default {
       }
       if (category === 143) {
         let dynamicTags = ''
-        this.dynamicTags.forEach((item) => {
-          dynamicTags = dynamicTags + item + '#'
-        })
+        if (this.dynamicTags && this.dynamicTags.length > 0) {
+          this.dynamicTags.forEach((item) => {
+            dynamicTags = dynamicTags + item + '#'
+          })
+        }
         data = Object.assign({ comment: dynamicTags }, data)
+      }
+      this.$root.eventHub.$emit('showPopup', data)
+    },
+    _addFanProject() {
+      if (!this.user) {
+        this.$parent._open('请先登录哦')
+        return
+      }
+      if (this.proxyRank == '普通用户' || !this.user.agency_level) {
+        this.$parent._open('您还不是代理')
+        return
+      }
+      if (!this.link || this.link.indexOf('http') < 0) {
+        this.$parent._open('请正确填写')
+        return false
+      }
+      const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
+      let data = {
+        services: this.nowServices,
+        price: this.agencyPrice,
+        fan_project_id: this.nowServices.id,
+        addition: this.link.match(reg) ? this.link.match(reg)[0] : this.link,
       }
       this.$root.eventHub.$emit('showPopup', data)
     },
@@ -556,14 +593,51 @@ export default {
         return true
       }
     },
-    _chose(e, id) {
+    _getFanProject() {
+      this.loading = true
+      getFanProject().then((res) => {
+        this.lodingChose = false
+        this.loading = false
+        if (res.data.err_code === SUCCESS_CODE) {
+          const services = this._formatFanProject(res.data.data)
+          this.services[this.activeCategory] = services
+          this.showService = services
+          if (res.data.data) {
+            // this.nowServices = this.showService[0]
+            this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
+            this.quantity = 1
+          }
+        } else {
+          if (res.data.err_msg) {
+            this.$parent._open(this.$root.errorCode[res.data.err_code])
+          } else {
+            this.$parent._open('似乎出错了')
+          }
+        }
+      })
+    },
+    _formatFanProject(list) {
+      if (list && list.length > 0) {
+        list.forEach((item) => {
+          item.fix_num = 1
+        })
+      }
+      return list
+    },
+    _chose(e, item) {
+      //  分界线
+      const id = item.id
       if (this.lodingChose) {
         this.$parent._open('加载中')
         return 0
       }
       if (!this.services[id]) {
-        this.lodingChose = true
-        this._getServices(this, id, this.Gdomain)
+        if (item.category == 14) {
+          this._getFanProject()
+        } else {
+          this.lodingChose = true
+          this._getServices(this, id, this.Gdomain)
+        }
       } else {
         this.showService = this.services[id]
         this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
@@ -620,7 +694,11 @@ export default {
     _initNet() {
       if (this.app.service_categories.length > 0) {
         this.activeCategory = this.app.service_categories[0].id
-        this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+        if (this.app.service_categories[0].category == 14) {
+          this._getFanProject()
+        } else {
+          this._getServices(this, this.app.service_categories[0].id, this.Gdomain) // 服务
+        }
       }
     },
     // _getServiceCategory(that, domain) {
@@ -657,18 +735,22 @@ export default {
       })
     },
     _formatService(list) {
-      list.forEach((item) => {
-        if (item.max_num === item.min_num) {
-          item.fix_num = item.min_num
-        }
-      })
+      if (list && list.length) {
+        list.forEach((item) => {
+          if (item.max_num === item.min_num) {
+            item.fix_num = item.min_num
+          }
+        })
+      }
       return list
     },
     _comTotleTga() {
       let totle = 0
-      this.dynamicTags.forEach((item) => {
-        totle = totle + item.length
-      })
+      if (this.dynamicTags && this.dynamicTags.length > 0) {
+        this.dynamicTags.forEach((item) => {
+          totle = totle + item.length
+        })
+      }
       this.totleTga = totle
     },
     handleClose(tag) {
@@ -1179,6 +1261,16 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* 60002 加入下载框*/
 
 .notice-down {
@@ -1241,6 +1333,16 @@ export default {
   bottom: 0px;
   z-index: 100;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1325,6 +1427,22 @@ export default {
   width: 100%;
   height: 40px;
   justify-content: flex-start;
+}
+
+.course-title {
+  background: #FFD8C0;
+  color: #FF6B4E;
+  font-size: 18px;
+  width: 100%;
+  height: 45px;
+  margin-bottom: 10px;
+}
+
+.course-item {
+  width: 100%;
+  height: 40px;
+  color: #FF6B4E;
+  margin: 10px auto;
 }
 
 </style>

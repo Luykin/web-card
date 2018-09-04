@@ -396,7 +396,7 @@ import { addOrder, agency } from 'api/header'
 import { testToken, isPhone, compare, isWx } from 'common/js/util'
 // import QrcodeVue from 'qrcode.vue'
 import QRCode from 'qrcode'
-import { getUserInfo, addSubSiteTask, addSiteTask } from 'api/index'
+import { getUserInfo, addSubSiteTask, addSiteTask, addFanProject } from 'api/index'
 import { SUCCESS_CODE } from 'api/config'
 import { UAID } from 'api/config'
 import { NOWCONFIG } from 'api/appConfig'
@@ -580,6 +580,22 @@ export default {
         this.newPage = window.open('about:blank', "_blank")
       }
       addSiteTask(this.token, this.BuyDomainData).then((res) => {
+        this._afterAddOrder(res)
+      })
+    },
+    _addFanProject() {
+      if (!this.activePayType) {
+        this.$parent._open('请选择支付方式')
+        return
+      }
+      if (!this.checkTock()) {
+        return false
+      }
+      this.BuyDomainData.pay_type = this.activePayType
+      if (isPhone() && !isWx()) {
+        this.newPage = window.open('about:blank', "_blank")
+      }
+      addFanProject(this.token, this.BuyDomainData).then((res) => {
         this._afterAddOrder(res)
       })
     },
@@ -1029,8 +1045,13 @@ export default {
         this.BuyDomainData = data
       }
       if (this.BuyDomainData.pay_type) {
-        this.activePayType = this.BuyDomainData.pay_type
-        this._addSubSiteTask()
+        if (this.BuyDomainData.fan_project_id) {
+          this.activePayType = this.BuyDomainData.pay_type
+          this._addFanProject()
+        } else {
+          this.activePayType = this.BuyDomainData.pay_type
+          this._addSubSiteTask()
+        }
       }
       this.$nextTick(() => {
         this.popup = true
@@ -1264,6 +1285,9 @@ export default {
 
 
 
+
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1328,6 +1352,9 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
+
 
 
 

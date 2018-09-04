@@ -29,7 +29,7 @@ export default {
       this._getSecretBooksDetail(id)
     })
     const query = this.$route.query
-    if (query.id) {
+    if (!query.id) {
       this.$router.replace({
         path: '/secret-books'
       })
@@ -101,6 +101,7 @@ export default {
   height: auto;
   padding: 30px 10px;
   line-height: 20px;
+  user-select: text;
 }
 
 </style>

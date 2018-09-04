@@ -29,7 +29,7 @@
     <div class="h-footer-box flex sh-phone">联系邮箱：{{emil}}</div>
     <div class="h-footer-box flex sh-phone">客服微信：{{wx}}</div>
     <div class="border-f sh-phone"></div>
-    <div class="h-footer-box flex sh-phone" v-show="user.phone == 17323869299">{{userAgent}}</div>
+<!--     <div class="h-footer-box flex sh-phone" v-show="user.phone == 17323869299">{{userAgent}}</div> -->
     <!--     <div class="h-footer-box flex sh-phone" v-show="!hid">联系邮箱：{{emil}}</div> -->
     <div class="h-footer-title flex sh-phone" v-show="!hid">商务联系</div>
     <div class="h-footer-title h-footer-title-q flex sh-phone">QQ联系：<span class="c-y">{{qq}}</span></div>
