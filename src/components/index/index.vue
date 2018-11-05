@@ -14,38 +14,38 @@
             </div>
             <div class="qr-down-btn flex cursor" :class="{'active-qr-down-btn' : downLink == 0}" @click="_updataDownLink(0)">
               <img src="http://p8sxtcg6t.bkt.clouddn.com/iOS.png" alt="IOS快手刷粉" class="qdb-img">IOS</div>
-            <div class="qr-down-btn flex cursor" :class="{'active-qr-down-btn' : downLink == 1}" @click="_updataDownLink(1)">
-              <img src="http://p8sxtcg6t.bkt.clouddn.com/android.png" alt="Android快手刷粉" class="qdb-img">Android</div>
+              <div class="qr-down-btn flex cursor" :class="{'active-qr-down-btn' : downLink == 1}" @click="_updataDownLink(1)">
+                <img src="http://p8sxtcg6t.bkt.clouddn.com/android.png" alt="Android快手刷粉" class="qdb-img">Android</div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="main-box-header flex">
-        <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()">
-          <img :src="item.icon" class="mbh-icon" v-if="item.icon">
-          <div v-else class="mbh-icon"></div>
-          <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
-          <!-- <waveCanvas :cWidth="70" :cHeight="65" :cid='item.id' :ref="item.id" :id='item.id'></waveCanvas> -->
-        </div>
-      </div>
-      <div v-loading='loading'>
-        <!-- loading 开始 -->
-        <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
-        <div class="course" v-if="showService && nowServices" v-html='nowServices.tips || nowServices.des' :class="{'course-border' : uaid <= 60002}">
-        </div>
-        <div class="course flex" v-if="showService && nowServices && nowServices.fan_project_service" :class="{'course-border' : uaid <= 60002}" style="align-items: flex-start; padding: 0;width: 90%; flex-wrap: wrap;  background: #ffe8d2 url('http://p7o5mvmp4.bkt.clouddn.com/%E9%AB%98%E7%BA%A7%E7%89%88.png') no-repeat; background-position: 98% 98%; background-size: 60px auto;overflow: hidden;">
-          <!-- <div class="course-title flex">基础版</div> -->
-          <div class="course-item flex">上热门：<span class="min-span-ci flex">{{nowServices.hour}}小时</span></div>
-          <div class="course-item flex">曝光时间：<span class="min-span-ci flex">{{nowServices.exposure_hour}}小时</span></div>
-          <div class="course-item flex">预计点赞数:<span class="min-span-ci flex">{{nowServices.like_num}}w+</span></div>
-          <div class="course-item flex">预计曝光量: <span class="min-span-ci flex">{{nowServices.exposure_num}}w+</span></div>
-        </div>
-        <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
-          <div class="comment-box-descrpt flex">请先添加自定义评论，评论可以分为多条，总字数不能超过100字。</div>
-          <el-tag :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false" @close="handleClose(tag)" type="danger">
-            {{tag}}
-          </el-tag>
+          <div class="main-box-header flex">
+            <div class="mbh-item flex" v-for="item in app.service_categories" :class="{'activeCategory':activeCategory == item.id}" @click="_chose($event,item)" v-bind:key="item.id+Math.random()">
+              <img :src="item.icon" class="mbh-icon" v-if="item.icon">
+              <div v-else class="mbh-icon"></div>
+              <div class="mbh-label flex">{{item.label.slice(0,4)}}</div>
+              <!-- <waveCanvas :cWidth="70" :cHeight="65" :cid='item.id' :ref="item.id" :id='item.id'></waveCanvas> -->
+            </div>
+          </div>
+          <div v-loading='loading'>
+            <!-- loading 开始 -->
+            <div class="no-data" v-show="!showService">暂未开放此业务，请平台关注公告!</div>
+            <div class="course" v-if="showService && nowServices" v-html='nowServices.tips || nowServices.des' :class="{'course-border' : uaid <= 60002}">
+            </div>
+            <div class="course flex" v-if="showService && nowServices && nowServices.fan_project_service" :class="{'course-border' : uaid <= 60002}" style="align-items: flex-start; padding: 0;width: 90%; flex-wrap: wrap;  background: #ffe8d2 url('http://p7o5mvmp4.bkt.clouddn.com/%E9%AB%98%E7%BA%A7%E7%89%88.png') no-repeat; background-position: 98% 98%; background-size: 60px auto;overflow: hidden;">
+              <!-- <div class="course-title flex">基础版</div> -->
+              <div class="course-item flex">上热门：<span class="min-span-ci flex">{{nowServices.hour}}小时</span></div>
+              <div class="course-item flex">曝光时间：<span class="min-span-ci flex">{{nowServices.exposure_hour}}小时</span></div>
+              <div class="course-item flex">预计点赞数:<span class="min-span-ci flex">{{nowServices.like_num}}+</span></div>
+              <div class="course-item flex">预计曝光量: <span class="min-span-ci flex">{{nowServices.exposure_num}}+</span></div>
+            </div>
+            <div class="comment-box flex" v-show="nowServices && nowServices.category === 143">
+              <div class="comment-box-descrpt flex">请先添加自定义评论，评论可以分为多条，总字数不能超过100字。</div>
+              <el-tag :key="tag" v-for="tag in dynamicTags" closable :disable-transitions="false" @close="handleClose(tag)" type="danger">
+                {{tag}}
+              </el-tag>
           <!--             <el-input class="input-new-tag" v-if="true" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
-            </el-input> -->
+          </el-input> -->
           <div class="tag-input-warp" v-if="inputVisible && totleTga < 99">
             <input class="tag-input" v-model="inputValue" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm" @keyup.enter="handleInputConfirm" ref="saveTagInput">
           </div>
@@ -62,7 +62,13 @@
               </el-time-select>
             </div>
           </div>
-          <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25) && pc'>
+          <div class="select-item" v-if="nowServices && nowServices.category == 145">
+            <div class="select-item-label flex ellipsis">手机号</div>
+            <div class="flex input-defult">
+              <input type="text" placeholder="请填写抖音绑定的手机号" class="i-ipnput" v-model="phoned" @keyup.enter="_sublime(nowServices.category)">
+            </div>
+          </div>
+          <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25 || nowServices.category === 145) && pc'>
           </div>
           <div class="select-item" v-if="showService">
             <div class="select-item-label flex ellipsis">
@@ -88,34 +94,34 @@
               </el-popover>
               <el-button v-popover:popover4 @click="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4 || nowServices.fan_project_service))">{{nowServices.category > 0&&nowServices.category
                 < 10 ? '获取说说列表': '查看教程'}}</el-button>
+              </div>
+              <div class="flex input-defult" v-if="nowServices">
+                <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
+                <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+              </div>
             </div>
-            <div class="flex input-defult" v-if="nowServices">
-              <!-- nowServices.category>0&&nowServices.category<10?'请按教程输入QQ号': '请按教程粘贴链接' -->
-              <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
+            <div class="select-item" v-if="showService">
+              <div class="select-item-label flex ellipsis">数量</div>
+              <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
+              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
+                <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+              </div>
+              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
+            </div>
+            <div class="select-item" v-if="showService">
+              <div class="select-item-label flex ellipsis">业务</div>
+              <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
+                <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
+                </el-option>
+              </el-select>
             </div>
           </div>
-          <div class="select-item" v-if="showService">
-            <div class="select-item-label flex ellipsis">数量</div>
-            <div class="num-limiit" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">(<span class="red-score-sapn">{{nowServices.min_num}}</span>{{nowServices.units}}-<span class="red-score-sapn">{{nowServices.max_num}}</span>{{nowServices.units}})</div>
-            <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
-              <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+          <div v-if="showService && nowServices">
+            <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
+            <div class="rule-hints flex ellipsis" v-if="nowServices.price">
+              <span class="rh-title">所需金额:</span>
+              <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(nowServices.price) + '单价'}}= {{consumeMoney + '元'}}</span>
             </div>
-            <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
-          </div>
-          <div class="select-item" v-if="showService">
-            <div class="select-item-label flex ellipsis">业务</div>
-            <el-select v-model="choseServiceValue" placeholder="请选择" class="index-select" no-data-text="暂无业务" @change="_clear">
-              <el-option v-for="item in showService" :key="item.label" :label="item.label" :value="item.id">
-              </el-option>
-            </el-select>
-          </div>
-        </div>
-        <div v-if="showService && nowServices">
-          <div class="chose-box ellipsis" v-if="suosuo">{{suosuo}}</div>
-          <div class="rule-hints flex ellipsis" v-if="nowServices.price">
-            <span class="rh-title">所需金额:</span>
-            <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(nowServices.price) + '单价'}}= {{consumeMoney + '元'}}</span>
-          </div>
           <!--           <div class="rule-hints flex ellipsis" v-if="!Gdomain">
             <span class="rh-title">所需金额:</span>
             <span class="need-score-sapn">{{quantity || 0}}{{nowServices.units}} * {{nowServices.rate + '单价'}}= {{consumeNum + '元'}}</span>
@@ -135,21 +141,23 @@
         <!-- loading 结束 -->
       </div>
     </div>
+    <img src="http://p7o5mvmp4.bkt.clouddn.com/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E6%8C%89%E9%92%AE@3x.png" class="agent-img-navtive" @click="_toagent">
+    <!-- $root.eventHub.$emit('agent') -->
   </div>
 </template>
 <script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addFanProject } from 'api/index'
-import { testToken } from 'common/js/util'
-import { mapGetters, mapMutations } from 'vuex'
-import { SUCCESS_CODE, modifyEnv } from 'api/config'
-import { Judge } from 'common/js/judge'
-import { UAID } from 'api/config'
-import { NOWCONFIG } from 'api/appConfig'
-const BILI = 0.8
-export default {
-  mixins: [Judge],
-  data() {
-    return {
+  import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addFanProject } from 'api/index'
+  import { testToken } from 'common/js/util'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { SUCCESS_CODE, modifyEnv } from 'api/config'
+  import { Judge } from 'common/js/judge'
+  import { UAID } from 'api/config'
+  import { NOWCONFIG } from 'api/appConfig'
+  const BILI = 0.8
+  export default {
+    mixins: [Judge],
+    data() {
+      return {
       // 很重要，代表是否为分站的参数
       Gdomain: null,
       uaid: null,
@@ -160,6 +168,7 @@ export default {
       orderTimeD: '',
       orderTimeS: '',
       quantity: '',
+      phoned: '',
       shuoshuoPage: 0,
       choseServiceValue: '',
       lodingChose: null,
@@ -259,6 +268,12 @@ export default {
     },
     placeholder() {
       if (this.nowServices) {
+        if (this.nowServices.category == 145) {
+          return '请按教程填写抖音号'
+        }
+        if (this.nowServices.services) {
+          return '请按教程输入' + (this.nowServices.services[0].form || '链接')
+        }
         return this.nowServices.category > 0 && this.nowServices.category < 10 ? '请按教程输入QQ号' : this.nowServices.category === 24 || this.nowServices.category === 25 ? '请按教程粘贴快手ID' : '请按教程粘贴链接'
       }
       return '请按教程粘贴链接'
@@ -289,9 +304,16 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
+    _toagent() {
+      if (!this.user) {
+        this.$parent._open('请先登录哦')
+      } else {
+        this.$root.eventHub.$emit('agent')
+      }
+    },
     pcOrphone() {
       if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {} else {
         this.$router.replace({
@@ -353,6 +375,11 @@ export default {
         this.$parent._open('未知错误')
         return false
       }
+      let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
+      if (this.nowServices.category == 145 && (!this.phoned || !myreg.test(this.phoned))) {
+        this.$parent._open('请正确填写手机号')
+        return false
+      }
       if (!this.checkTock()) {
         return false
       }
@@ -366,11 +393,15 @@ export default {
           this.$parent._open('请正确填写QQ号')
           return false
         }
-        if (!this.link) {
+        if (!this.link && category != 145) {
           this.$parent._open('请正确填写')
           return false
         }
-        if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25) {
+        if (!this.link && category == 145) {
+          this.$parent._open('请正确填写抖音号')
+          return false
+        }
+        if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25 && category !== 145) {
           this.$parent._open('请正确填写')
           return false
         }
@@ -441,6 +472,11 @@ export default {
         }
         data = Object.assign({ comment: dynamicTags }, data)
       }
+      if (this.nowServices.category == 145 && this.phoned) {
+        Object.assign(data, {
+          target_id: this.phoned
+        })
+      }
       this.$root.eventHub.$emit('showPopup', data)
     },
     _addFanProject() {
@@ -463,6 +499,7 @@ export default {
         fan_project_id: this.nowServices.id,
         addition: this.link.match(reg) ? this.link.match(reg)[0] : this.link,
       }
+      console.log(data, '??')
       this.$root.eventHub.$emit('showPopup', data)
     },
     _afterAddtask(res) {
@@ -1443,6 +1480,14 @@ export default {
   height: 40px;
   color: #FF6B4E;
   margin: 10px auto;
+}
+.agent-img-navtive{
+  position: fixed;
+  right: 0;
+  bottom: 90px;
+  z-index: 999;
+  width: 130px;
+  height: auto;
 }
 
 </style>

@@ -19,7 +19,7 @@
           </div>
         </div>
         <div v-if="nowServices">
-          <div class="cr-item flex" v-if="!nowServices.fan_project_service">
+          <div class="cr-item flex">
             <!-- <div class="cr-box-tit ellipsis flex back-title">首页公告:</div> -->
             <div class="cr-box-max flex sp-tips">
               <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
@@ -37,8 +37,10 @@
             <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
           </div>
           <div class="chose-box-service-srm flex" v-if="nowServices && nowServices.fan_project_service">
+            <!-- <img src="https://cdn.xingkwh.com/%E4%BE%8B%E5%AD%90.png" alt="上热门成功案例" class="shili-pic"> -->
             <div class="cbss-item cursor flex" v-for="item in showService" @click="_nowServce(item)" :class="{'active-cbss-item': item.id == nowServices.id}">
-              <div class="cbss-item-title flex">
+              <img :src="item.icon" v-if="item.icon" class="cbss-item-tag">
+              <div class="cbss-item-title flex ellipsis">
                 {{item.label}}
                 <span class="cbss-fu-title flex">{{item.seo}}</span>
               </div>
@@ -51,6 +53,7 @@
                 <i class="iconfont icon-zhengque trang-icon"></i>
               </div>
             </div>
+            <img src="https://cdn.xingkwh.com/%E4%BE%8B%E5%AD%90.png" alt="上热门成功案例" class="shili-pic">
           </div>
           <div class="cr-st-line"></div>
           <div class="cr-item flex" v-show="!nowServices.fan_project_service">
@@ -72,13 +75,13 @@
                 <input type="text" :placeholder="placeholder" class="i-ipnput" v-model="link" @keyup.enter="_sublime(nowServices.category)">
               </div>
             </div>
-            <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))">
+            <el-popover ref="popover4" :placement="position" :width="popoverWidth" trigger="click" v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) || nowServices.fan_project_service)">
               <div class="p-course-box" v-show="!pc || choseSay">
                 <div class="pcb-warp">
                   <div v-if="!nowServices.tutorials_mobile && (nowServices.category!==2 && nowServices.category!==4)" class="flex no-tutorials">暂无教程</div>
                   <div v-if="(nowServices.category ===2 || nowServices.category===4) && !sayList && !lodingS" class="flex no-tutorials">您输入的QQ号无效或无权限访问此QQ号空间</div>
                   <div class="flex no-tutorials loding" v-if="lodingS">加载中</div>
-                  <img :src="nowServices.tutorials_mobile" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+                  <img :src="nowServices.tutorials_mobile" class="course-img" v-if="nowServices.tutorials && ((nowServices.category!==2 && nowServices.category!==4) || nowServices.fan_project_service)">
                   <div v-if="sayList && (nowServices.category ===2 || nowServices.category ===4)" v-for="item in sayList" class="say-list-item" @click="_choseSayList(item)">
                     {{item.content}}
                   </div>
@@ -88,105 +91,115 @@
               <div class="pc-course" v-show='pc && !choseSay' ref='pcCourse'>
                 <div class="close-btn-c flex cursor" @click='_closeCourse'>{{closeName}}</div>
                 <div v-if="!nowServices.tutorials" class="flex no-tutorials">暂无教程</div>
-                <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && (nowServices.category!==2 && nowServices.category!==4)">
+                <img :src="nowServices.tutorials" class="course-img" v-if="nowServices.tutorials && ((nowServices.category!==2 && nowServices.category!==4)|| nowServices.fan_project_service)">
               </div>
             </el-popover>
-            <el-button v-popover:popover4 @click.stop="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4))" class="btn-zsy">{{nowServices.category > 0&&nowServices.category
+            <el-button v-popover:popover4 @click.stop="_choseShuoShuo(nowServices.category)" ref='elbutton' v-if="nowServices && (nowServices.category>10||(nowServices.category===2 || nowServices.category===4) || nowServices.fan_project_service) " class="btn-zsy">{{nowServices.category > 0&&nowServices.category
               < 10 ? '获取说说': '查看教程'}} </el-button>
-          </div>
-          <div class="cr-item flex" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
-            <div class="cr-box-tit ellipsis flex back-title">预约时间:</div>
-            <div class="cr-box-min flex margin-right over-hidden">
-              <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd' ref='pickerD'>
-              </el-date-picker>
-              <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp' ref='pickerS'>
-              </el-time-select>
-              <img src="../../assets/logo.png" alt="" @load="_setBG" v-show='false'>
             </div>
-          </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex back-title">商品数量:</div>
-            <div class="cr-box-min flex margin-right">
-              <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
-                <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+            <div class="cr-item flex" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25)'>
+              <div class="cr-box-tit ellipsis flex back-title">预约时间:</div>
+              <div class="cr-box-min flex margin-right over-hidden">
+                <el-date-picker v-model="orderTimeD" type="date" placeholder="选择日期" :picker-options="pickerOptions" value-format='timestamp' format='yyyy-MM-dd' ref='pickerD'>
+                </el-date-picker>
+                <el-time-select v-model="orderTimeS" :picker-options="{start: '00:00',step: '00:30',end: '23:30'}" placeholder="选择时间" value-format='timestamp' ref='pickerS'>
+                </el-time-select>
+                <img src="../../assets/logo.png" alt="" @load="_setBG" v-show='false'>
               </div>
-              <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
-              <div class="num-tips flex" v-show='nowServices.submit_category != 2 && !nowServices.fix_num'>注: 下单数量范围：{{nowServices.min_num}} ~ {{nowServices.max_num}}</div>
             </div>
+            <div class="cr-item flex" v-if="nowServices && nowServices.category == 145">
+              <div class="cr-box-tit ellipsis flex back-title">手机号:</div>
+              <div class="cr-box-min flex margin-right">
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写抖音绑定的手机号" class="i-ipnput" v-model="phoned">
+                </div>
+              </div>
+            </div>
+            <div class="cr-item flex">
+              <div class="cr-box-tit ellipsis flex back-title">商品数量:</div>
+              <div class="cr-box-min flex margin-right">
+                <div class="flex input-defult" v-if="nowServices && nowServices.submit_category !== 2 && !nowServices.fix_num">
+                  <input type="text" placeholder="请填写数量" class="i-ipnput" v-model="quantity" @keyup.enter="_sublime(nowServices.category)" @keyup="_rectifyMoney" ref='quantityInput'>
+                </div>
+                <div class="i-input-disable flex" v-if="nowServices && nowServices.submit_category === 2 || nowServices.fix_num">{{quantity}} (固定数量)</div>
+                <div class="num-tips flex" v-show='nowServices.submit_category != 2 && !nowServices.fix_num'>注: 下单数量范围：{{nowServices.min_num}} ~ {{nowServices.max_num}}</div>
+              </div>
+            </div>
+            <div class="cr-item flex">
+              <div class="cr-box-tit ellipsis flex back-title">所需金额:</div>
+              <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(agentSchemePrice) + '单价'}}= {{consumeMoney + '元'}}</div>
+            </div>
+            <div class="cr-item flex" v-show="!nowServices.fan_project_service">
+              <div class="cr-box-tit ellipsis flex back-title">代理折后:</div>
+              <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level? user.agency_level.discount || 1 : 1 )*10 + '折'}} = {{agencyPrice + '元'}}</div>
+            </div>
+            <div class="chose-box ellipsis flex" v-if="suosuo">{{suosuo}}</div>
+            <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
+            <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0 && nowServices.category">提交订单</div>
+            <div class="btn-back flex cursor" @click="_addFanProject(nowServices.id)" v-show="showService && nowServices.behavior !== 0 && nowServices.fan_project_service">提交方案</div>
           </div>
-          <div class="cr-item flex">
-            <div class="cr-box-tit ellipsis flex back-title">所需金额:</div>
-            <div class="cr-box-min flex margin-right">{{quantity || 0}}{{nowServices.units}} * {{parseFloat(nowServices.price) + '单价'}}= {{consumeMoney + '元'}}</div>
-          </div>
-          <div class="cr-item flex" v-show="!nowServices.fan_project_service">
-            <div class="cr-box-tit ellipsis flex back-title">代理折后:</div>
-            <div class="cr-box-min flex margin-right">{{consumeMoney + '原价'}}{{'* ' + (user.agency_level? user.agency_level.discount || 1 : 1 )*10 + '折'}} = {{agencyPrice + '元'}}</div>
-          </div>
-          <div class="chose-box ellipsis flex" v-if="suosuo">{{suosuo}}</div>
-          <div class="weihu-btn flex" v-show="showService && nowServices.behavior == 0">维护中</div>
-          <div class="btn-back flex cursor" @click="_sublime(nowServices.category)" v-show="showService && nowServices.behavior !== 0 && nowServices.category">提交订单</div>
-          <div class="btn-back flex cursor" @click="_addFanProject(nowServices.id)" v-show="showService && nowServices.behavior !== 0 && nowServices.fan_project_service">提交方案</div>
         </div>
       </div>
+      <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
     </div>
-    <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
-  </div>
-</template>
-<script type="text/javascript">
-import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addAgencyFanProject } from 'api/index'
-import { mapGetters, mapMutations } from 'vuex'
-import BAgent from 'components/backstage-banner/backstage-banner'
-import { SUCCESS_CODE } from 'api/config'
-import { testToken } from 'common/js/util'
-import { NOWCONFIG } from 'api/appConfig'
-import interlayer from 'base/interlayer/interlayer'
-const BILI = 0.8
-export default {
-  data() {
-    return {
-      Gdomain: null,
-      activeCategory: 1,
-      lodingChose: null,
-      showService: false,
-      services: [],
-      link: '',
-      quantity: '',
-      orderTimeD: '',
-      orderTimeS: '',
-      suosuo: false,
-      pc: true,
-      loading: null,
-      showSC: false,
-      sayList: false,
-      choseSay: false,
-      lodingS: false,
-      position: 'right',
-      closeName: '关闭',
-      popoverWidth: 950,
-      nowServicesCategory: '',
-      targetid: null,
-      suosuo: null,
-      totleTga: 0,
-      dynamicTags: [],
-      inputVisible: null,
-      inputValue: '',
-    }
-  },
-  created() {
-    const query = this.$route.query
-    if (query.token && query.tokenTime && query.sgin) {
-      if (query.sgin == navigator.userAgent.slice(-10)) {
-        this.setToken(query.token)
-        this.setTokenTime(query.tokenTime)
-      } else {
-        window.location.href = NOWCONFIG.seo
-      }
-    }
-    this._updataUser(query.token, query.tokenTime)
-    this._getAppInfo(this)
-    this.$root.eventHub.$on('closeCourse', () => {
-      this._closeCourse()
-    })
+  </template>
+  <script type="text/javascript">
+    import { getServiceCategory, getServices, addTask, getUserInfo, getShuoshuoList, addTaskTargetId, getAppInfo, getFanProject, addAgencyFanProject } from 'api/index'
+    import { mapGetters, mapMutations } from 'vuex'
+    import BAgent from 'components/backstage-banner/backstage-banner'
+    import { SUCCESS_CODE } from 'api/config'
+    import { testToken } from 'common/js/util'
+    import { NOWCONFIG } from 'api/appConfig'
+    import interlayer from 'base/interlayer/interlayer'
+    const BILI = 0.8
+    export default {
+      data() {
+        return {
+          Gdomain: null,
+          activeCategory: 1,
+          lodingChose: null,
+          showService: false,
+          services: [],
+          link: '',
+          quantity: '',
+          orderTimeD: '',
+          orderTimeS: '',
+          suosuo: false,
+          pc: true,
+          loading: null,
+          showSC: false,
+          sayList: false,
+          choseSay: false,
+          lodingS: false,
+          position: 'right',
+          closeName: '关闭',
+          popoverWidth: 950,
+          nowServicesCategory: '',
+          targetid: null,
+          suosuo: null,
+          totleTga: 0,
+          dynamicTags: [],
+          inputVisible: null,
+          inputValue: '',
+          phoned: '',
+          agentSchemePrice: 0,
+        }
+      },
+      created() {
+        const query = this.$route.query
+        if (query.token && query.tokenTime && query.sgin) {
+          if (query.sgin == navigator.userAgent.slice(-10)) {
+            this.setToken(query.token)
+            this.setTokenTime(query.tokenTime)
+          } else {
+            window.location.href = NOWCONFIG.seo
+          }
+        }
+        this._updataUser(query.token, query.tokenTime)
+        this._getAppInfo(this)
+        this.$root.eventHub.$on('closeCourse', () => {
+          this._closeCourse()
+        })
     // this._updataUser()
     this._setPopoverWidth()
   },
@@ -204,24 +217,36 @@ export default {
     })
   },
   computed: {
+    // agentSchemePrice() {
+    //   if (this.nowServices.fan_project_service) {
+    //     console.log('方案')
+    //     return this.nowServices.out_price
+    //   } else {
+    //     console.log('服务')
+    //     return this.nowServices.price
+    //   }
+    // },
     placeholder() {
+      if (this.nowServicesCategory == 145) {
+        return '请按教程填写抖音号'
+      }
       return this.nowServicesCategory > 0 && this.nowServicesCategory < 10 ? '请输入QQ号' : this.nowServicesCategory === 24 || this.nowServicesCategory === 25 ? '请按教程粘贴快手ID' : '请按教程粘贴链接'
     },
     consumeMoney() {
-      if (this.nowServices.price) {
-        return Math.round((this.quantity || 0) * this.nowServices.price)
+      if (this.agentSchemePrice) {
+        return Math.round((this.quantity || 0) * this.agentSchemePrice)
       } else {
         return false
       }
     },
     agencyPrice() {
       if (this.nowServices.fan_project_service) {
-        return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+        return Math.round(((this.quantity || 0) * (this.agentSchemePrice || this.nowServices.score)) * 100) / 100
       } else {
         if (this.user.agency_level) {
-          return Math.round((this.quantity || 0) * (this.nowServices.price || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
+          return Math.round((this.quantity || 0) * (this.agentSchemePrice || this.nowServices.score) * (this.user.agency_level.discount || 1) * 100) / 100
         } else {
-          return Math.round(((this.quantity || 0) * (this.nowServices.price || this.nowServices.score)) * 100) / 100
+          return Math.round(((this.quantity || 0) * (this.agentSchemePrice || this.nowServices.score)) * 100) / 100
         }
       }
     },
@@ -246,7 +271,7 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   // updated() {
   //   this.$nextTick(() => {
@@ -290,9 +315,13 @@ export default {
       ps.style.height = '46px'
     },
     _nowServce(item) {
-      // console.log(item)
       this.nowServices = item
       this.nowServicesCategory = this.nowServices.category
+      if (this.nowServices.fan_project_service) {
+        this.agentSchemePrice = this.nowServices.out_price
+      } else {
+        this.agentSchemePrice = this.nowServices.price
+      }
       this._clear()
       if (this.nowServices.submit_category === 2) {
         this.quantity = this.nowServices.min_num
@@ -391,6 +420,11 @@ export default {
         this.showService = this.services[id]
         this.nowServices = this.showService[0]
         this.nowServicesCategory = this.nowServices.category
+        if (this.nowServices.fan_project_service) {
+          this.agentSchemePrice = this.nowServices.out_price
+        } else {
+          this.agentSchemePrice = this.nowServices.price
+        }
         if (this.nowServices.submit_category === 2) {
           this.quantity = this.nowServices.min_num
         }
@@ -426,6 +460,11 @@ export default {
           this.showService = services
           this.nowServices = this.showService[0]
           this.nowServicesCategory = this.nowServices.category
+          if (this.nowServices.fan_project_service) {
+            this.agentSchemePrice = this.nowServices.out_price
+          } else {
+            this.agentSchemePrice = this.nowServices.price
+          }
           if (res.data.data) {
             this.choseServiceValue = this.showService[0] ? this.showService[0].id : ''
             this.quantity = 1
@@ -530,6 +569,11 @@ export default {
           that.showService = services
           that.nowServices = that.showService[0]
           that.nowServicesCategory = that.nowServices.category
+          if (this.nowServices.fan_project_service) {
+            this.agentSchemePrice = this.nowServices.out_price
+          } else {
+            this.agentSchemePrice = this.nowServices.price
+          }
           if (that.nowServices.submit_category === 2) {
             that.quantity = that.nowServices.min_num
           }
@@ -577,6 +621,11 @@ export default {
       if (!this.checkTock()) {
         return false
       }
+      let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
+      if (category == 145 && (!this.phoned || !myreg.test(this.phoned))) {
+        this.$parent._open('请正确填写手机号')
+        return false
+      }
       if (category === 2 || category === 4) {
         if (!this.targetid) {
           this.$parent._open('请选择说说')
@@ -591,7 +640,7 @@ export default {
           this.$parent._open('请正确填写')
           return false
         }
-        if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25) {
+        if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25 && category !== 145) {
           this.$parent._open('请正确填写')
           return false
         }
@@ -687,6 +736,12 @@ export default {
         })
         return true
       }
+      if (this.nowServices.category == 145 && this.phoned) {
+        addTask(price, this.quantity, this.token, this.nowServices.id, this.link, this.phoned).then((res) => {
+          this._afterAddtask(res)
+        })
+        return true
+      }
       addTask(price, this.quantity, this.token, this.nowServices.id, this.link).then((res) => {
         this._afterAddtask(res)
       })
@@ -708,7 +763,7 @@ export default {
       this.orderTimeD = ''
       this.orderTimeS = ''
       this.link = ''
-      this.quantity = ''
+      // this.quantity = ''
       this.netWorking = false
       this.targetid = false
       this.sublimeTime = false
@@ -1196,6 +1251,15 @@ export default {
 
 
 
+
+
+
+
+
+
+
+
+
 /* 抖音自定义评论 */
 
 .comment-box {
@@ -1278,7 +1342,7 @@ export default {
   min-height: 245px;
   margin: 10px auto 0;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  /*  justify-content: flex-start;*/
 }
 
 .cbss-item {
@@ -1291,7 +1355,6 @@ export default {
   align-items: flex-start;
   align-content: flex-start;
   flex-wrap: wrap;
-  overflow: hidden;
   position: relative;
   box-sizing: border-box;
 }
@@ -1304,9 +1367,11 @@ export default {
   font-size: 16px;
   flex-wrap: wrap;
   align-content: center;
-  /*  font-weight: 600;*/
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
 }
-.active-cbss-item .cbss-item-title{
+
+.active-cbss-item .cbss-item-title {
   color: #fff;
 }
 
@@ -1321,11 +1386,12 @@ export default {
   background-size: 16px;
 }
 
-.active-cbss-item .course-item{
+.active-cbss-item .course-item {
   background: url(https://cdn.xingkwh.com/%E9%87%91%E8%89%B2.png) no-repeat;
   background-position: 12px 50%;
   background-size: 16px;
 }
+
 .active-cbss-item {
   border: 2px solid rgba(255, 210, 54, 1);
 }
@@ -1337,15 +1403,13 @@ export default {
 .active-cbss-item .course-item {
   color: #FF9100;
 }
+
 .active-cbss-item .cbss-fu-title {
   color: #fff;
 }
+
 .trang {
   opacity: 0;
-}
-
-.active-cbss-item .trang {
-  opacity: 1;
   position: absolute;
   bottom: 0;
   right: 0;
@@ -1356,6 +1420,11 @@ export default {
   border-left: 20px solid rgba(0, 0, 0, 0);
   border-right: 20px solid #FFD236;
   border-bottom: 20px solid #FFD236;
+  border-bottom-right-radius: 10px;
+}
+
+.active-cbss-item .trang {
+  opacity: 1;
 }
 
 .active-cbss-item .trang-icon {
@@ -1372,6 +1441,29 @@ export default {
   color: #999;
 }
 
+.cbss-item-tag {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(40%, -30%);
+  z-index: 1000;
+}
+
+.shili-pic {
+  display: none;
+  position: absolute;
+  z-index: 1001;
+  right: 0%;
+  top: 50%;
+  width: 550px;
+  transform: translate(90%, -80%);
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 1px 1px 15px rgba(0, 0, 0, .5);
+}
+.chose-box-service-srm:hover .shili-pic {
+  display: block;
+}
 </style>
 <!-- <style type="text/css" scoped src="common/css/backstage.css">
 </style> -->

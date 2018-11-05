@@ -1,7 +1,12 @@
 import axios from 'axios'
 import qs from 'qs'
-import { PREFIX_URL, UAID } from './config'
-import { getSign } from 'common/js/util'
+import {
+  PREFIX_URL,
+  UAID
+} from './config'
+import {
+  getSign
+} from 'common/js/util'
 
 export function getSiteinfo(token) {
   const url = `${PREFIX_URL}/site_info`
@@ -9,7 +14,9 @@ export function getSiteinfo(token) {
     token: token
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -45,29 +52,31 @@ export function setSiteinfo(token, icon, site_name, title_suffix, announcement, 
     email: email,
     contact: contact
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function getAgencyservice(token, status, service_category_id) {
   const url = `${PREFIX_URL}/agency_service`
@@ -75,13 +84,19 @@ export function getAgencyservice(token, status, service_category_id) {
     token: token
   }
   if (status) {
-    data = Object.assign({ status: status }, data)
+    data = Object.assign({
+      status: status
+    }, data)
   }
   if (service_category_id) {
-    data = Object.assign({ service_category_id: service_category_id }, data)
+    data = Object.assign({
+      service_category_id: service_category_id
+    }, data)
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -112,7 +127,9 @@ export function getPoundageConfig(id) {
     k: 'poundage'
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -144,7 +161,9 @@ export function getWithdrawlist(token, num, page) {
     page: page
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -176,29 +195,31 @@ export function withdraw(token, money, account_id) {
     money: money,
     account_id: account_id
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function setAgency(token, service_id, price, status) {
   const url = `${PREFIX_URL}/set_agency_service`
@@ -208,29 +229,31 @@ export function setAgency(token, service_id, price, status) {
     price: price,
     status: status
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function getAccount(token) {
   const url = `${PREFIX_URL}/withdraw_account`
@@ -238,7 +261,9 @@ export function getAccount(token) {
     token: token
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -262,7 +287,7 @@ export function getAccount(token) {
     }
   })
 }
-export function addAccount(token, account_type, account, name, code) {
+export function addAccount(token, account_type, account, name, code, wx_code) {
   const url = `${PREFIX_URL}/add_withdraw_account`
   let data = {
     token: token,
@@ -271,29 +296,36 @@ export function addAccount(token, account_type, account, name, code) {
     name: name,
     code: code
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  if (wx_code) {
+    Object.assign(data, {
+      wx_code: wx_code
+    })
+  }
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      // console.log(error.response.data)
-      console.log(error.response.status)
-      // console.log(error.response.headers)
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        // console.log(error.response.data)
+        console.log(error.response.status)
+        // console.log(error.response.headers)
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function getOrders(token, num, page, is_agency, code) {
   const url = `${PREFIX_URL}/orders`
@@ -304,10 +336,14 @@ export function getOrders(token, num, page, is_agency, code) {
     is_agency: is_agency
   }
   if (code) {
-    data = Object.assign({ code: code }, data)
+    data = Object.assign({
+      code: code
+    }, data)
   }
   return axios.get(url, {
-      params: Object.assign({ sign: getSign(data) }, data)
+      params: Object.assign({
+        sign: getSign(data)
+      }, data)
     })
     .then(function(res) {
       return Promise.resolve(res)
@@ -330,7 +366,7 @@ export function getOrders(token, num, page, is_agency, code) {
       }
     })
 }
-export function getTasks(token, num, page, is_agency, task_id, service_category_id) {
+export function getTasks(token, num, page, is_agency, task_id, service_category_id, phone) {
   const url = `${PREFIX_URL}/tasks`
   let data = {
     token: token,
@@ -339,13 +375,24 @@ export function getTasks(token, num, page, is_agency, task_id, service_category_
     is_agency: is_agency
   }
   if (task_id) {
-    data = Object.assign({ task_id: task_id }, data)
+    data = Object.assign({
+      task_id: task_id
+    }, data)
   }
   if (service_category_id) {
-    data = Object.assign({ service_category_id: service_category_id }, data)
+    data = Object.assign({
+      service_category_id: service_category_id
+    }, data)
+  }
+  if (phone) {
+    Object.assign(data, {
+      phone: phone
+    })
   }
   return axios.get(url, {
-      params: Object.assign({ sign: getSign(data) }, data)
+      params: Object.assign({
+        sign: getSign(data)
+      }, data)
     })
     .then(function(res) {
       return Promise.resolve(res)
@@ -374,26 +421,28 @@ export function setDomain(token, sub_domain) {
     token: token,
     sub_domain: sub_domain
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function delAccount(token, account_id, code) {
   const url = `${PREFIX_URL}/del_withdraw_account`
@@ -402,58 +451,64 @@ export function delAccount(token, account_id, code) {
     account_id: account_id,
     code: code
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function subDomains(sub_domain) {
   const url = `${PREFIX_URL}/sub_domains`
   let data = {
     sub_domain: sub_domain
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
-    if (error.response) {
-      return Promise.resolve({
-        data: {
-          err_code: error.response.status,
-          err_msg: error.response.status
-        }
-      })
-    } else {
-      return Promise.resolve({
-        data: {
-          err_code: -1,
-          err_msg: -1
-        }
-      })
-    }
-  })
+      if (error.response) {
+        return Promise.resolve({
+          data: {
+            err_code: error.response.status,
+            err_msg: error.response.status
+          }
+        })
+      } else {
+        return Promise.resolve({
+          data: {
+            err_code: -1,
+            err_msg: -1
+          }
+        })
+      }
+    })
 }
 export function getAgencyLevel() {
   const url = `${PREFIX_URL}/agency_level`
   let data = {}
   return axios.get(url, {
-      params: Object.assign({ sign: getSign(data) }, data)
+      params: Object.assign({
+        sign: getSign(data)
+      }, data)
     })
     .then(function(res) {
       return Promise.resolve(res)

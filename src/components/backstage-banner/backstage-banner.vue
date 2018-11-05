@@ -35,7 +35,7 @@
     <div class="backstage-fenge"></div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_dialogTableVisible">代理介绍</div>
     <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">客服帮助</div>
-    <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">发票申请</div>
+    <!-- <div class="mg-btn flex cursor notice-heder-btn" @click="_openQQ">发票申请</div> -->
     <!--   <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/goodsManage')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/goodsManage'}">商品管理</div> -->
     <!--     <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/task')" v-bind:class="{'active-mg-btn' : $route.fullPath == '/task'}">任务列表</div> -->
     <!--    <div class="mg-btn flex cursor notice-heder-btn" @click="_openc('/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86', 2)" v-bind:class="{'active-mg-btn' : $route.fullPath == '/management?mx=%E6%9F%A5%E7%9C%8B%E6%98%8E%E7%BB%86'}">查看明细</div> -->

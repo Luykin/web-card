@@ -6,7 +6,7 @@
         <div class="recharge-title-item flex cursor" @click="_chosePage(1)" :class="{'rti-active' : page === 1 }">在线支付充值</div>
         <div class="recharge-title-item flex cursor" @click="_chosePage(2)" :class="{'rti-active' : page === 2 }">银行汇款充值</div>
       </div>
-      <div v-show="!payUrl && page === 1" class="pu-warp">
+      <div v-show="!payUrl && page === 1" class="pu-warp" v-loading="zhifuloading">
         <div class="cr-item flex">
           <div class="cr-box-tit ellipsis flex">充值方式:</div>
           <div class="goods-box flex">
@@ -60,19 +60,19 @@
       </div>
     </div>
     <!--     <a id='links' href="#" style='display:none;'></a>
-    <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe> -->
-  </div>
-</template>
-<script>
-import QRCode from 'qrcode'
-import BAgent from 'components/backstage-banner/backstage-banner'
-import { mapGetters, mapMutations } from 'vuex'
-import { getAppInfo } from 'api/index'
-import { SUCCESS_CODE } from 'api/config'
-import { testToken } from 'common/js/util'
-import { addOrder } from 'api/header'
-import { getOrders } from 'api/score-record'
-import { isPhone, isWx } from 'common/js/util'
+      <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe> -->
+    </div>
+  </template>
+  <script>
+    import QRCode from 'qrcode'
+    import BAgent from 'components/backstage-banner/backstage-banner'
+    import { mapGetters, mapMutations } from 'vuex'
+    import { getAppInfo } from 'api/index'
+    import { SUCCESS_CODE } from 'api/config'
+    import { testToken } from 'common/js/util'
+    import { addOrder } from 'api/header'
+    import { getOrders } from 'api/score-record'
+    import { isPhone, isWx } from 'common/js/util'
 export default {
   data() {
     return {
@@ -88,8 +88,9 @@ export default {
       timeforCumt: 0,
       ifreamPayurl: null,
       wxPayTips: null,
+      zhifuloading: null,
       tableData: [
-        { label: '中国农业银行', code: '6228480478794701878', name: '张恒' }
+      { label: '中国农业银行', code: '6228480478794701878', name: '张恒' }
       ]
     }
   },
@@ -113,7 +114,7 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
     _getAppInfo(that) {
@@ -145,6 +146,7 @@ export default {
       window.open('http://wpa.qq.com/msgrd?v=3&uin=42428851&site=qq&menu=yes', '_brank')
     },
     _sureCompletionPayment() {
+      this._clearTimeforSPS()
       this.$router.replace({
         path: '/bg-money-record'
       })
@@ -198,6 +200,7 @@ export default {
         if (isPhone()) {
           this.newPage = window.open('about:blank', "_blank")
         }
+        this.zhifuloading = true
         addOrder(this.token, this.choseGood.score, this.activePayType, this.choseGood.price, this.choseGood.id).then((res) => {
           this._afterAddOrder(res)
         })
@@ -225,6 +228,7 @@ export default {
           if (isPhone() && !isWx()) {
             this.newPage = window.open('about:blank', "_blank")
           }
+          this.zhifuloading = true
           addOrder(this.token, this.money, this.activePayType, this.money).then((res) => {
             this._afterAddOrder(res)
           })
@@ -240,25 +244,30 @@ export default {
         if (isPhone() && !isWx()) {
           this.newPage.location.href = this.payUrl
         }
-        const opts = {
-          type: 'image/jpeg'
-        }
-        QRCode.toDataURL(this.payUrl, opts, (err, url) => {
-          if (err) {
-            this.$parent._open('二维码解析出错')
-            console.error(err)
-          } else {
-            this.$refs.payImg.src = url
+        if (res.data.data.image_url) {
+          this.payUrl = true
+          this.$refs.payImg.src = 'data:image/png;base64,' + res.data.data.image_url
+        } else {
+          const opts = {
+            type: 'image/jpeg'
           }
-        })
+          QRCode.toDataURL(this.payUrl, opts, (err, url) => {
+            if (err) {
+              this.$parent._open('二维码解析出错')
+              console.error(err)
+            } else {
+              this.$refs.payImg.src = url
+            }
+          })
+        }
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           // this.payUrl = false
           this._surePaySuc(this.code)
           this.timeforCumt++
-            if (this.timeforCumt >= 70) {
-              this._clearTimeforSPS()
-            }
+          if (this.timeforCumt >= 70) {
+            this._clearTimeforSPS()
+          }
         }, 3000)
       } else {
         // this._hiddenSidebar()
@@ -269,6 +278,7 @@ export default {
           this.$parent._open('似乎出错了')
         }
       }
+      this.zhifuloading = null
     },
     _surePaySuc(code) {
       if (!this._timeforSPS) {

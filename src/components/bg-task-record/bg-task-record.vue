@@ -26,11 +26,11 @@
             </el-table-column>
             <el-table-column prop="status" label="状态">
             </el-table-column>
-            <el-table-column prop="createA" label="提交时间">
+            <el-table-column prop="createA" label="提交时间" width="100">
             </el-table-column>
           </el-table>
-          <div id="i-page" class="i-page flex" v-show="tableDataF && tableDataF.length > 3">
-            <el-pagination layout="prev, pager, next" :total="totalF" @current-change="handleCurrentChangeF">
+          <div id="i-page" class="i-page flex" v-show="totalF > 3">
+            <el-pagination layout="prev, pager, next" :total="totalF" @current-change="handleCurrentChangeF" :page-size="fannum">
             </el-pagination>
           </div>
         </div>
@@ -56,9 +56,9 @@
           </el-table-column>
           <!--           <el-table-column prop="time" label="预计完成">
           </el-table-column> -->
-          <el-table-column prop="appointment_time" label="预约时间">
+          <el-table-column prop="appointment_time" label="预约时间" width="100">
           </el-table-column>
-          <el-table-column prop="createA" label="提交时间">
+          <el-table-column prop="createA" label="提交时间" width="100">
           </el-table-column>
         </el-table>
         <div id="i-page" class="i-page flex">
@@ -76,7 +76,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import { SUCCESS_CODE } from 'api/config'
 import { testToken, timeChange } from 'common/js/util'
 const NUM = 10
-const FANNUM = 3
+// const FANNUM = 3
 export default {
   data() {
     return {
@@ -87,6 +87,7 @@ export default {
       currentPage2: 5,
       currentPage3: 5,
       currentPage4: 4,
+      fannum: 3,
       page: 0,
       pageF: 0,
       total: 10,
@@ -136,7 +137,7 @@ export default {
   },
   methods: {
     _viewLink(e) {
-      window.open(e.hrefLink)
+      window.open(e.hrefLink || e.addition)
     },
     _orderInt() {
       this.choseItem = this.app.service_categories.concat([])
@@ -224,7 +225,7 @@ export default {
         return false
       }
       this.loadingF = true
-      getFanProjectOrders(this.token, FANNUM, this.pageF).then((res) => {
+      getFanProjectOrders(this.token, this.fannum, this.pageF).then((res) => {
         this.afterFanProjectOrders(res, this)
       })
     },
@@ -239,6 +240,11 @@ export default {
       list.forEach((item) => {
         item.status = this.state[item.status]
         item.createA = timeChange(item.create)
+        if (item.addition.indexOf('http') > -1) {
+          item.showLink = true
+        } else {
+          item.showLink = false
+        }
       })
       return list
     },
@@ -421,7 +427,7 @@ export default {
     handleCurrentChangeF(val) {
       console.log(val - 1)
       this.pageF = val - 1
-      this._getTasks()
+      this._getFanOrder()
       console.log(`当前页: ${val}`)
     },
     ...mapMutations({

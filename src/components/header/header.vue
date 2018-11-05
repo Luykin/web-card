@@ -10,16 +10,17 @@
       <nav class="pc-nav flex" id="pc-nav">
         <div class="nav-ul flex">
           <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
-            <!-- <el-menu-item index="/official">主页</el-menu-item> -->
+            <!-- <el-menu-item index="/none/9" @click="_toIndex">主页</el-menu-item> -->
             <el-menu-item index="/index" v-show="$route.name != 'management'">{{env}}</el-menu-item>
+            <el-menu-item index="/none/10" @click="_toCP" v-if='nowconfig.seo'>我们的产品</el-menu-item>
             <el-menu-item index="/order" v-show="user && $route.name != 'management'">我的订单</el-menu-item>
             <!-- <el-menu-item index="/score-record" v-show="user">积分记录</el-menu-item> -->
             <!-- <el-menu-item index="/none/1" v-show="user && !FENZAN" class="disable">
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && nowconfig.agent_switch" class="disable">
+            <!--             <el-menu-item index="/agent" v-show="user && !FENZAN && $route.name != 'management' && nowconfig.agent_switch" class="disable">
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-submenu index="/none/cont1" v-show="user && $route.name != 'management'">
               <template slot="title">我的账户</template>
               <el-menu-item index="/none" class='phone-item disable flex agent-item' v-show="proxyRank && user" disabled>
@@ -51,6 +52,12 @@
               <el-menu-item index="/backstage" v-show="user.is_agency && user.agency && user.agency.level> -1">
                 <div class="agent-ul-li flex cursor">
                   <div class="agent-ul-li-left flex ellipsis">代理后台</div>
+                  <div class="agent-ul-li-right flex ellipsis"></div>
+                </div>
+              </el-menu-item>
+              <el-menu-item index="/none" v-show="!user.is_agency" disabled>
+                <div class="agent-ul-li flex cursor" @click="$root.eventHub.$emit('agent')">
+                  <div class="agent-ul-li-left flex ellipsis">申请代理</div>
                   <div class="agent-ul-li-right flex ellipsis"></div>
                 </div>
               </el-menu-item>
@@ -111,11 +118,14 @@
       <el-row class="tac">
         <el-col>
           <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @select="handleSelect" text-color="#000" active-text-color="#ff9430">
-            <!-- <el-menu-item index="/official">
+            <!--             <el-menu-item index="/none/9" @click="_toIndex">
               <i class="iconfont icon-tijiaodingdan"></i>主页
             </el-menu-item> -->
             <el-menu-item index="/old-index" v-show="!$root.pageData">
               <i class="iconfont icon-tijiaodingdan"></i>{{env}}
+            </el-menu-item>
+            <el-menu-item index="/none/10" @click="_toCP" v-if='nowconfig.seo'>
+              <i class="iconfont icon-tijiaodingdan"></i>我们的产品
             </el-menu-item>
             <el-menu-item index="/order" v-show="user && !$root.pageData">
               <i class="iconfont icon-unie64a"></i> 我的订单
@@ -127,10 +137,10 @@
               <i class="iconfont icon-jifen"></i>
               <div class="log-out" @click="_showPopup($event)">充值积分</div>
             </el-menu-item> -->
-            <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && !$root.pageData && !showDL">
+            <!--             <el-menu-item index="/agent" class='disable' v-show="user && !FENZAN && !$root.pageData && !showDL">
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out" @click="_showAgent($event)">申请代理</div>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-menu-item index="/backstage" v-show="showDL">
               <i class="iconfont icon-dailishang"></i>
               <div class="log-out">代理后台</div>
@@ -167,10 +177,10 @@
               <i class="iconfont icon-kefu"></i>
               <div class="log-out" @click="_emit('openqq',false)">客服帮助</div>
             </el-menu-item>
-            <el-menu-item index="/none/fapiao" v-show="showDL && $root.pageData === 1" class='disable'>
+            <!-- <el-menu-item index="/none/fapiao" v-show="showDL && $root.pageData === 1" class='disable'>
               <i class="iconfont icon-fapiao"></i>
               <div class="log-out" @click="_emit('openqq',false)">发票申请</div>
-            </el-menu-item>
+            </el-menu-item> -->
             <el-submenu v-show="user" index="5">
               <template slot="title">
                 <i class="iconfont icon-zhanghu"></i> 我的账户
@@ -193,10 +203,10 @@
     </sidebar>
     <interlayer ref="interlayer" @close='_interlayerHide'></interlayer>
     <popup ref="popup">
-      <div class="recharge-box">
+      <div class="recharge-box" v-loading="zhifuloading">
         <div class="recharge-box-title flex" v-show="!payUrl">{{BuyDomainData ? '订单确认' : '积分充值'}}</div>
         <div class="recharge-box-title flex" v-show="payUrl">{{payType}}扫码支付</div>
-        <div class="content-qr flex" v-if="payUrl">
+        <div class="content-qr flex" v-show="payUrl">
           <div class="cq-left flex"><img :src="'http://p70pqu6ys.bkt.clouddn.com/'+ activePayType +'.png'" alt="支付方式" class="cq-pay-img"></div>
           <div class="cq-right flex">
             <div class="code-div flex">订单编号:{{code}} 充值金额: <span class="my-money" v-show='!BuyDomainData'>{{money||choseGood.price}}</span><span class="my-money" v-if='BuyDomainData'>{{BuyDomainData.price}}</span>元
@@ -238,236 +248,236 @@
           </div>
           <!--           {{BuyDomainData.addition}}
             {{BuyDomainData.price}} -->
-        </div>
-        <!-- app  支付方式 -->
-        <div class="goods-box flex" v-show="!payUrl">
-          <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
-            <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}</div>
-        </div>
-        <!-- app  支付方式  end -->
-        <div class="recharge-btn-box flex" v-show="!payUrl">
-          <div class="recharge-btn-sure flex sure cursor" @click="_addOrder" v-if="!BuyDomainData">确认</div>
-          <div class="recharge-btn-sure flex sure cursor" @click="_addSubSiteTask" v-if="BuyDomainData">确定</div>
-          <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
-        </div>
-      </div>
-    </popup>
-    <!-- 2018.04.21-申请代理 -->
-    <popup ref='agent' :protocol='true'>
-      <div v-show='!hadAgree'>
-        <div class="recharge-box-title-agent flex">代理合作协议</div>
-        <div class="agreement-content">
-          <p>尊敬的用户您好，感谢您使用“星空网红助手平台”网站及相关服务！ 根据《中华人民共和国合同法》及相关法律法规的规定，用户和星空网红助手平台（以下简称我平台）双方本着自愿、平等、诚信的原则，就用户购买星空网红助手平台相关服务及有关事宜达成如下条款:</p>
-          <div class="agreement-content-title flex">第一条 代理服务内容</div>
-          <p>1、我平台同意该用户代理销售相关互联网在线服务，我平台将全力支持配合用户的销售行为。</p>
-          <p> 2、用户的具体可销售服务内容和产品价格，以网站当前实际报价为准。</p>
-          <div class="agreement-content-title flex">第二条 代理费用及支付</div>
-          <p>1、用户需缴纳代理费用方可成为我平台代理，获取代理服务销售价格和相关支持。代理费用为年费，仅为一年的使用费用。</p>
-          <p>2、我平台给用户提供的服务费用，采取预付费的形式进行结算，以用户使用服务等功能的实际价格进行收取。</p>
-          <p>3、用户的实际购买价格折扣，根据用户的代理等级有不同折扣，实际折扣以当前实际情况为准。</p>
-          <div class="agreement-content-title flex">第三条 用户的权利及义务</div>
-          <p>1、用户按本协议约定享有我平台产品服务的使用权、产品升级服务及客户服务。</p>
-          <p>2、用户购买我平台产品服务，应按本协议的约定按时向我平台支付相应的服务费用。</p>
-          <p>3、用户必须遵守国家有关法律、法规的规定，不得利用我平台服务从事国家法律法规所禁止的活动，并对利用我平台服务使用行为及数据内容的合法性承担完全责任。</p>
-          <p>4、如我平台服务与本协议约定及官方公布的条款或内容不符，用户有权单方提前终止我平台服务的使用，并可申请退还截至终止之日至尚未抵扣的费用。</p>
-          <div class="agreement-content-title flex">第四条 “星空网红助手平台”的权利及义务 </div>
-          <p>1、我平台按本协议约定向用户提供技术服务及本协议约定的产品升级服务。</p>
-          <p> 2、我平台将持续对我平台的服务平台提供升级服务，包括且不限于：功能优化、功能新增、第三方集成插件等功能和服务，相关升级服务将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效方式通知用户。 </p>
-          <p>3、我平台将基于我平台服务质量提升的考虑，可能调整或优化服务内容或服务方式，所有调整或优化的服务内容和服务方式将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效的方式通知用户。</p>
-          <p>4、我平台服务平台在协议约定版本内的我平台自行开发或拥有知识产权的功能优化、功能新增等升级服务将免费为用户提供。</p>
-          <p>5、我平台对用户使用我平台服务的数据实行 7*24 小时技术支持。如果发现用户出现非法行为，我平台有权冻结用户账号直至用户查清停止非法行为为止，同时用户应积极配合自查非法行为，将信息准确提供给我平台以备国家相关监管部门审查。 </p>
-          <div class="agreement-content-title flex">第五条 费用续费和协议延续</div>
-          <p>1、用户需在其已经确认的订单的服务期满前 30 日内确认是否续费，用户已支付的订单服务期满且未在 30 日内完成续费订单确认及费用支付的，我平台有权在用户确认的订单服务期满后中止向用户服务，但我平台产品服务平台会将用户账号中的数据自到期之日起保存30 天，此期间称为保留期。 </p>
-          <p>2、如用户在保留期内完成续费订单确认及费用支付的，我平台将恢复用户的服务及账号中的数据，在保留期内未及时完成续费订单确认及费用支付的，我平台将在保留期结束后不再保存用户账号中的数据，由此造成的一切后果由用户自行承担。 </p>
-          <p>3、保留期满后用户仍未完成续费订单确认及费用支付的，本协议自动终止。如用户仍有预付款未抵扣的，视为用户放弃上述预付款 </p>
-          <div class="agreement-content-title flex">第六条 保密条款 </div>
-          <p>1、保密信息指双方合作过程中由披露方向接收方披露的所有保密信息，包括但不限于商业计划、客户信息、服务协议、技术数据、产品构思、产品价格、职员名单、操作手册等。</p>
-          <p>2、保密信息还包括用户使用我平台产生的数据及相关内容，以及涉及我平台与本协议有关的所有信息，包括但不限于我平台的服务内容、优惠费率等。 </p>
-          <p>3、用户和我平台双方不得将保密信息向第三方或者公众透露，否则承担由此给保密信息所有方造成的一切损失。 </p>
-          <p>4、保密责任不因本协议的终止而终止。 </p>
-          <div class="agreement-content-title flex">第七条 知识产权 </div>
-          <p>1、 我平台完全拥有我平台服务及产品的全部知识产权（包括但不限于版权、商标权、专利权及商业秘密等），用户签署本协议后并未拥有产品的所有权。我平台的名字、标志、LOGO、产品名字等属于我平台，未经我平台授权，其他方不得使用。 </p>
-          <p>2、用户完全拥有在使用我平台服务过程中产生的数据及相关内容的所有权，除法律允许的情况下，我平台不得使用用户的文件数据及相关内容。 </p>
-          <div class="agreement-content-title flex">第八条 不可抗力 </div>
-          <p>1、因不可抗力事件，致使一方无法履行本协议，发生不可抗力的一方有权提前终止本协议，在不可抗力的影响范围内得以免除责任，但应在上述情况发生后 5 个工作日内书面通知并提供有效证明。</p>
-          <p>2、不可抗力事件包括但不限于：国家政策调整、机房中继线路调整、电信运营商机房维护检修、网络互联互通链接不通畅、电信运营商政策调整与影响。</p>
-          <p>3、鉴于我平台为基于互联网应用的产品服务平台的特殊性，因黑客、病毒、电信部门技术调整等引起的事件，用户亦认同不属于我平台违约。但我平台应尽最大努力保护用户权益并在事件结束后立即恢复服务。</p>
-          <div class="agreement-content-title flex">第九条 违约责任 </div>
-          <p> 1、违约金条款适用于正式的付费服务周期。</p>
-          <p> 2、除本协议另有约定外，任何一方违反本协议而使另一方发生任何费用或开支或额外责任或遭受损失的，违约方应在收到非违约方书面通知之日起十个工作日内就该费用、开支、责任或损失，给予非违约方赔偿。 </p>
-          <p>3、如用户违反本协议及附件相关约定，我平台有权提前解除服务协议，并不退还用户所支付的服务费用；如给我平台造成损失的，用户应当赔偿我平台实际发生的损失。</p>
-          <p>4、如我平台所提供的服务和本协议及附件相关约定不符，用户有权提前解除协议，我平台退还用户所支付的服务费用</p>
-          <div class="agreement-content-title flex">第十条 争议及解决 </div>
-          <p>用户及我平台就本协议的任何争议须友好协商。如协商不成，用户及我平台均可向被告方所在地人民法院起诉。本协议之签署、效力、解释和执行以及本协议项下争议之解决均应适用中国法律</p>
-          <div class="agreement-content-title flex">第十一条 其他 </div>
-          <p>本协议的版权为我平台所有，我平台保留一切解释和修改的权利，并在修改后通知用户。</p>
-          <p class="font-weight-agent">对于以上《代理合作协议》的各项内容，用户已全文阅读并完全理解。</p>
-        </div>
-        <div class="recharge-btn-box-after flex bottom">
-          <div class="recharge-btn-sure-after flex sure-agent cursor" @click='_agree'>同意并继续</div>
-          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
-        </div>
-      </div>
-      <div v-show='hadAgree'>
-        <div class="recharge-box-title-agent flex">提交代理申请</div>
-        <div class="agreement-content overHiden">
-          <div class="flex agree-input-box">
-            <div class="agree-label flex ellipsis">公司简称<span class="must">*</span></div>
-            <div class="flex input-defult">
-              <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName">
+          </div>
+          <!-- app  支付方式 -->
+          <div class="goods-box flex" v-show="!payUrl">
+            <div v-for="(value, key) in app.payments" @click="_chosePayType(key, value)" :class="{'active-pay-type':activePayType === key, 'disable-pay-type' : !value}" class="cursor flex pay-item ellipsis" v-if='value'>
+              <img :src="'http://ozp5yj4ke.bkt.clouddn.com/'+ key + '.png'" class="pay-icon"> {{key === 'wx' ? '微信支付':key === 'qq'?'QQ支付':'支付宝支付'}}</div>
+            </div>
+            <!-- app  支付方式  end -->
+            <div class="recharge-btn-box flex" v-show="!payUrl">
+              <div class="recharge-btn-sure flex sure cursor" @click="_addOrder" v-if="!BuyDomainData">确认</div>
+              <div class="recharge-btn-sure flex sure cursor" @click="_addSubSiteTask" v-if="BuyDomainData">确定</div>
+              <div class="recharge-btn-sure flex cancel cursor" @click='_hiddenSidebar'>取消</div>
             </div>
           </div>
-          <div class="flex agree-input-box">
-            <div class="agree-label flex ellipsis">申请人<span class="must">*</span></div>
-            <div class="flex input-defult">
-              <input type="text" placeholder="请填写申请人" class="i-ipnput" v-model="applicant">
+        </popup>
+        <!-- 2018.04.21-申请代理 -->
+        <popup ref='agent' :protocol='true'>
+          <div v-show='!hadAgree'>
+            <div class="recharge-box-title-agent flex">代理合作协议</div>
+            <div class="agreement-content">
+              <p>尊敬的用户您好，感谢您使用“星空网红助手平台”网站及相关服务！ 根据《中华人民共和国合同法》及相关法律法规的规定，用户和星空网红助手平台（以下简称我平台）双方本着自愿、平等、诚信的原则，就用户购买星空网红助手平台相关服务及有关事宜达成如下条款:</p>
+              <div class="agreement-content-title flex">第一条 代理服务内容</div>
+              <p>1、我平台同意该用户代理销售相关互联网在线服务，我平台将全力支持配合用户的销售行为。</p>
+              <p> 2、用户的具体可销售服务内容和产品价格，以网站当前实际报价为准。</p>
+              <div class="agreement-content-title flex">第二条 代理费用及支付</div>
+              <p>1、用户需缴纳代理费用方可成为我平台代理，获取代理服务销售价格和相关支持。代理费用为年费，仅为一年的使用费用。</p>
+              <p>2、我平台给用户提供的服务费用，采取预付费的形式进行结算，以用户使用服务等功能的实际价格进行收取。</p>
+              <p>3、用户的实际购买价格折扣，根据用户的代理等级有不同折扣，实际折扣以当前实际情况为准。</p>
+              <div class="agreement-content-title flex">第三条 用户的权利及义务</div>
+              <p>1、用户按本协议约定享有我平台产品服务的使用权、产品升级服务及客户服务。</p>
+              <p>2、用户购买我平台产品服务，应按本协议的约定按时向我平台支付相应的服务费用。</p>
+              <p>3、用户必须遵守国家有关法律、法规的规定，不得利用我平台服务从事国家法律法规所禁止的活动，并对利用我平台服务使用行为及数据内容的合法性承担完全责任。</p>
+              <p>4、如我平台服务与本协议约定及官方公布的条款或内容不符，用户有权单方提前终止我平台服务的使用，并可申请退还截至终止之日至尚未抵扣的费用。</p>
+              <div class="agreement-content-title flex">第四条 “星空网红助手平台”的权利及义务 </div>
+              <p>1、我平台按本协议约定向用户提供技术服务及本协议约定的产品升级服务。</p>
+              <p> 2、我平台将持续对我平台的服务平台提供升级服务，包括且不限于：功能优化、功能新增、第三方集成插件等功能和服务，相关升级服务将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效方式通知用户。 </p>
+              <p>3、我平台将基于我平台服务质量提升的考虑，可能调整或优化服务内容或服务方式，所有调整或优化的服务内容和服务方式将会以协议约定的电话、邮件或提前在我平台网站显著位置公示等有效的方式通知用户。</p>
+              <p>4、我平台服务平台在协议约定版本内的我平台自行开发或拥有知识产权的功能优化、功能新增等升级服务将免费为用户提供。</p>
+              <p>5、我平台对用户使用我平台服务的数据实行 7*24 小时技术支持。如果发现用户出现非法行为，我平台有权冻结用户账号直至用户查清停止非法行为为止，同时用户应积极配合自查非法行为，将信息准确提供给我平台以备国家相关监管部门审查。 </p>
+              <div class="agreement-content-title flex">第五条 费用续费和协议延续</div>
+              <p>1、用户需在其已经确认的订单的服务期满前 30 日内确认是否续费，用户已支付的订单服务期满且未在 30 日内完成续费订单确认及费用支付的，我平台有权在用户确认的订单服务期满后中止向用户服务，但我平台产品服务平台会将用户账号中的数据自到期之日起保存30 天，此期间称为保留期。 </p>
+              <p>2、如用户在保留期内完成续费订单确认及费用支付的，我平台将恢复用户的服务及账号中的数据，在保留期内未及时完成续费订单确认及费用支付的，我平台将在保留期结束后不再保存用户账号中的数据，由此造成的一切后果由用户自行承担。 </p>
+              <p>3、保留期满后用户仍未完成续费订单确认及费用支付的，本协议自动终止。如用户仍有预付款未抵扣的，视为用户放弃上述预付款 </p>
+              <div class="agreement-content-title flex">第六条 保密条款 </div>
+              <p>1、保密信息指双方合作过程中由披露方向接收方披露的所有保密信息，包括但不限于商业计划、客户信息、服务协议、技术数据、产品构思、产品价格、职员名单、操作手册等。</p>
+              <p>2、保密信息还包括用户使用我平台产生的数据及相关内容，以及涉及我平台与本协议有关的所有信息，包括但不限于我平台的服务内容、优惠费率等。 </p>
+              <p>3、用户和我平台双方不得将保密信息向第三方或者公众透露，否则承担由此给保密信息所有方造成的一切损失。 </p>
+              <p>4、保密责任不因本协议的终止而终止。 </p>
+              <div class="agreement-content-title flex">第七条 知识产权 </div>
+              <p>1、 我平台完全拥有我平台服务及产品的全部知识产权（包括但不限于版权、商标权、专利权及商业秘密等），用户签署本协议后并未拥有产品的所有权。我平台的名字、标志、LOGO、产品名字等属于我平台，未经我平台授权，其他方不得使用。 </p>
+              <p>2、用户完全拥有在使用我平台服务过程中产生的数据及相关内容的所有权，除法律允许的情况下，我平台不得使用用户的文件数据及相关内容。 </p>
+              <div class="agreement-content-title flex">第八条 不可抗力 </div>
+              <p>1、因不可抗力事件，致使一方无法履行本协议，发生不可抗力的一方有权提前终止本协议，在不可抗力的影响范围内得以免除责任，但应在上述情况发生后 5 个工作日内书面通知并提供有效证明。</p>
+              <p>2、不可抗力事件包括但不限于：国家政策调整、机房中继线路调整、电信运营商机房维护检修、网络互联互通链接不通畅、电信运营商政策调整与影响。</p>
+              <p>3、鉴于我平台为基于互联网应用的产品服务平台的特殊性，因黑客、病毒、电信部门技术调整等引起的事件，用户亦认同不属于我平台违约。但我平台应尽最大努力保护用户权益并在事件结束后立即恢复服务。</p>
+              <div class="agreement-content-title flex">第九条 违约责任 </div>
+              <p> 1、违约金条款适用于正式的付费服务周期。</p>
+              <p> 2、除本协议另有约定外，任何一方违反本协议而使另一方发生任何费用或开支或额外责任或遭受损失的，违约方应在收到非违约方书面通知之日起十个工作日内就该费用、开支、责任或损失，给予非违约方赔偿。 </p>
+              <p>3、如用户违反本协议及附件相关约定，我平台有权提前解除服务协议，并不退还用户所支付的服务费用；如给我平台造成损失的，用户应当赔偿我平台实际发生的损失。</p>
+              <p>4、如我平台所提供的服务和本协议及附件相关约定不符，用户有权提前解除协议，我平台退还用户所支付的服务费用</p>
+              <div class="agreement-content-title flex">第十条 争议及解决 </div>
+              <p>用户及我平台就本协议的任何争议须友好协商。如协商不成，用户及我平台均可向被告方所在地人民法院起诉。本协议之签署、效力、解释和执行以及本协议项下争议之解决均应适用中国法律</p>
+              <div class="agreement-content-title flex">第十一条 其他 </div>
+              <p>本协议的版权为我平台所有，我平台保留一切解释和修改的权利，并在修改后通知用户。</p>
+              <p class="font-weight-agent">对于以上《代理合作协议》的各项内容，用户已全文阅读并完全理解。</p>
+            </div>
+            <div class="recharge-btn-box-after flex bottom">
+              <div class="recharge-btn-sure-after flex sure-agent cursor" @click='_agree'>同意并继续</div>
+              <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
             </div>
           </div>
-          <div class="flex agree-input-box">
-            <div class="agree-label flex ellipsis">联系电话<span class="must">*</span></div>
-            <div class="flex input-defult">
-              <input type="text" placeholder="请填写联系电话" class="i-ipnput" v-model="telephone">
+          <div v-show='hadAgree'>
+            <div class="recharge-box-title-agent flex">提交代理申请</div>
+            <div class="agreement-content overHiden">
+              <div class="flex agree-input-box">
+                <div class="agree-label flex ellipsis">公司简称<span class="must">*</span></div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写公司简称" class="i-ipnput" v-model="companyName">
+                </div>
+              </div>
+              <div class="flex agree-input-box">
+                <div class="agree-label flex ellipsis">申请人<span class="must">*</span></div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写申请人" class="i-ipnput" v-model="applicant">
+                </div>
+              </div>
+              <div class="flex agree-input-box">
+                <div class="agree-label flex ellipsis">联系电话<span class="must">*</span></div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写联系电话" class="i-ipnput" v-model="telephone">
+                </div>
+              </div>
+              <div class="flex agree-input-box">
+                <div class="agree-label flex ellipsis">电子邮箱<span class="must">*</span></div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写电子邮箱" class="i-ipnput" v-model="mailBox">
+                </div>
+              </div>
+              <div class="flex agree-input-box">
+                <div class="agree-label flex ellipsis">申请需求<span class="not-must">(非必填)</span></div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请简要描述您的需求" class="i-ipnput" v-model="demand">
+                </div>
+              </div>
+            </div>
+            <div class="recharge-btn-box-after flex bottom">
+              <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_sublimeAgree">提交申请</div>
+              <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
             </div>
           </div>
-          <div class="flex agree-input-box">
-            <div class="agree-label flex ellipsis">电子邮箱<span class="must">*</span></div>
-            <div class="flex input-defult">
-              <input type="text" placeholder="请填写电子邮箱" class="i-ipnput" v-model="mailBox">
+        </popup>
+        <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
+          <div class="dialog-min-text flex">{{dialogText}}</div>
+          <div class="flex dialog-btn-box">
+            <!-- <div class="dialog-min-btn flex cursor ellipsis" @click="centerDialogVisible = false">取消</div> -->
+            <div class="dialog-min-btn flex cursor ellipsis" @click="_toDL()">现在去代理后台</div>
+          </div>
+        </el-dialog>
+        <popup ref='domain'>
+          <div>
+            <div class="recharge-box-title-agent flex">设置您分站域名</div>
+            <div class="rbta-input-warp flex">
+              <input type="text" name="domain" class="rbata-iw-left flex" placeholder="填写您的域名" v-model="domainText" @input="_changeExists">
+              <div class="rbata-iw-right flex">.xkfans.com</div>
+              <div class="rbata-iw-right flex rbta-btn cursor" @click="_checkDomain">检查</div>
+            </div>
+            <div class="titps-domain flex" v-show="exists === 1">温馨提示:设置完成后您可以通过{{domainText}}.xkfans.com访问您的分站</div>
+            <div class="titps-domain flex sucess-domain" v-show="exists === 2">此网址{{domainText}}.xkfans.com可以被使用</div>
+            <div class="titps-domain flex fail-domain" v-show="exists === 3">此网址{{domainText}}.xkfans.com已经被使用</div>
+            <!-- #FF9100 -->
+            <div class="recharge-btn-box-after flex bottom">
+              <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_setDomainSure">确定</div>
+              <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenDomain">取消</div>
             </div>
           </div>
-          <div class="flex agree-input-box">
-            <div class="agree-label flex ellipsis">申请需求<span class="not-must">(非必填)</span></div>
-            <div class="flex input-defult">
-              <input type="text" placeholder="请简要描述您的需求" class="i-ipnput" v-model="demand">
+        </popup>
+        <el-dialog :visible.sync="dialogTableVisible" style="margin-top: -14vh">
+          <div class="dl-explain-warp">
+            <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%A3%E7%90%86%E7%89%B9%E6%9D%83%E8%AF%B4%E6%98%8E.png" alt="代理简易说明" class="dl-explain-img">
+            <div class="dl-agencylevel flex">
+              <div v-for="item in agencyLevel" v-show="item.level>0" class="dl-aglevel-item flex">{{Math.ceil(item.money)}}元</div>
             </div>
           </div>
-        </div>
-        <div class="recharge-btn-box-after flex bottom">
-          <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_sublimeAgree">提交申请</div>
-          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenAgent">我再考虑考虑</div>
-        </div>
+        </el-dialog>
+        <a id='links' href="#" style='display:none;'></a>
+        <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe>
       </div>
-    </popup>
-    <el-dialog :title="dialogTitle" :visible.sync="centerDialogVisible" width="30vw" center :show-close="false" top="35vh">
-      <div class="dialog-min-text flex">{{dialogText}}</div>
-      <div class="flex dialog-btn-box">
-        <!-- <div class="dialog-min-btn flex cursor ellipsis" @click="centerDialogVisible = false">取消</div> -->
-        <div class="dialog-min-btn flex cursor ellipsis" @click="_toDL()">现在去代理后台</div>
-      </div>
-    </el-dialog>
-    <popup ref='domain'>
-      <div>
-        <div class="recharge-box-title-agent flex">设置您分站域名</div>
-        <div class="rbta-input-warp flex">
-          <input type="text" name="domain" class="rbata-iw-left flex" placeholder="填写您的域名" v-model="domainText" @input="_changeExists">
-          <div class="rbata-iw-right flex">.xkfans.com</div>
-          <div class="rbata-iw-right flex rbta-btn cursor" @click="_checkDomain">检查</div>
-        </div>
-        <div class="titps-domain flex" v-show="exists === 1">温馨提示:设置完成后您可以通过{{domainText}}.xkfans.com访问您的分站</div>
-        <div class="titps-domain flex sucess-domain" v-show="exists === 2">此网址{{domainText}}.xkfans.com可以被使用</div>
-        <div class="titps-domain flex fail-domain" v-show="exists === 3">此网址{{domainText}}.xkfans.com已经被使用</div>
-        <!-- #FF9100 -->
-        <div class="recharge-btn-box-after flex bottom">
-          <div class="recharge-btn-sure-after flex sure-agent cursor" @click="_setDomainSure">确定</div>
-          <div class="recharge-btn-sure-after flex cancel cursor" @click="_hiddenDomain">取消</div>
-        </div>
-      </div>
-    </popup>
-    <el-dialog :visible.sync="dialogTableVisible" style="margin-top: -14vh">
-      <div class="dl-explain-warp">
-        <img src="http://p70pqu6ys.bkt.clouddn.com/%E4%BB%A3%E7%90%86%E7%89%B9%E6%9D%83%E8%AF%B4%E6%98%8E.png" alt="代理简易说明" class="dl-explain-img">
-        <div class="dl-agencylevel flex">
-          <div v-for="item in agencyLevel" v-show="item.level>0" class="dl-aglevel-item flex">{{Math.ceil(item.money)}}元</div>
-        </div>
-      </div>
-    </el-dialog>
-    <a id='links' href="#" style='display:none;'></a>
-    <iframe :src="payUrl" v-if="payUrl && ifreamPayurl" class="pay-iframe" seamless></iframe>
-  </div>
-</template>
-<script type="text/javascript">
-import { setDomain, setSiteinfo, subDomains, getAgencyLevel } from 'api/site'
-import { getOrders } from 'api/score-record'
-import sidebar from 'components/sidebar/sidebar'
-import { mapGetters, mapMutations } from 'vuex'
-import interlayer from 'base/interlayer/interlayer'
-import popup from 'base/popup/popup'
-import { addOrder, agency } from 'api/header'
-import { testToken, isPhone, compare, isWx } from 'common/js/util'
-// import QrcodeVue from 'qrcode.vue'
-import QRCode from 'qrcode'
-import { getUserInfo, addSubSiteTask, addSiteTask, addFanProject } from 'api/index'
-import { SUCCESS_CODE } from 'api/config'
-import { UAID } from 'api/config'
-import { NOWCONFIG } from 'api/appConfig'
-export default {
-  data() {
-    return {
-      BuyDomainData: null,
-      nowconfig: null,
-      uaid: null,
-      sidebar: null,
-      popup: null,
-      agent: null,
-      payUrl: null,
-      size: 120,
-      code: null,
-      FENZAN: null,
-      choseGoodId: -1,
-      inputFocus: true,
-      activePayType: null,
-      env: '网红打造',
-      time: null,
-      hadAgree: null,
-      centerDialogVisible: null,
-      exists: 1,
-      dialogText: '',
-      dialogTitle: '',
-      money: '',
-      companyName: '',
-      applicant: '',
-      telephone: '',
-      mailBox: '',
-      demand: '',
-      domainText: '',
-      _timeforSPS: null,
-      timeforCumt: 0,
-      ifreamPayurl: null,
-      newPage: null,
-      dialogTableVisible: null,
-      agencyLevel: null,
-      wxPayTips: null,
-      rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
-      iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
-    }
-  },
-  created() {
-    this.uaid = UAID
-    this.nowconfig = NOWCONFIG
-    this._headerInit()
-    this.$root.eventHub.$on('user', (location) => {
-      this._updataUser(location)
-    })
-    this.$root.eventHub.$on('agent', () => {
-      this._toShowAgent()
-    })
-    this.$root.eventHub.$on('env', () => {
-      this.env = '测试环境'
-    })
-    this.$root.eventHub.$on('showPopup', (data) => {
-      this._showPopup(false, data)
-    })
-    this.$root.eventHub.$on('domain', () => {
-      this._setDomain()
-    })
-    this.$root.eventHub.$on('dialogTableVisible', () => {
-      this.dialogTableVisible = true
-    })
-    this.$root.eventHub.$on('logo', (src) => {
-      this._setLogo(src)
-      this._FENZAN()
-    })
-    this.$root.eventHub.$emit('canvas')
+    </template>
+    <script type="text/javascript">
+      import { setDomain, setSiteinfo, subDomains, getAgencyLevel } from 'api/site'
+      import { getOrders } from 'api/score-record'
+      import sidebar from 'components/sidebar/sidebar'
+      import { mapGetters, mapMutations } from 'vuex'
+      import interlayer from 'base/interlayer/interlayer'
+      import popup from 'base/popup/popup'
+      import { addOrder, agency } from 'api/header'
+      import { testToken, isPhone, compare, isWx } from 'common/js/util'
+      import QRCode from 'qrcode'
+      import { getUserInfo, addSubSiteTask, addSiteTask, addFanProject } from 'api/index'
+      import { SUCCESS_CODE } from 'api/config'
+      import { UAID } from 'api/config'
+      import { NOWCONFIG } from 'api/appConfig'
+      export default {
+        data() {
+          return {
+            BuyDomainData: null,
+            nowconfig: null,
+            uaid: null,
+            sidebar: null,
+            popup: null,
+            agent: null,
+            payUrl: null,
+            size: 120,
+            code: null,
+            FENZAN: null,
+            choseGoodId: -1,
+            inputFocus: true,
+            activePayType: null,
+            env: '网红应援',
+            time: null,
+            hadAgree: null,
+            centerDialogVisible: null,
+            exists: 1,
+            dialogText: '',
+            dialogTitle: '',
+            money: '',
+            companyName: '',
+            applicant: '',
+            telephone: '',
+            mailBox: '',
+            demand: '',
+            domainText: '',
+            _timeforSPS: null,
+            timeforCumt: 0,
+            ifreamPayurl: null,
+            newPage: null,
+            dialogTableVisible: null,
+            agencyLevel: null,
+            wxPayTips: null,
+            zhifuloading: null,
+            rank: ['青铜代理', '白银代理', '黄金代理', '王者代理'],
+            iconList: ['http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E8%AE%B01.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A72.png', 'http://p70pqu6ys.bkt.clouddn.com/%E7%AD%89%E7%BA%A73@2x.png']
+          }
+        },
+        created() {
+          this.uaid = UAID
+          this.nowconfig = NOWCONFIG
+          this._headerInit()
+          this.$root.eventHub.$on('user', (location) => {
+            this._updataUser(location)
+          })
+          this.$root.eventHub.$on('agent', () => {
+            this._toShowAgent()
+          })
+          this.$root.eventHub.$on('env', () => {
+            this.env = '测试环境'
+          })
+          this.$root.eventHub.$on('showPopup', (data) => {
+            this._showPopup(false, data)
+          })
+          this.$root.eventHub.$on('domain', () => {
+            this._setDomain()
+          })
+          this.$root.eventHub.$on('dialogTableVisible', () => {
+            // this.dialogTableVisible = true
+          })
+          this.$root.eventHub.$on('logo', (src) => {
+            this._setLogo(src)
+            this._FENZAN()
+          })
+          this.$root.eventHub.$emit('canvas')
     // this._getAppInfo(this)
     this.telephone = this.user.phone || ''
     // this.choseGoodId = this.app.goods[0].id || -1
@@ -524,7 +534,7 @@ export default {
       'scorerate',
       'tokenTime',
       'app'
-    ])
+      ])
   },
   methods: {
     _headerInit() {
@@ -579,9 +589,16 @@ export default {
       if (isPhone() && !isWx()) {
         this.newPage = window.open('about:blank', "_blank")
       }
-      addSiteTask(this.token, this.BuyDomainData).then((res) => {
-        this._afterAddOrder(res)
-      })
+      this.zhifuloading = true
+      if (this.BuyDomainData.fan_project_id) {
+        addFanProject(this.token, this.BuyDomainData).then((res) => {
+          this._afterAddOrder(res)
+        })
+      } else {
+        addSiteTask(this.token, this.BuyDomainData).then((res) => {
+          this._afterAddOrder(res)
+        })
+      }
     },
     _addFanProject() {
       if (!this.activePayType) {
@@ -595,6 +612,8 @@ export default {
       if (isPhone() && !isWx()) {
         this.newPage = window.open('about:blank', "_blank")
       }
+      // console.log(this.BuyDomainData)
+      this.zhifuloading = true
       addFanProject(this.token, this.BuyDomainData).then((res) => {
         this._afterAddOrder(res)
       })
@@ -933,23 +952,29 @@ export default {
         if (isPhone() && !isWx()) {
           this.newPage.location.href = this.payUrl
         }
-        const opts = {
-          type: 'image/jpeg'
+        if (res.data.data.image_url) {
+          this.payUrl = true
+          this.$refs.payImg.src = 'data:image/png;base64,' + res.data.data.image_url
+        } else {
+          const opts = {
+            type: 'image/jpeg'
+          }
+          QRCode.toDataURL(this.payUrl, opts, (err, url) => {
+            if (err) {
+              this.$parent._open('二维码解析出错')
+              console.error(err)
+            } else {
+              this.$refs.payImg.src = url
+            }
+          })
         }
-        QRCode.toDataURL(this.payUrl, opts)
-          .then(url => {
-            this.$refs.payImg.src = url
-          })
-          .catch(err => {
-            console.error(err)
-          })
         this.timeforCumt = 0
         this._timeforSPS = setInterval(() => {
           this._surePaySuc(this.code)
           this.timeforCumt++
-            if (this.timeforCumt >= 70) {
-              this._clearTimeforSPS()
-            }
+          if (this.timeforCumt >= 70) {
+            this._clearTimeforSPS()
+          }
         }, 3000)
       } else {
         this._hiddenSidebar()
@@ -960,6 +985,7 @@ export default {
           this.$parent._open('似乎出错了')
         }
       }
+      this.zhifuloading = null
     },
     _surePaySuc(code) {
       if (!this._timeforSPS) {
@@ -1005,6 +1031,19 @@ export default {
       }
       this.$root.eventHub.$emit('canvas', true)
     },
+    _toCP() {
+      if (this.nowconfig.seo) {
+        window.open(this.nowconfig.seo + '/download/2')
+      } else {
+        this.$root.eventHub.$emit('updateOrder')
+        this.$root.eventHub.$emit('user')
+        this.$root.eventHub.$emit('updateScoreRecord')
+        this.$router.replace({
+          path: '/index'
+        })
+        this.$root.eventHub.$emit('canvas', true)
+      }
+    },
     _toIndex() {
       if (this.nowconfig.seo) {
         // window.location.href = this.nowconfig.seo
@@ -1044,7 +1083,9 @@ export default {
       if (data) {
         this.BuyDomainData = data
       }
+      console.log(this.BuyDomainData.pay_type, '???')
       if (this.BuyDomainData.pay_type) {
+        // console.log(this.BuyDomainData.fan_project_id)
         if (this.BuyDomainData.fan_project_id) {
           this.activePayType = this.BuyDomainData.pay_type
           this._addFanProject()
@@ -1288,6 +1329,8 @@ export default {
 
 
 
+
+
 /*start ---改写我的账户下拉窗 2018.04.27*/
 
 .phone-item {
@@ -1352,6 +1395,8 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
 }
+
+
 
 
 

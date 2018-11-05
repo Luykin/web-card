@@ -4,9 +4,9 @@
       <m-agent></m-agent>
       <div class="configure-box flex">
         <div class="configure-box-item flex">
-          <div class="cbi-name flex ellipsis">我的提现账户:</div>
+          <div class="cbi-name flex ellipsis">提现账户:</div>
           <div class="cbi-input-box flex disable-i">
-            <span>{{nowAccount ? nowAccount.account :  '您还没有绑定提现账户哦'}}</span>
+            <span style="white-space: nowrap;">{{nowAccount ? nowAccount.account :  '您还没有绑定提现账户'}}</span>
           </div>
           <div class="cbi-btn flex cursor" @click="showPop" v-show="!nowAccount">去绑定</div>
           <div class="cbi-btn flex cursor" @click="_delete(nowAccount)" v-show="nowAccount">解绑</div>
@@ -29,10 +29,16 @@
           <div class="cbi-name flex ellipsis">提现金额:</div>
           <div class="cbi-input-box flex disable-i">
             <input type="text" class="edit-input" v-model="rmoney" @keyup="_rectifyMoney">
-            <div class="poundage flex">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div>
+            <!-- <div class="poundage flex shpc">注: 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(100的整数倍)</div> -->
+            <!-- <div class="poundage flex shpc" style="transform: translate(0, 200%);">打款时间: 每周二进行统一打款处理，请耐心等待。</div> -->
           </div>
           <div class="cbi-btn flex cursor" @click="_withdraw">确认提现</div>
         </div>
+        <div class="poundage flex shpc" style="position: relative; transform: none; width: 80%; height: 24px; padding-left: 17%;">温馨提示： 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(请输入金额为100的整数倍)</div>
+        <div class="flex shpc poundage" style="position: relative; transform: none; width: 80%; height: 24px; padding-left: 17%;">打款时间
+        ：提现订单每周二进行统一打款处理，请耐心等待。</div>
+        <div class="phone-poundage sh-phone">打款时间： 提现订单每周二进行统一打款处理，请耐心等待。</div>
+        <div class="phone-poundage sh-phone">温馨提示： 单笔最低提现金额{{app.min_withdraw}}元，提现手续费{{app.withdraw_rate * 100}}%(请输入金额为100的整数倍)</div>
       </div>
       <div class="show-line"></div>
       <div class="goods-table">
@@ -58,22 +64,35 @@
         </div>
       </div>
     </div>
+    <!-- <div class="qrcode-box flex">
+      <img ref="payImg" class="wximg">
+    </div> -->
     <popup ref="popup">
       <div class="recharge-box-title-agent flex">绑定提现账户</div>
       <div class="agreement-content overHiden">
         <div class="flex agree-input-box">
-          <div class="aib-label flex ellipsis">提现方式：</div>
+          <div class="aib-label flex ellipsis shpc">提现方式：</div>
           <div class="flex aib-input-warp none-bg">
-            <div class="r-i-warp flex cursor" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(1)" :class="wh_type===1?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/ali.png" class="riw-img"> 支付宝
             </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(2)" :class="wh_type==2?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(2)" :class="wh_type==2?'active-riw':''">
               <img src="http://ozp5yj4ke.bkt.clouddn.com/wx.png" class="riw-img"> 微信
             </div>
-            <div class="r-i-warp flex cursor" @click="_choseType(3)" :class="wh_type==3?'active-riw':''">
+            <div class="r-i-warp flex cursor ellipsis" @click="_choseType(3)" :class="wh_type==3?'active-riw':''">
               <img src="http://p70pqu6ys.bkt.clouddn.com/%E9%93%B6%E8%A1%8C%E5%8D%A1%E5%9B%BE%E6%A0%87.png" class="riw-img"> 银行卡
             </div>
           </div>
+        </div>
+        <div class="qrcode-box flex" v-if="wh_type == 2 && !showhasopenid && !showmoretime">
+          <img :src="wxurlqrcode">
+          <div class="tips-qr flex">请先用微信扫描二维码绑定提现账户</div>
+        </div>
+        <div v-if="showhasopenid && !showmoretime" class="tips-qr flex">
+          您已成功绑定微信帐号!
+        </div>
+        <div v-if="showmoretime" class="tips-qr flex" @click="_choseType(2, true)" style="cursor: pointer;">
+          您已长时间未操作,请点我重试!
         </div>
         <div class="flex agree-input-box">
           <div class="aib-label flex ellipsis">提现账户：</div>
@@ -157,20 +176,21 @@
   </div>
 </template>
 <script type="text/javascript">
-import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount, delAccount } from 'api/site'
-import { mapGetters, mapMutations } from 'vuex'
-import { testToken, timeChange } from 'common/js/util'
-import { SUCCESS_CODE } from 'api/config'
-import popup from 'base/popup/popup'
-import interlayer from 'base/interlayer/interlayer'
-import { sendVerify } from 'api/login'
-import MAgent from 'components/agent-banner/agent-banner'
-export default {
-  data() {
-    return {
-      page_size: 8,
-      page: 0,
-      siteInfo: false,
+  import QRCode from 'qrcode'
+  import { getSiteinfo, getPoundageConfig, getWithdrawlist, withdraw, getAccount, addAccount, delAccount } from 'api/site'
+  import { mapGetters, mapMutations } from 'vuex'
+  import { testToken, timeChange } from 'common/js/util'
+  import { SUCCESS_CODE } from 'api/config'
+  import popup from 'base/popup/popup'
+  import interlayer from 'base/interlayer/interlayer'
+  import { sendVerify } from 'api/login'
+  import MAgent from 'components/agent-banner/agent-banner'
+  export default {
+    data() {
+      return {
+        page_size: 8,
+        page: 0,
+        siteInfo: false,
       // min_amount: false,
       // rate: false,
       showListAccount: false,
@@ -191,7 +211,12 @@ export default {
       wdList: [],
       accountList: [],
       centerDialogVisible: false,
-      time: '获取验证码'
+      time: '获取验证码',
+      wxurlqrcode: '',
+      showhasopenid: null,
+      timerac: null,
+      countnum: 0,
+      showmoretime: null
     }
   },
   created() {
@@ -210,7 +235,10 @@ export default {
       'token',
       'tokenTime',
       'app'
-    ])
+      ])
+  },
+  mounted() {
+
   },
   methods: {
     _checkRW() {
@@ -218,7 +246,29 @@ export default {
         path: '/task'
       })
     },
-    _choseType(e) {
+    _choseType(e, reload) {
+      if (reload) {
+        this.timerac = null
+        this.showmoretime = null
+        this.countnum = 0
+      }
+      if (e == 2) {
+        if (!this.showhasopenid) {
+          if (!this.timerac) {
+            this._getAccount()
+            this.timerac = setInterval(() => {
+              this.countnum += 1
+              this._getAccount()
+              if (this.countnum > 18) {
+                this.showmoretime = true
+                clearInterval(this.timerac)
+              }
+            }, 2500)
+          }
+        } else {
+          clearInterval(this.timerac)
+        }
+      }
       this.wh_type = e
     },
     tableRowClassName(row) {
@@ -280,6 +330,7 @@ export default {
         }
       })
     },
+    // https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx63fdbdaf7aa236c9&redirect_uri=http%3a%2f%2fdev.xkfans.com%2f%23%2fwxlogin?token=${this.$route.query.token}&response_type=code&scope=snsapi_base#wechat_redirect
     _sureAddAccount() {
       if (!this.raccount) {
         this.$parent._open('请填写账户')
@@ -364,10 +415,27 @@ export default {
       this.showListAccount = !this.showListAccount
     },
     _interlayerHide() {
+      clearInterval(this.timerac)
       this.$refs.popup._hiddenPopup()
       this.$refs.interlayer._hiddenLayer()
     },
+    _newQR() {
+      const urlc = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx63fdbdaf7aa236c9&redirect_uri=http%3a%2f%2fdev.xkfans.com%2f%23%2fwxlogin?token=${this.token}&response_type=code&scope=snsapi_base#wechat_redirect`
+      const opts = {
+        type: 'image/jpeg'
+      }
+      // console.log(document.querySelector('.wximg'))
+      QRCode.toDataURL(urlc, opts, (err, url) => {
+        if (err) {
+          this.$parent._open('二维码解析出错')
+          console.error(err)
+        } else {
+          this.wxurlqrcode = url
+        }
+      })
+    },
     showPop() {
+      this._newQR()
       this.$refs.popup._showPopup()
       this.$refs.interlayer._setZIndex(9999)
       this.$refs.interlayer._showLayer()
@@ -383,13 +451,13 @@ export default {
       })
     },
     _reflectInit() {
-      if (!this.user.agency || !this.user.agency.sub_site) {
-        this.$parent._open('请先创建分站')
-        this.$router.replace({
-          path: '/agent'
-        })
-        return false
-      }
+      // if (!this.user.agency || !this.user.agency.sub_site) {
+      //   this.$parent._open('请先创建分站')
+      //   this.$router.replace({
+      //     path: '/agent'
+      //   })
+      //   return false
+      // }
       if (!this.checkTock()) {
         return false
       }
@@ -402,9 +470,13 @@ export default {
     _getAccount() {
       getAccount(this.token).then((res) => {
         if (res.data.err_code === SUCCESS_CODE) {
-          this.accountList = res.data.data
-          if (res.data.data && res.data.data.length > 0) {
-            this.nowAccount = res.data.data[0] || false
+          this.accountList = res.data.data.withdraw_accounts
+          this.showhasopenid = res.data.data.has_openid
+          if (this.showhasopenid) {
+            clearInterval(this.timerac)
+          }
+          if (this.accountList && this.accountList.length > 0) {
+            this.nowAccount = this.accountList[0] || false
           }
         } else {
           if (res.data.err_msg) {
@@ -555,7 +627,8 @@ export default {
     MAgent
   },
   beforeCreate: function() {
-    document.getElementsByTagName("body")[0].className = "add_bg"
+    clearInterval(this.timerac)
+    // document.getElementsByTagName("body")[0].className = "add_bg"
   }
 }
 
@@ -1007,9 +1080,30 @@ export default {
   text-indent: 2px;
 }
 .phone-poundage{
-  width: 100%;
-  height: 40px;
-  line-height: 20px;
+  width: 96%;
+  min-height: 40px;
+  height: auto;
+  line-height: 30px;
   color: #FF9100;
+  font-size: 13px;
+}
+.qrcode-box {
+  width: 180px;
+  height: 210px;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.qrcode-box img{
+  width: 180px;
+  height: 180px;
+}
+.tips-qr{
+  height: 30px;
+  width: 100%;
+  /*overflow: hidden;*/
+  white-space: nowrap;
+  color: #FF9100;
+  font-size: 13px;
 }
 </style>

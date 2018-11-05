@@ -1,7 +1,14 @@
 import axios from 'axios'
 import qs from 'qs'
-import { PREFIX_URL, UAID } from './config'
-import { getSign, isPhone, isWx } from 'common/js/util'
+import {
+  PREFIX_URL,
+  UAID
+} from './config'
+import {
+  getSign,
+  isPhone,
+  isWx
+} from 'common/js/util'
 
 export function getServiceCategory() {
   const url = `${PREFIX_URL}/service_category`
@@ -9,7 +16,9 @@ export function getServiceCategory() {
     uaid: UAID
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   })
@@ -21,10 +30,14 @@ export function getServices(id, sub_domain) {
     service_category_id: id
   }
   if (sub_domain) {
-    data = Object.assign({ sub_domain: sub_domain }, data)
+    data = Object.assign({
+      sub_domain: sub_domain
+    }, data)
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   })
@@ -35,7 +48,9 @@ export function getFanProject() {
     is_fan_project: 1
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -71,12 +86,27 @@ export function addFanProject(token, buydata) {
     addition: buydata.addition,
     pay_type: buydata.pay_type,
   }
+  // Object.assign(data, {
+  //   device: 'wx'
+  // })
   if (isPhone() && !isWx()) {
-    data = Object.assign({ device: 'phone' }, data)
+    data = Object.assign({
+      device: 'phone'
+    }, data)
   } else {
-    data = Object.assign({ device: 'pc' }, data)
+    if (isWx()) {
+      data = Object.assign({
+        device: 'wx'
+      }, data)
+    } else {
+      data = Object.assign({
+        device: 'pc'
+      }, data)
+    }
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -109,7 +139,9 @@ export function addAgencyFanProject(token, price, fan_project_id, addition) {
     price: price,
     addition: addition
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -141,7 +173,9 @@ export function getAppInfo() {
     uaid: UAID
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   })
@@ -157,16 +191,24 @@ export function addTask(score, point, token, serviceid, addition, targetid, subl
     addition: addition
   }
   if (targetid) {
-    data = Object.assign({ target_id: targetid }, data)
+    data = Object.assign({
+      target_id: targetid
+    }, data)
   }
   if (sublimeTime) {
-    data = Object.assign({ appointment_time: sublimeTime }, data)
+    data = Object.assign({
+      appointment_time: sublimeTime
+    }, data)
   }
   if (comment) {
-    data = Object.assign({ comment: comment }, data)
+    data = Object.assign({
+      comment: comment
+    }, data)
   }
   console.log(data)
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     })
@@ -197,7 +239,9 @@ export function getUserInfo(token) {
     token: token
   }
   return axios.get(url, {
-      params: Object.assign({ sign: getSign(data) }, data)
+      params: Object.assign({
+        sign: getSign(data)
+      }, data)
     })
     .then(function(res) {
       return Promise.resolve(res)
@@ -229,7 +273,9 @@ export function getShuoshuoList(qq, token) {
     qq: qq,
     token: token
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     })
@@ -260,7 +306,9 @@ export function getsubsite(sub_domain) {
     uaid: UAID,
     sub_domain: sub_domain
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -291,7 +339,9 @@ export function latestTasks() {
     num: 10,
   }
   return axios.get(url, {
-    params: Object.assign({ sign: getSign(data) }, data)
+    params: Object.assign({
+      sign: getSign(data)
+    }, data)
   }).then(function(res) {
     return Promise.resolve(res)
   }).catch(function(error) {
@@ -331,12 +381,18 @@ export function addSubSiteTask(token, buydata) {
 
   }
   if (buydata.target_id) {
-    data = Object.assign({ target_id: buydata.target_id }, data)
+    data = Object.assign({
+      target_id: buydata.target_id
+    }, data)
   }
   if (buydata.appointment_time) {
-    data = Object.assign({ appointment_time: buydata.appointment_time }, data)
+    data = Object.assign({
+      appointment_time: buydata.appointment_time
+    }, data)
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -373,26 +429,51 @@ export function addSiteTask(token, buydata) {
     pay_type: buydata.pay_type
   }
   if (buydata.sub_domain) {
-    data = Object.assign({ sub_domain: buydata.sub_domain }, data)
+    data = Object.assign({
+      sub_domain: buydata.sub_domain
+    }, data)
   }
   if (buydata.target_id) {
-    data = Object.assign({ target_id: buydata.target_id }, data)
+    data = Object.assign({
+      target_id: buydata.target_id
+    }, data)
   }
   if (buydata.appointment_time) {
-    data = Object.assign({ appointment_time: buydata.appointment_time }, data)
+    data = Object.assign({
+      appointment_time: buydata.appointment_time
+    }, data)
   }
   if (buydata.service_type) {
-    data = Object.assign({ service_type: buydata.service_type }, data)
+    data = Object.assign({
+      service_type: buydata.service_type
+    }, data)
   }
   if (buydata.comment) {
-    data = Object.assign({ comment: buydata.comment }, data)
+    data = Object.assign({
+      comment: buydata.comment
+    }, data)
   }
+  // Object.assign(data, {
+  //   device: 'wx'
+  // })
   if (isPhone() && !isWx()) {
-    data = Object.assign({ device: 'phone' }, data)
+    data = Object.assign({
+      device: 'phone'
+    }, data)
   } else {
-    data = Object.assign({ device: 'pc' }, data)
+    if (isWx()) {
+      data = Object.assign({
+        device: 'wx'
+      }, data)
+    } else {
+      data = Object.assign({
+        device: 'pc'
+      }, data)
+    }
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -423,7 +504,9 @@ export function getCombosCategory() {
   let data = {
     uaid: UAID
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {
@@ -453,7 +536,9 @@ export function getCombos(categoryid) {
     category_id: categoryid,
     uaid: UAID
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     }).catch(function(error) {

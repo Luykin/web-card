@@ -266,7 +266,7 @@ export default {
       }
       if (this.money.indexOf('.') > -1) {
         const end = this.money.indexOf('.')
-        this.money = this.money.slice(0, end + 3)
+        this.money = this.money.slice(0, end + 6)
       }
     },
     showPop(e) {

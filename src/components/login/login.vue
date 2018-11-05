@@ -1,6 +1,6 @@
 <template>
   <div id="main-body" ref='mainbody'>
-    <div class="login-box flex" id="login-box">
+    <div class="login-box flex" id="login-box" v-loading='loading'>
       <div class="login-box-title flex">
         <div class="login-title">登录</div>
         <div class="min-font flex">登录后开始下单</div>
@@ -35,10 +35,13 @@ export default {
   data() {
     return {
       phone: this.$route.query.phone || '',
-      password: ''
+      password: '',
+      loading: null,
     }
   },
   created() {
+    const query = this.$route.query
+    console.log(query)
     this.$root.eventHub.$emit('canvas')
     const that = this
     // setTimeout(()=>{
@@ -56,7 +59,9 @@ export default {
         return false
       }
       const that = this
+      this.loading = true
       login(this.phone, this.password).then((res) => {
+        this.loading = null
         if (res.data.err_code === SUCCESS_CODE) {
           if (res.data.data.user) {
             that.setUser(res.data.data.user)

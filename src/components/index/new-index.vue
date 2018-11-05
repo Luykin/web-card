@@ -75,15 +75,15 @@
               <div v-if="!inputVisible && totleTga < 99" class="add-newcoment flex cursor" @click="showInput">增加新评论</div>
             </div>
             <!--  下单介绍  -->
-            <div class="course flex" v-if="showService && nowServices && !nowServices.fan_project_service" :class="{'course-border' : uaid <= 60002}">
+            <div class="course flex" v-if="showService && nowServices" :class="{'course-border' : uaid <= 60002}">
               <img src="http://pbfntaxkx.bkt.clouddn.com/zhibo_person.png" alt="温馨提示" class="course-img-icon">
               <div v-html='nowServices.tips || nowServices.des'></div>
             </div>
-            <div class="course flex fps-tra" v-if="showService && nowServices && nowServices.fan_project_service" style="align-items: flex-start; padding: 0;width: 78%; background: #fff; justify-content: center; border-top: 15px solid #FFE5CB; border-left: 28px solid #FFE5CB; border-right: 28px solid #FFE5CB; height: 200px; border-bottom: 15px solid #FFE5CB; position: relative; cursor: pointer;">
+            <div class="course flex fps-tra" v-if="showService && nowServices && nowServices.fan_project_service" style="align-items: flex-start; padding: 0;width: 81%; background: #fff; justify-content: center; border-top: 15px solid #FFE5CB; border-left: 28px solid #FFE5CB; border-right: 28px solid #FFE5CB; height: 200px; border-bottom: 15px solid #FFE5CB; position: relative; cursor: pointer;">
               <img src="https://cdn.xingkwh.com/%E4%BE%8B%E5%AD%90.png" alt="上热门成功案例" class="shili-pic">
               <div class="content-course-warp flex">
                 <!-- <div class="ccw-bg"></div> -->
-                <img :src="'https://cdn.xingkwh.com/'+ nowServices.id +'.png'" alt="套餐序号" class="course-ccw-bg">
+                <img :src="'https://cdn.xingkwh.com/'+ (nowServices.id % 3 ? nowServices.id % 3 : 3) +'.png'" alt="套餐序号" class="course-ccw-bg">
                 <div class="course-ccw-info flex">
                   <div class="course-ccw-info-title flex">{{'• '+ nowServices.label + ' •'}}</div>
                   <div class="course-ccw-info-tips flex">{{nowServices.seo}}</div>
@@ -116,7 +116,13 @@
                   </el-time-select>
                 </div>
               </div>
-              <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25) && pc'>
+              <div class="select-item" v-if="nowServices && nowServices.category == 145">
+                <div class="select-item-label flex ellipsis">手机号</div>
+                <div class="flex input-defult">
+                  <input type="text" placeholder="请填写抖音绑定的手机号" class="i-ipnput" v-model="phoned" @keyup.enter="_sublime(nowServices.category)">
+                </div>
+              </div>
+              <div class="select-item" v-show='nowServices && (nowServices.category === 24 || nowServices.category === 25 || nowServices.category === 145) && pc'>
               </div>
               <div class="select-item" v-if="showService">
                 <div class="select-item-label flex ellipsis">
@@ -251,6 +257,7 @@ export default {
       orderTimeD: '',
       orderTimeS: '',
       quantity: '',
+      phoned: '',
       shuoshuoPage: 0,
       lodingChose: null,
       serviceCategory: false,
@@ -352,6 +359,9 @@ export default {
     },
     placeholder() {
       if (this.nowServices) {
+        if (this.nowServices.category == 145) {
+          return '请按教程填写抖音号'
+        }
         if (this.nowServices.services) {
           return '请按教程输入' + (this.nowServices.services[0].form || '链接')
         }
@@ -414,9 +424,10 @@ export default {
           path: '/backstage'
         })
       } else {
-        this.$router.replace({
-          path: '/agent'
-        })
+        // this.$router.replace({
+        //   path: '/agent'
+        // })
+        this.$root.eventHub.$emit('agent')
       }
     },
     _latestTasks() {
@@ -579,6 +590,11 @@ export default {
         this.$parent._open('请正确填写')
         return false
       }
+      // let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
+      // if (this.nowServices.category == 145 && (!this.phoned || !myreg.test(this.phoned))) {
+      //   this.$parent._open('请填写手机号')
+      //   return false
+      // }
       const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
       let data = {
         services: this.nowServices,
@@ -587,6 +603,11 @@ export default {
         addition: this.link.match(reg) ? this.link.match(reg)[0] : this.link,
         pay_type: this.activePayType
       }
+      // if (this.nowServices.category == 145 && this.phoned) {
+      //   Object.assign(data, {
+
+      //   })
+      // }
       this.$root.eventHub.$emit('showPopup', data)
     },
     _formatFanProject(list) {
@@ -652,11 +673,16 @@ export default {
         this.$parent._open('未知错误')
         return false
       }
+      let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
+      if (this.nowServices.category == 145 && (!this.phoned || !myreg.test(this.phoned))) {
+        this.$parent._open('请正确填写手机号')
+        return false
+      }
       if (!this.checkTock()) {
         return false
       }
       if (this.nowServices.services) {
-        if (!this.link || this.link.indexOf('http') < 0) {
+        if ((!this.link || this.link.indexOf('http') < 0) && category != 145) {
           this.$parent._open('请正确填写')
           return false
         }
@@ -667,15 +693,19 @@ export default {
             return false
           }
         } else {
-          if (!this.link && category < 10) {
+          if (!this.link && category < 10 && category != 145) {
             this.$parent._open('请正确填写QQ号')
+            return false
+          }
+          if (!this.link && category == 145) {
+            this.$parent._open('请正确填写抖音号')
             return false
           }
           if (!this.link) {
             this.$parent._open('请正确填写')
             return false
           }
-          if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25) {
+          if ((!this.link || this.link.indexOf('http') < 0) && category > 10 && category !== 21 && category !== 40 && category !== 24 && category !== 25 && category != 145) {
             this.$parent._open('请正确填写')
             return false
           }
@@ -741,6 +771,11 @@ export default {
           })
         }
         data = Object.assign({ comment: dynamicTags }, data)
+      }
+      if (this.nowServices.category == 145 && this.phoned) {
+        Object.assign(data, {
+          target_id: this.phoned
+        })
       }
       this.$root.eventHub.$emit('showPopup', data)
     },
@@ -2247,7 +2282,7 @@ export default {
   transform: translate(90%, -50%);
   height: auto;
   border-radius: 15px;
-  box-shadow: 1px 1px 15px rgba(0,0,0,.5);
+  box-shadow: 1px 1px 15px rgba(0, 0, 0, .5);
 }
 
 </style>

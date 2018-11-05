@@ -39,7 +39,7 @@
         </div>
         <div class="flex input-btn-box">
           <div class="ibb-input-warp">
-            <input type="text" name="mxInput" class="aib-ipnput" placeholder="输入ID或订单号查询" v-model="code">
+            <input type="text" name="mxInput" class="aib-ipnput" placeholder="输入手机号或者订单ID" v-model="code">
           </div>
           <div class="good-btn flex cursor margin20" @click="_chose(false)">查询</div>
           <div class="good-btn flex cursor margin20" @click="_chose(true)">全部订单</div>
@@ -50,76 +50,77 @@
           </el-table-column>
           <el-table-column prop="id" label="订单ID">
           </el-table-column>
-          <el-table-column prop="addition" label="分享链接/用户ID">
+          <el-table-column prop="phone" label="用户手机" width='120'>
           </el-table-column>
-          <el-table-column
-          label="">
-          <template slot-scope="scope">
-            <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="start_point" label="初始数量">
-        </el-table-column> 
-        <el-table-column prop="point" label="数量">
-        </el-table-column>
-        <el-table-column prop="status" label="状态">
-        </el-table-column>
-<!--         <el-table-column prop="time" label="预计完成">
+          <el-table-column prop="addition" label="链接">
+          </el-table-column>
+          <el-table-column label="">
+            <template slot-scope="scope">
+              <el-button @click="_viewLink(scope.row)" type="text" size="small" v-if="scope.row.showLink">查看链接</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column prop="start_point" label="初始数量">
+          </el-table-column>
+          <el-table-column prop="point" label="数量">
+          </el-table-column>
+          <el-table-column prop="status" label="状态">
+          </el-table-column>
+          <!--         <el-table-column prop="time" label="预计完成">
         </el-table-column> -->
-        <el-table-column prop="appointment_time" label="预约时间">
-        </el-table-column>
-        <el-table-column prop="createA" label="提交时间">
-        </el-table-column>
-      </el-table>
-      <div id="i-page" class="i-page flex">
-        <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
-        </el-pagination>
+          <el-table-column prop="createA" label="提交时间" width="100">
+          </el-table-column>
+          <el-table-column prop="appointment_time" label="预约时间" width="100">
+          </el-table-column>
+        </el-table>
+        <div id="i-page" class="i-page flex">
+          <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange">
+          </el-pagination>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 <script type="text/javascript">
-  // import { getSiteinfo, getOrders } from 'api/site'
-  import { getTasks, getSiteinfo } from 'api/site'
-  import { mapGetters, mapMutations } from 'vuex'
-  import { testToken, timeChange } from 'common/js/util'
-  import { SUCCESS_CODE } from 'api/config'
-  import MAgent from 'components/agent-banner/agent-banner'
-  const NUM = 10
-  export default {
-    data() {
-      return {
-        siteInfo: false,
-        showMingXi: false,
-        tableData: false,
-        page: 0,
-        total: 0,
-        bgPath: null,
-        code: '',
-        siteInfo: false,
-        loading: false,
-        state: {
-          '-10': '未支付',
-          '-9': '进行中',
-          '-8': '订单失败',
-          '-7': '进行中',
-          '-6': '订单失败',
-          '-5': '进行中',
-          '-4': '已完成',
-          '-3': '准备中',
-          '-2': '准备中',
-          '-1': '准备中',
-          '0': '准备中',
-          '1': '进行中',
-          '2': '已完成',
-          '3': '进行中',
-          '4': '订单取消',
-          '5': '订单取消'
-        }
+// import { getSiteinfo, getOrders } from 'api/site'
+import { getTasks, getSiteinfo } from 'api/site'
+import { mapGetters, mapMutations } from 'vuex'
+import { testToken, timeChange } from 'common/js/util'
+import { SUCCESS_CODE } from 'api/config'
+import MAgent from 'components/agent-banner/agent-banner'
+const NUM = 10
+export default {
+  data() {
+    return {
+      siteInfo: false,
+      showMingXi: false,
+      tableData: false,
+      page: 0,
+      total: 0,
+      bgPath: null,
+      code: '',
+      siteInfo: false,
+      loading: false,
+      state: {
+        '-10': '未支付',
+        '-9': '进行中',
+        '-8': '订单失败',
+        '-7': '进行中',
+        '-6': '订单失败',
+        '-5': '进行中',
+        '-4': '已完成',
+        '-3': '准备中',
+        '-2': '准备中',
+        '-1': '准备中',
+        '0': '准备中',
+        '1': '进行中',
+        '2': '已完成',
+        '3': '进行中',
+        '4': '订单取消',
+        '5': '订单取消'
       }
-    },
-    created() {
+    }
+  },
+  created() {
     // this.$root.eventHub.$emit('user')
     this._siteInit()
   },
@@ -132,7 +133,7 @@
       'token',
       'tokenTime',
       'app'
-      ])
+    ])
   },
   components: {
     MAgent
@@ -227,10 +228,21 @@
       this.loading = true
       // const that = this
       if (id) {
-        // console.log(id)
-        getTasks(this.token, NUM, this.page, 1, id).then((res) => {
-          this.afterGetTasks(res, this)
-        })
+        (async() => {
+          try {
+            let idList
+            idList = await getTasks(this.token, NUM, this.page, 1, id)
+            if (idList.data.data.count) {} else {
+              idList = await getTasks(this.token, NUM, this.page, 1, null, null, id)
+            }
+            this.afterGetTasks(idList, this)
+          } catch (err) {
+            console.log(err)
+          }
+        })()
+        // getTasks(this.token, NUM, this.page, 1, id).then((res) => {
+        //   this.afterGetTasks(res, this)
+        // })
       } else {
         getTasks(this.token, NUM, this.page, 1).then((res) => {
           this.afterGetTasks(res, this)
@@ -247,13 +259,13 @@
           that._countDown(this.tableData)
         }, 1000)
       }
-    }, 
+    },
     _countDown(list) {
       const that = this
       let time = Date.parse(new Date()) / 1000
       list.forEach((item) => {
         // console.log(item.status)
-        if (item.status ==='完成' || item.status ==='未支付') {
+        if (item.status === '完成' || item.status === '未支付') {
           item.time = '-'
           return
         }
@@ -278,7 +290,7 @@
       minute = minute === 0 ? '' : minute < 10 ? '0' + minute + ':' : minute + ':'
       second = second < 10 ? '0' + second : second
       return day + hour + minute + second
-    },   
+    },
     _normalTasks(list) {
       const that = this
       list.forEach((item) => {
@@ -287,7 +299,7 @@
         item.createA = timeChange(item.create)
         item.currentNum = '-'
         item.time = '-'
-        if (item.hrefLink.indexOf('http')> -1) {
+        if (item.hrefLink.indexOf('http') > -1) {
           item.showLink = true
         } else {
           item.showLink = false
@@ -353,12 +365,13 @@
 /*#body{
   background: url(http://p70pqu6ys.bkt.clouddn.com/%E8%83%8C%E6%99%AF%E5%9B%BE%EF%BC%881920x1335%29.png) no-repeat !important;
   }*/
-  #main-box {
-   /* width: 45% !important;*/
-   opacity: .95 !important;
- }
 
- .notice {
+#main-box {
+  /* width: 45% !important;*/
+  opacity: .95 !important;
+}
+
+.notice {
   position: absolute;
   right: 0;
   top: 0;
@@ -557,7 +570,8 @@
   height: 10px;
   width: 100%;
 }
-.margin-right{
+
+.margin-right {
   /*margin-right: 20px;*/
   margin: 0 20px 0 10px;
 }

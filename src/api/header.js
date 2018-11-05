@@ -1,7 +1,46 @@
 import axios from 'axios'
 import qs from 'qs'
-import { PREFIX_URL, UAID } from './config'
-import { getSign, isPhone, isWx } from 'common/js/util'
+import {
+  PREFIX_URL,
+  UAID
+} from './config'
+import {
+  getSign,
+  isPhone,
+  isWx
+} from 'common/js/util'
+
+// export function getAccessToken(appid, appSecret) {
+//   const url = 'https://api.weixin.qq.com/cgi-bin/token'
+//   let data = {
+//     grant_type: 'client_credential',
+//     appid: appid,
+//     appSecret: appSecret
+//   }
+//   return axios.get(url, {
+//     params: Object.assign({
+//       sign: getSign(data)
+//     }, data)
+//   }).then(function(res) {
+//     return Promise.resolve(res)
+//   })
+// }
+
+// export function getWXACode(appid, appSecret) {
+//   const url = 'https://api.weixin.qq.com/wxa/getwxacode'
+//   let data = {
+//     grant_type: 'client_credential',
+//     appid: appid,
+//     appSecret: appSecret
+//   }
+//   return axios.get(url, {
+//     params: Object.assign({
+//       sign: getSign(data)
+//     }, data)
+//   }).then(function(res) {
+//     return Promise.resolve(res)
+//   })
+// }
 
 export function addOrder(token, score, paytype, price, id) {
   const url = `${PREFIX_URL}/add_order`
@@ -12,15 +51,32 @@ export function addOrder(token, score, paytype, price, id) {
     price: price,
     uaid: UAID
   }
-  if (id || id === 0) {
-    data = Object.assign({ good_id: id }, data)
-  }
+  // if (id || id === 0) {
+  //   data = Object.assign({
+  //     good_id: id
+  //   }, data)
+  // }
   if (isPhone() && !isWx()) {
-    data = Object.assign({ device: 'phone' }, data)
+    data = Object.assign({
+      device: 'phone'
+    }, data)
   } else {
-    data = Object.assign({ device: 'pc' }, data)
+    if (isWx()) {
+      data = Object.assign({
+        device: 'wx'
+      }, data)
+    } else {
+      data = Object.assign({
+        device: 'pc'
+      }, data)
+    }
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  // Object.assign(data, {
+  //   device: 'wx'
+  // })
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     })
@@ -55,9 +111,13 @@ export function agency(token, company, proposer, phone, email, remarks) {
     email: email
   }
   if (remarks) {
-    data = Object.assign({ remarks: remarks }, data)
+    data = Object.assign({
+      remarks: remarks
+    }, data)
   }
-  return axios.post(url, qs.stringify(Object.assign({ sign: getSign(data) }, data)))
+  return axios.post(url, qs.stringify(Object.assign({
+      sign: getSign(data)
+    }, data)))
     .then(function(res) {
       return Promise.resolve(res)
     })
