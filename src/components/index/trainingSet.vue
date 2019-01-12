@@ -1,12 +1,10 @@
 <template>
-    <div>
-      index
-    </div>
+    <div>trainingSet</div>
 </template>
 
 <script>
     export default {
-        name: "index"
+        name: "training-set"
     }
 </script>
 

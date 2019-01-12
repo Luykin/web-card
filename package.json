@@ -17,14 +17,11 @@
         "crypto-js": "^3.1.9-1",
         "element-ui": "^2.2.2",
         "js-md5": "^0.7.2",
-        "punycode": "^2.1.1",
-        "qrcode": "^1.2.2",
         "qs": "^6.5.1",
         "vue": "^2.5.2",
         "vue-router": "^3.0.1",
-        "vue-scroller": "^2.2.0",
-        "vue2-editor": "^2.5.0",
-        "vuex": "^3.0.1"
+        "better-scroll": "^1.13.2",
+        "vue2-editor": "^2.5.0"
     },
     "devDependencies": {
         "autoprefixer": "^7.1.2",
