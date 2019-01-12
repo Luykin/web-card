@@ -2,14 +2,12 @@
     <div class="index">
       <div class="index-main">
         <crumbs :crumbs="crumbs_list"></crumbs>
-        <!--<div class="main-title flex">-->
-          <!--卡片列表-->
-        <!--</div>-->
-        <div class="flex card js cur" v-for="item in 10" @click="_toCard(item)">
+        <empty v-show="!list.length"></empty>
+        <div class="flex card js cur" v-for="item in list" @click="_toCard(item)">
           <img src="../../assets/card.jpg"/>
           <div class="flex card-right fw">
-            <div class="flex tb-item-right-title js">英语大标题</div>
-            <div class="flex tb-item-right-info js">学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦友只为你提分</div>
+            <div class="flex tb-item-right-title js">{{item.title}}</div>
+            <div class="flex tb-item-right-info js">{{item.min_title}}</div>
           </div>
         </div>
       </div>
@@ -18,6 +16,8 @@
 
 <script>
     import crumbs from 'base/crumbs/crumbs'
+    import {card_list} from 'api/index'
+    import empty from 'base/empty/empty'
     export default {
       name: "card",
       data() {
@@ -31,10 +31,33 @@
           },{
             name: '卡片列表',
             path: null
-          }]
+          }],
+          list: []
         }
       },
+      created() {
+        if (!this.$route.params.id) {
+          this.$router.replace({
+            name: `train-index`
+          });
+          return false
+        }
+        this.crumbs_list[1].path = {
+          name: 'cardSet',
+          params: this.$route.params.cardSetParams
+        };
+        console.log(this.$route.params);
+        this.getCardList(this.$route.params.id)
+      },
       methods: {
+        async getCardList(id) {
+          this.$root.eventHub.$emit('loading', true);
+          const ret = await card_list(id);
+          this.$root.eventHub.$emit('loading', null);
+          if (ret.status === 200 && ret.data.state === 200) {
+            this.list = ret.data.rows
+          }
+        },
         _toCard() {
           this.$router.push({
             name: `card-detail`,
@@ -44,7 +67,8 @@
 
       },
       components: {
-        crumbs
+        crumbs,
+        empty
       }
     }
 </script>

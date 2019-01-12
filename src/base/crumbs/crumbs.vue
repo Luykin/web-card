@@ -1,6 +1,6 @@
 <template>
   <div class="crumbs flex js">
-    <router-link tag='span' :to='item.path' :key="item.name" class="crumbs-active cur" v-for="item in crumbs" v-if="item.path">
+    <router-link tag='span' :to='item.path' :params="item.params" :key="item.name" class="crumbs-active cur" v-for="item in crumbs" v-if="item.path">
       {{item.name}} >
     </router-link>
     <span>{{crumbs[crumbs.length - 1].name}}</span>

@@ -10,7 +10,9 @@
           卡片集
         </div>
         <div class="card-set-warp flex fw js">
-          <div class="card-set-item cur" v-for="i in 6" @click="_toCard"></div>
+          <div class="card-set-item cur" v-for="item in list" @click="_toCard(item.id)">
+            {{item.name}}
+          </div>
         </div>
         <div class="main-title flex">
           视频介绍
@@ -27,6 +29,7 @@
 
 <script>
     import crumbs from 'base/crumbs/crumbs'
+    import { cardSet_list } from 'api/index'
     export default {
         name: "card-set",
         data() {
@@ -37,17 +40,37 @@
             },{
               name: '卡片集',
               path: null
-            }]
+            }],
+            list: []
           }
         },
         created() {
-          // console.log(this.$route)
+          // console.log(this.$route.params)
+          if (!this.$route.params.id) {
+            this.$router.replace({
+              name: `train-index`
+            });
+            return false
+          }
+          this._getCardSetList(this.$route.params.id)
         },
         methods: {
-          _toCard() {
+          async _getCardSetList(id) {
+            this.$root.eventHub.$emit('loading', true);
+            const ret = await cardSet_list(id);
+            this.$root.eventHub.$emit('loading', null);
+            if (ret.status === 200 && ret.data.state === 200) {
+              // console.log(ret)
+              this.list = ret.data.rows
+            }
+          },
+          _toCard(id) {
             this.$router.push({
               name: `card`,
-              params: ''
+              params: {
+                id,
+                cardSetParams: this.$route.params
+              }
             })
           },
         },
@@ -74,6 +97,7 @@
   .card-set-item{
     width: 24%;
     height: 270px;
+    color: #777;
     box-shadow: 0 0 15px rgba(0,0,0,.2);
     border-radius: 4px;
     margin: 20px 4.665%;

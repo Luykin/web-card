@@ -20,11 +20,11 @@
               <img src="../../assets/training.png"/>
             </div>
             <div class="tb-item-right flex fw">
-              <div class="flex tb-item-right-title js cur"  @click="_toCarSet(item)">英语大标题</div>
-              <div class="flex tb-item-right-info js">学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦学习过程智能可视化 知晓每一步的提升点精英名师伴护式教学 亦师亦友只为你提分</div>
+              <div class="flex tb-item-right-title js cur"  @click="_toCarSet(item)">{{item.name}}</div>
+              <div class="flex tb-item-right-info js">{{item.describe}}</div>
               <div class="flex tb-item-right-num js">
                 <div class="flex tb-item-right-btn cur" @click="_toCarSet(item)">查看全部</div>
-                <span class="flex js">已有123人进行训练</span>
+                <span class="flex js">已有{{item.people_number}}人进行训练</span>
               </div>
             </div>
           </div>
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+  import {subject_list, train_list} from 'api/index'
   import empty from 'base/empty/empty'
   let vm = null;
   export default {
@@ -56,7 +57,7 @@
             id: 3
           },
         ],
-        list: [1,2,3,4,5],
+        list: [],
         // cardSet: null,
         activeId: 0,
         swiperOption: {
@@ -89,7 +90,8 @@
           image: require('../../assets/banner.jpg'),
           path: 'tr-banner',
           info: 'info'
-        }]
+        }],
+        trainListCache: []
       }
     },
     computed: {
@@ -99,10 +101,45 @@
     },
     created() {
       vm = this;
+      this._init()
     },
     methods: {
+      _init(){
+        this._getSubject()
+      },
+      async _getSubject() {
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await subject_list();
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          if (ret.data.count) {
+            this.training_list = ret.data.rows;
+            this.activeId = ret.data.rows[0].id;
+            this._getTrainList(this.activeId);
+          }
+        }
+      },
+      async _getTrainList(id, must, sucess) {
+        if (this.trainListCache[id] && !must) {
+          this.list = this.trainListCache[id];
+          sucess();
+          return false
+        }
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await train_list(id);
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          this.list = ret.data.rows;
+          this.trainListCache[id] = ret.data.rows;
+          if (sucess) {
+            sucess()
+          }
+        }
+      },
       _chose(item) {
-        this.activeId = item.id
+        this._getTrainList(item.id, null,() => {
+          this.activeId = item.id
+        });
       },
       _toCarSet(item) {
         this.$router.push({
