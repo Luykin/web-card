@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  min-height: 100%;
   min-width: 1180px;
   user-select: none;
 }
@@ -8,7 +9,8 @@ html {
 body {
   margin: 0;
   padding: 0;
-  line-height: 1;
+  line-height: 25px;
+  min-height: 100%;
 }
 
 div,
@@ -88,6 +90,7 @@ input:focus::-webkit-contacts-auto-fill-button {
 }
 
 .flex{
+  width: 100%;
   display: -webkit-box; /* Chrome 4+, Safari 3.1, iOS Safari 3.2+ */
   display: -moz-box; /* Firefox 17- */
   display: -webkit-flex; /* Chrome 21+, Safari 6.1+, iOS Safari 7+, Opera 15/16 */
@@ -102,8 +105,68 @@ input:focus::-webkit-contacts-auto-fill-button {
   align-items: center;
   -ms-flex-align: center;
   -webkit-box-align: center;
+  align-content: center;
 }
-
+.fw{
+  flex-wrap: wrap;
+}
+.js{
+  justify-content: flex-start;
+}
 .cur{
   cursor: pointer;
+}
+.index{
+  max-width: 1920px;
+  min-height: 1080px;
+  height: auto;
+  margin: 0 auto;
+}
+.index-main{
+  width: 75%;
+  height: auto;
+  min-height: 200px;
+  margin: 0 auto;
+}
+.main-title{
+  width: 100%;
+  height: 100px;
+  color: #EB7B2D;
+  font-weight: 600;
+  font-size: 24px;
+}
+.layer{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgb(0,0,0,.75);
+}
+.swiper-box{
+  min-width: 1920px;
+}
+.layer-enter-active, .layer-leave-active{
+  transition: opacity .6s;
+  opacity: 1;
+}
+.layer-enter, .layer-leave-to{
+  transition: opacity 0s;
+  opacity: 0;
+}
+
+.audio-warp{
+  width: 80%;
+  height: 640px;
+  margin: 0 auto;
+  padding: 0;
+  box-shadow: 0 0 10px rgba(0,0,0,.1);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.audio-warp video{
+  width: 100%;
+  height: 100%;
 }

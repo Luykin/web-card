@@ -4,7 +4,7 @@
     <keep-alive>
       <router-view ref='body'></router-view>
     </keep-alive>
-    <!--<foot></foot>-->
+    <foot></foot>
     <!--<centerTips ref='centerTips'>-->
       <!--<div class="tips-class flex ellipsis">{{centerTips}}</div>-->
     <!--</centerTips>-->
@@ -12,7 +12,7 @@
 </template>
 <script>
 import MHeader from 'components/header/header'
-// import foot from 'components/footer/footer'
+import foot from 'components/footer/footer'
 // import XCanvas from 'components/canvas/canvas'
 // import centerTips from 'base/centerTips/centerTips'
 
@@ -32,7 +32,8 @@ export default {
 
   },
   components: {
-    MHeader
+    MHeader,
+    foot
   },
   watch: {
   }
@@ -41,5 +42,6 @@ export default {
 </script>
 <style>
 @import url(common/css/reset.css);
+@import url(common/icon/iconfont.css);
 
 </style>

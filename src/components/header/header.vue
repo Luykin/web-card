@@ -25,7 +25,7 @@
               name: '服务于价格',
               path: '/vip'
             }, {
-              name: '登录|注册',
+              name: '登录 | 注册',
               path: '/login'
             }]
           }
@@ -37,15 +37,16 @@
   .header{
     width: 100%;
     height: 80px;
-    font-size: 15px;
+    font-size: 16px;
     background: #fff;
     color: #494949;
     box-shadow: 0 0 10px rgb(0,0,0,.1);
     overflow: hidden;
   }
   .header img{
-    width: 90px;
+    width: 110px;
     height: auto;
+    max-height: 70px;
     margin-right: 100px;
   }
   .header-item{
@@ -70,6 +71,7 @@
     background: #367ABD;
     transform: scale(0, 1);
     transition: all .3s;
+    transform-origin: center center;
   }
   .header-item:hover{
     color: #367ABD;
