@@ -28,6 +28,16 @@
         }]
       }
     },
+    created() {
+      this.crumbs_list[1].path = {
+        name: 'cardSet',
+        params: this.$route.params.cardSetParams
+      };
+      this.crumbs_list[2].path = {
+        name: 'card',
+        params: this.$route.params
+      };
+    },
     components: {
       crumbs
     }

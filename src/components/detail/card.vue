@@ -61,7 +61,7 @@
         _toCard() {
           this.$router.push({
             name: `card-detail`,
-            params: ''
+            params: this.$route.params
           })
         }
 

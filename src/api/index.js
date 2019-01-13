@@ -71,3 +71,18 @@ export function card_list(id_list) {
       })
     })
 }
+
+export function good_list() {
+  const url = `${PREFIX_URL}/goods/list`;
+  let data = {};
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}

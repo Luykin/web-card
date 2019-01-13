@@ -17,7 +17,7 @@
           <empty v-show="!list.length"></empty>
           <div class="tb-item flex" v-for="item in list">
             <div class="tb-item-left flex js">
-              <img src="../../assets/training.png"/>
+              <img :src="item.image"/>
             </div>
             <div class="tb-item-right flex fw">
               <div class="flex tb-item-right-title js cur"  @click="_toCarSet(item)">{{item.name}}</div>
@@ -113,10 +113,24 @@
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
           if (ret.data.count) {
-            this.training_list = ret.data.rows;
-            this.activeId = ret.data.rows[0].id;
+            this.training_list = this._formatShow(ret.data.rows);
+            this.activeId = this.training_list[0].id;
             this._getTrainList(this.activeId);
           }
+        }
+      },
+      _formatShow(list) {
+        if (!list || !list.length){
+          return[]
+        } else {
+          let ret = [];
+          list.forEach((item) => {
+            // console.log(item.show)
+            if (item.show === 0) {
+              ret.push(item)
+            }
+          });
+          return ret;
         }
       },
       async _getTrainList(id, must, sucess) {
