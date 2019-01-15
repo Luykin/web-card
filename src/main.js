@@ -20,9 +20,25 @@ const app = new Vue({
   template: '<App/>',
   data: {
     eventHub: new Vue(),
+    user: null,
     errorCode: {
       '404': '资源不存在',
       '405': '系统繁忙',
     }
   }
 });
+
+export function getuser() {
+  if (!app) {
+    return false
+  }
+  return app.user
+}
+export function setuser(user) {
+  if (!app) {
+    return false
+  }
+  if (user) {
+    app.user = user
+  }
+}

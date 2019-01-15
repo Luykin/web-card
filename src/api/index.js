@@ -86,3 +86,55 @@ export function good_list() {
       })
     })
 }
+
+export function send_message(phone) {
+  const url = `${PREFIX_URL}/login/messages`;
+  let data = {
+    phone
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+export function register(phone, code) {
+  const url = `${PREFIX_URL}/login/register`;
+  let data = {
+    phone,
+    code
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+export function code_login(phone, code) {
+  const url = `${PREFIX_URL}/login/code`;
+  let data = {
+    phone,
+    code
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}

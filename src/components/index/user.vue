@@ -1,5 +1,9 @@
 <template>
-
+  <transition name="layer">
+    <div class="index">
+      user
+    </div>
+  </transition>
 </template>
 
 <script>

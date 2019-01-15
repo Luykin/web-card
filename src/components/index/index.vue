@@ -23,7 +23,7 @@
         </div>
         <div class="audio-warp">
           <!--controls-->
-          <video src="../../assets/index.mp4">
+          <video src="http://cdn.jiangzhifan.com/video_20190114_003323.mp4">
           </video >
         </div>
         <div class="main-title flex">

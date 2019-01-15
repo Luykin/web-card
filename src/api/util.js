@@ -38,3 +38,41 @@ const verifyPhone = (phone) => {
     let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/;
     return myreg.test(phone)
 };
+
+// //aes加密
+// export function encrypt(word, key_word='5634567895007501') {
+//   const key = CryptoJS.enc.Utf8.parse(key_word); //16位
+//   const iv = CryptoJS.enc.Utf8.parse(key_word);
+//   let encrypted = '';
+//   if (typeof(word) === 'string') {
+//     const srcs = CryptoJS.enc.Utf8.parse(word);
+//     encrypted = CryptoJS.AES.encrypt(srcs, key, {
+//       iv: iv,
+//       mode: CryptoJS.mode.CBC,
+//       padding: CryptoJS.pad.Pkcs7
+//     });
+//   } else if (typeof(word) === 'object') {//对象格式的转成json字符串
+//     const srcs = CryptoJS.enc.Utf8.parse(JSON.stringify(word));
+//     encrypted = CryptoJS.AES.encrypt(srcs, key, {
+//       iv: iv,
+//       mode: CryptoJS.mode.CBC,
+//       padding: CryptoJS.pad.Pkcs7
+//     })
+//   }
+//   return encrypted.ciphertext.toString();
+// }
+//
+// // aes解密
+// export function decrypt(word, key_word='5634567895007501') {
+//   const key = CryptoJS.enc.Utf8.parse(key_word);
+//   const iv = CryptoJS.enc.Utf8.parse(key_word);
+//   const encryptedHexStr = CryptoJS.enc.Hex.parse(word);
+//   const srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+//   const decrypt = CryptoJS.AES.decrypt(srcs, key, {
+//     iv: iv,
+//     mode: CryptoJS.mode.CBC,
+//     padding: CryptoJS.pad.Pkcs7
+//   });
+//   const decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+//   return decryptedStr.toString();
+// }

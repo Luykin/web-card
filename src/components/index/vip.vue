@@ -15,7 +15,9 @@
             <p class="describe flex">{{item.describe}}</p>
             <p class="flex">现价: <span class="current-price">{{item.current_price}}元</span></p>
             <span class="flex original-price">原价: {{item.original_price}}元</span>
-            <div class="gi-btn flex" :class="{'disable': item.duration < 0}">{{good_btn(item.duration)}}</div>
+            <router-link tag='div' to='/vip/buy' class="gi-btn flex" :class="{'disable': item.duration < 0}">
+              {{good_btn(item.duration)}}
+            </router-link>
           </div>
         </div>
         <div class="main-title flex">
@@ -148,6 +150,8 @@
     background: #ededed;
     color: #999;
     border: 1px solid #ddd;
+    pointer-events: none;
+    user-select: none;
   }
   .disable:hover{
     background: #ededed;
