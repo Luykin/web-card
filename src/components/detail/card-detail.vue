@@ -76,7 +76,8 @@
           params: this.$route.params.params
         };
       }
-      if (this.$route.params.info_index) {
+      // console.log(this.$route.params, '收到的')
+      if ('info_index' in this.$route.params) {
         this.exercise_group_index = this.$route.params.info_index;
         localStorage.setItem('exercise_group_index', this.$route.params.info_index)
       } else {
@@ -96,12 +97,20 @@
           this.$router.replace({
             name: `train-index`
           });
+          return false
         }
       }
+      console.log(this.info, this.exercise_group_index, this.$root.exercise_group);
       this._init()
     },
     methods: {
       _init(){
+        if (!this.info.id && this.info.id!==0) {
+          this.$router.replace({
+            name: `train-index`
+          });
+          return false
+        }
         this._getCardDetail(this.info.id);
         this._setDisable()
       },

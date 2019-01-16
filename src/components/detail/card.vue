@@ -67,6 +67,7 @@
         } catch(e) {
           console.log(e)
         }
+        console.log(index, '第几个');
         this.$router.push({
           name: `card-detail`,
           params: {
