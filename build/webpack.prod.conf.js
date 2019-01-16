@@ -22,16 +22,16 @@ const uaid_qiniu_prefix = _config.UAID + _config.QINIU_PREFIX
 
 const Version = new Date().getTime()
 const qiniuPlugin = new QiniuPlugin({
-  ACCESS_KEY: "pnT5pT10yrAsQuUbl1QlIxw3OBSbGsxQA7dhama4",
-  SECRET_KEY: "nwXCPezSMnt5f2plL1qz-BukvX2RYQLjavpLv0Xl",
-  bucket: "wangzhantu",
+  ACCESS_KEY: "CgDwfEEaYD--pNiV8Fjo-uR_a74lQ_3wChaLQBwN",
+  SECRET_KEY: "kd_YkD608h91iDBWqeBdhGBCtl8IEQIo29btThTY",
+  bucket: "image",
   path: '[hash]',
   prefix: uaid_qiniu_prefix
 })
 const deleteqiniuPlugin = new DeleteqiniuPlugin({
-  ACCESS_KEY: "pnT5pT10yrAsQuUbl1QlIxw3OBSbGsxQA7dhama4",
-  SECRET_KEY: "nwXCPezSMnt5f2plL1qz-BukvX2RYQLjavpLv0Xl",
-  bucket: "wangzhantu",
+  ACCESS_KEY: "CgDwfEEaYD--pNiV8Fjo-uR_a74lQ_3wChaLQBwN",
+  SECRET_KEY: "kd_YkD608h91iDBWqeBdhGBCtl8IEQIo29btThTY",
+  bucket: "image",
   prefix: uaid_qiniu_prefix
 })
 
@@ -48,7 +48,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     path: config.build.assetsRoot,
     filename: utils.assetsPath('js/[name].[hash]' + Version + '.js'),
     chunkFilename: utils.assetsPath('js/[id].[hash]' + Version + '.js'),
-    publicPath: "https://cdn.xingkwh.com/" + uaid_qiniu_prefix + "[hash]/"
+    publicPath: "http://cdn.jiangzhifan.com/" + uaid_qiniu_prefix + "[hash]/"
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
@@ -78,7 +78,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: utils.assetsPath('css/[name].[contenthash]' + Version + '.css'),
       // Setting the following option to `false` will not extract CSS from codesplit chunks.
       // Their CSS will instead be inserted dynamically with style-loader when the codesplit chunk has been loaded by webpack.
-      // It's currently set to `true` because we are seeing that sourcemaps are included in the codesplit bundle as well when it's `false`, 
+      // It's currently set to `true` because we are seeing that sourcemaps are included in the codesplit bundle as well when it's `false`,
       // increasing file size: https://github.com/vuejs-templates/webpack/issues/1110
       allChunks: true,
     }),

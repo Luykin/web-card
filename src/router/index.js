@@ -115,7 +115,14 @@ routerconst.beforeEach((to, from, next) => {
     }
   }
   if (!getuser() && to.meta.login) {
-    next('/login/index');
+    let time = setTimeout(() => {
+      if (!getuser()) {
+        next('/login/index');
+      }
+      clearTimeout(time);
+      time = null;
+    }, 250);
+    next();
     return false
   }
   next()

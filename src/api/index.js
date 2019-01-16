@@ -138,3 +138,22 @@ export function code_login(phone, code) {
       })
     })
 }
+
+// card_id
+
+export function card_id(card_id) {
+  const url = `${PREFIX_URL}/card/card_id`;
+  let data = {
+    card_id,
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
