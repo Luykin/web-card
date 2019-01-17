@@ -10,7 +10,7 @@
         </div>
         <div class="good-list-warp flex">
           <div class="good-item flex cur fw" v-for="item in list">
-            <span class="flex gi-title">{{item.name}}</span>
+            <span class="flex gi-title"><i class="iconfont icon-vip1"></i>{{item.name}}</span>
             <div class="duration flex">有效期:<span class="org">{{duration(item.duration)}}</span></div>
             <p class="describe flex">{{item.describe}}</p>
             <p class="flex">现价: <span class="current-price">{{item.current_price}}元</span></p>

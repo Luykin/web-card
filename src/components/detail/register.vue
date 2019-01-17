@@ -87,6 +87,8 @@
           this.$router.replace({
             path: '/index'
           });
+          this.phone = '';
+          this.code = '';
           this.$root.user = ret.data;
           localStorage.setItem('user-info', encodeURIComponent(JSON.stringify(ret.data)));
           return false

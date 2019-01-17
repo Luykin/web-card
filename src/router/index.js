@@ -77,9 +77,26 @@ const routerconst = new Router({
   }, {
     path: '/user',
     name: 'user',
+    redirect: '/user/collection',
     meta: {login: true},
     component: () =>
-      import (`components/index/user`)
+      import (`components/index/user`),
+    children: [{
+      path: '/user/collection',
+      name: '/user/collection',
+      component: () =>
+        import (`components/detail/user-collection`),
+    },{
+      path: '/user/card',
+      name: '/user/card',
+      component: () =>
+        import (`components/detail/user-coll-card`),
+    },{
+      path: '/user/myTraining',
+      name: '/user/myTraining',
+      component: () =>
+        import (`components/detail/user-mytrain`),
+    }]
   }, {
     path: '/login',
     redirect: '/login/index',

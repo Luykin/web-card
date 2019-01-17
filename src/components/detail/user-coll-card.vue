@@ -48,16 +48,10 @@
         detail: false,
         disabled: true,
         crumbs_list: [{
-          name: '训练首页',
-          path: '/trainingSet'
+          name: '个人中心',
+          path: '/user'
         }, {
-          name: '卡片集',
-          path: '/trainingSet/cardSet'
-        }, {
-          name: '卡片列表',
-          path: '/trainingSet/card'
-        }, {
-          name: '卡片',
+          name: '收藏卡片',
           path: null
         }],
         info: {
@@ -69,16 +63,6 @@
       }
     },
     created() {
-      if (this.$route.params.params) {
-        this.crumbs_list[1].path = {
-          name: 'cardSet',
-          params: this.$route.params.params.cardSetParams
-        };
-        this.crumbs_list[2].path = {
-          name: 'card',
-          params: this.$route.params.params
-        };
-      }
       if ('info_index' in this.$route.params) {
         this.exercise_group_index = this.$route.params.info_index;
         localStorage.setItem('exercise_group_index', this.$route.params.info_index)
@@ -102,7 +86,7 @@
           return false
         }
       }
-      console.log(this.info, this.exercise_group_index, this.$root.exercise_group);
+      // console.log(this.info, this.exercise_group_index, this.$root.exercise_group);
       this._init(300)
     },
     methods: {
@@ -260,6 +244,6 @@
     /*pointer-events: none;*/
   }
   /*.disable .icon-icon-test{*/
-    /*color: ;*/
+  /*color: ;*/
   /*}*/
 </style>

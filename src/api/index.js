@@ -141,10 +141,54 @@ export function code_login(phone, code) {
 
 // card_id
 
-export function card_id(card_id) {
+export function card_id(card_id, user_id) {
   const url = `${PREFIX_URL}/card/card_id`;
   let data = {
     card_id,
+  };
+  if (user_id) {
+    Object.assign(data, {
+      user_id
+    })
+  }
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+//collection 收藏
+
+export function collection(user_id, card_id, collection) {
+  const url = `${PREFIX_URL}/card/collection`;
+  let data = {
+    card_id,
+    user_id,
+    collection
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+//collection 收藏列表
+export function collection_list(user_id) {
+  const url = `${PREFIX_URL}/card/collection_list`;
+  let data = {
+    user_id
   };
   return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
     .then((res) => {

@@ -85,6 +85,8 @@
             message: '登录成功',
             type: 'success'
           });
+          this.code = '';
+          this.phone = '';
           this.$router.replace({
             path: '/index'
           });
