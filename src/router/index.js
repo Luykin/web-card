@@ -112,9 +112,15 @@ const routerconst = new Router({
       name: 'login-register',
       component: () =>
         import (`components/detail/register`),
+    },{
+      path: '/txLogin',
+      name: 'txLogin',
+      component: () =>
+        import (`components/detail/txLogin`),
     }]
   }]
 });
+// txLogin
 
 routerconst.beforeEach((to, from, next) => {
   if (!getuser()) {

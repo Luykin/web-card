@@ -34,7 +34,7 @@
 
 <script>
   const REG_PHONE = /^(((13[0-9]{1})|(15[0-9]{1})|(16[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}|(19[0-9]{1})))+\d{8})$/
-  const QQ_URL = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101542054&redirect_uri=http%3a%2f%2fwww.jiangzhifan.com%2fpay&state=text'
+  const QQ_URL = 'https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=101542054&redirect_uri=http%3a%2f%2fwww.jiangzhifan.com%2f%23%2ftxLogin&state=text';
   import {send_message, register} from 'api/index'
   import {encrypt} from 'api/util'
   export default {

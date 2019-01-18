@@ -2,7 +2,7 @@
   <transition name="layer">
     <div class="index-main flex fw">
       <userrouter></userrouter>
-      <div class="collection" v-if="$root.user">
+      <div class="collection" v-if="$root.user && $root.user.cards">
         <!--<div v-for="item in $root.user.cards">{{item.title}}</div>-->
         <empty v-show="!$root.user.cards.length"></empty>
         <div class="flex card js cur" v-for="(item,index) in $root.user.cards" @click="_toCard(index)">

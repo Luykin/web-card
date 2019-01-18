@@ -201,3 +201,26 @@ export function collection_list(user_id) {
       })
     })
 }
+
+//access_token
+export function access_token(code, redirect_uri) {
+  // const url = `https://graph.qq.com/oauth2.0/token`;
+  const url = `${PREFIX_URL}/login/access_token`;
+  let data = {
+    grant_type: 'authorization_code',
+    client_id: '101542054',
+    client_secret: 'e09ca0bd128ab639227ba6093d7c4c99',
+    code,
+    redirect_uri
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
