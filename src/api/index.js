@@ -224,3 +224,77 @@ export function access_token(code, redirect_uri) {
       })
     })
 }
+
+// app_info
+export function app_info(app_id = 1) {
+  const url = `${PREFIX_URL}/other/app_info`;
+  let data = {
+    app_id,
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+// course_type_list
+export function course_type_list(show_list = 'all') {
+  const url = `${PREFIX_URL}/other/course_type_list`;
+  let data = {
+    show_list,
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+// course_list
+export function course_list(course_type_id='all') {
+  const url = `${PREFIX_URL}/other/course_list`;
+  let data = {
+    course_type_id
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+
+// user_info
+export function user_info(id) {
+  const url = `${PREFIX_URL}/login/user_info`;
+  let data = {
+    id,
+    _tm: +new Date()
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}

@@ -2,7 +2,7 @@
   <transition name="layer">
     <div class="index">
       <swiper :options="swiperOption" ref="mySwiper" class="swiper-box">
-        <swiper-slide class="swiper-item" v-for="item in banner" :key="item">
+        <swiper-slide class="swiper-item" v-for="item in banner" :key="item" v-if="item.image">
           <img :src="item.image">
         </swiper-slide>
         <!--<div class="swiper-pagination" slot="pagination"></div>-->
@@ -11,25 +11,27 @@
         <div class="main-title flex">
           我们的优势
         </div>
-        <div class="flex index-info">
-          <img src="../../assets/ex.png"/>
+        <div class="flex index-info" v-if="$root.app_info">
+          <img :src="$root.app_info.index_card_image"/>
           <div class="flex fw index-info-text-warp">
-            <span class="flex index-info-text-title">标题标题</span>
-            <span class="flex index-info-text-detail">描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述</span>
+            <span class="flex index-info-text-title">{{$root.app_info.index_card_title}}</span>
+            <span class="flex index-info-text-detail">{{$root.app_info.index_card_text}}</span>
           </div>
         </div>
         <div class="main-title flex">
           视频介绍
         </div>
-        <div class="audio-warp">
+        <div class="audio-warp" v-if="$root.app_info">
           <!--controls-->
-          <video src="http://cdn.jiangzhifan.com/video_20190114_003323.mp4">
+          <video controls :src="$root.app_info.index_audio">
           </video >
         </div>
         <div class="main-title flex">
           学员口碑
         </div>
-
+        <div v-if="$root.app_info" class="flex">
+          <img :src="$root.app_info.index_praise"/>
+        </div>
       </div>
       <router-view></router-view>
     </div>
@@ -37,6 +39,7 @@
 </template>
 
 <script>
+  import {app_info} from 'api/index'
   let vm = null;
     export default {
       name: "index",
@@ -61,15 +64,15 @@
             }
           },
           banner: [{
-            image: require('../../assets/banner.jpg'),
+            image: '',
             path: 'index-banner',
             info: 'info'
           },{
-            image: require('../../assets/banner.jpg'),
+            image: '',
             path: 'index-banner',
             info: 'info'
           },{
-            image: require('../../assets/banner.jpg'),
+            image: '',
             path: 'index-banner',
             info: 'info'
           }]
@@ -80,15 +83,47 @@
           return this.$refs.mySwiper.swiper
         }
       },
-      created() {
+      mounted() {
         vm = this;
+        if (!this.$root || !this.$root.app_info) {
+          this._getAppinfo()
+        } else {
+          this._setApp()
+        }
       },
       methods: {
+        // app_info
+        async _getAppinfo() {
+          this.$root.eventHub.$emit('loading', true);
+          const ret = await app_info();
+          this.$root.eventHub.$emit('loading', null);
+          if (ret.status === 200 && ret.data.state === 200) {
+            this.$root.app_info = ret.data;
+            this._setApp()
+          }
+        },
+        _setApp() {
+          this.banner[0].image = this.$root.app_info.index_banner1;
+          this.banner[1].image = this.$root.app_info.index_banner2;
+          this.banner[2].image = this.$root.app_info.index_banner3;
+          this.banner[0].info = this.$root.app_info.index_path1;
+          this.banner[1].info = this.$root.app_info.index_path2;
+          this.banner[2].info = this.$root.app_info.index_path3;
+        },
         _toBanner(item){
-          this.$router.push({
-            name: item.path,
-            params: item.info
-          })
+          if (item.info.indexOf('http') > -1) {
+            console.log(item.info)
+            this.$router.push({
+              name: item.path,
+              params: {
+                path: item.info
+              }
+            })
+          } else {
+            this.$router.push({
+              path: `/${item.info}`,
+            })
+          }
         }
       },
     }

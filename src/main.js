@@ -21,6 +21,7 @@ const app = new Vue({
   data: {
     eventHub: new Vue(),
     user: null,
+    app_info: null,
     exercise_group: [],
     errorCode: {
       '404': '资源不存在',

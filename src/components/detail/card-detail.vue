@@ -186,6 +186,18 @@
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
           this.info = ret.data
+        } else {
+          if (ret.data.state === 435) {
+            this.$message({
+              message: '登录已失效',
+              type: 'warning'
+            });
+            this.$router.replace({
+              path: '/login'
+            });
+            this.$root.user = null;
+            localStorage.setItem('user-info', null);
+          }
         }
       },
       _setDisable() {

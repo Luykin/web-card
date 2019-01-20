@@ -14,6 +14,9 @@
     }, {
       name: '训练',
       path: '/trainingSet'
+    },{
+      name: '方法课',
+      path: '/course'
     }, {
       name: '服务于价格',
       path: '/vip'

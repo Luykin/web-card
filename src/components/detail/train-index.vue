@@ -2,7 +2,7 @@
   <transition name="layer">
     <div class="index">
       <swiper :options="swiperOption" ref="mySwiper" class="swiper-box">
-        <swiper-slide class="swiper-item" v-for="item in banner" :key="item">
+        <swiper-slide class="swiper-item" v-for="item in banner" :key="item" v-if="item.image">
           <img :src="item.image">
         </swiper-slide>
         <!--<div class="swiper-pagination" slot="pagination"></div>-->
@@ -37,6 +37,7 @@
 
 <script>
   import {subject_list, train_list} from 'api/index'
+  import {app_info} from 'api/index'
   import empty from 'base/empty/empty'
   let vm = null;
   export default {
@@ -79,15 +80,15 @@
           }
         },
         banner: [{
-          image: require('../../assets/banner.jpg'),
+          image: '',
           path: 'tr-banner',
           info: 'info'
         },{
-          image: require('../../assets/banner.jpg'),
+          image: '',
           path: 'tr-banner',
           info: 'info'
         },{
-          image: require('../../assets/banner.jpg'),
+          image: '',
           path: 'tr-banner',
           info: 'info'
         }],
@@ -99,13 +100,35 @@
         return this.$refs.mySwiper.swiper
       }
     },
-    created() {
+    mounted() {
       vm = this;
       this._init()
     },
     methods: {
       _init(){
-        this._getSubject()
+        this._getSubject();
+        if (!this.$root || !this.$root.app_info) {
+          this._getAppinfo()
+        } else {
+          this._setApp()
+        }
+      },
+      async _getAppinfo() {
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await app_info();
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          this.$root.app_info = ret.data;
+          this._setApp()
+        }
+      },
+      _setApp() {
+        this.banner[0].image = this.$root.app_info.train_banner1;
+        this.banner[1].image = this.$root.app_info.train_banner2;
+        this.banner[2].image = this.$root.app_info.train_banner3;
+        this.banner[0].info = this.$root.app_info.train_path1;
+        this.banner[1].info = this.$root.app_info.train_path2;
+        this.banner[2].info = this.$root.app_info.train_path3;
       },
       async _getSubject() {
         this.$root.eventHub.$emit('loading', true);
@@ -162,10 +185,19 @@
         })
       },
       _toBanner(item){
-        this.$router.push({
-          name: item.path,
-          params: item.info
-        })
+        if (item.info.indexOf('http') > -1) {
+          console.log(item.info)
+          this.$router.push({
+            name: item.path,
+            params: {
+              path: item.info
+            }
+          })
+        } else {
+          this.$router.push({
+            path: `/${item.info}`,
+          })
+        }
       }
     },
     components: {

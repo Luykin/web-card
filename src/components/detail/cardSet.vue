@@ -23,7 +23,7 @@
         <div class="main-title flex">
           视频介绍
         </div>
-        <div class="audio-warp">
+        <div class="audio-warp" v-if="this.$route.params.video_introduction">
           <!--controls-->
           <video controls :src="this.$route.params.video_introduction">
           </video >

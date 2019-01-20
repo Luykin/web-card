@@ -36,6 +36,7 @@
 </template>
 
 <script>
+  import {user_info} from 'api/index'
   export default {
     name: "user",
     data() {
@@ -46,7 +47,8 @@
     created() {
       setTimeout(() => {
         // this._getCollectionList()
-        console.log(this.$root.user)
+        // console.log(this.$root.user)
+        this._updateUserInfo(this.$root.user.id)
       }, 300);
     },
     computed: {
@@ -59,13 +61,40 @@
       }
     },
     methods: {
+      async _updateUserInfo(id) {
+        if (!id && id !== 0) {
+          return false
+        }
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await user_info(id);
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          this.$root.user = ret.data;
+          localStorage.setItem('user-info', encodeURIComponent(JSON.stringify(ret.data)));
+          return false
+        } else {
+          // console.log(ret)
+          if (ret.data.state === 435) {
+            this.$message({
+              message: '登录已失效',
+              type: 'warning'
+            });
+            this.$router.replace({
+              path: '/login'
+            });
+            this.dialogVisible = false;
+            this.$root.user = null;
+            localStorage.setItem('user-info', null);
+          }
+        }
+      },
       _sure() {
+        this.$router.replace({
+          path: '/index'
+        });
         this.dialogVisible = false;
         this.$root.user = null;
         localStorage.setItem('user-info', null);
-        this.$router.replace({
-          path: `./login`
-        });
       },
       // async _getCollectionList() {
       //   if (!this.$root.user) {

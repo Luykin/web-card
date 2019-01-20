@@ -1,7 +1,8 @@
 <template>
   <transition name="layer">
     <div class="layer flex" @click.self="_close">
-      banner 内容
+      <!--{{$route.params.path}}-->
+      <img :src="$route.params.path" class="banner-img"/>
     </div>
   </transition>
 </template>
@@ -10,7 +11,12 @@
     export default {
         name: "banner",
       created() {
-          console.log(this.$route)
+          if (!this.$route.params.path) {
+            this.$router.replace({
+              path: '/index'
+            })
+          }
+          // console.log(this.$route)
       },
         methods: {
           _close() {
@@ -21,5 +27,8 @@
 </script>
 
 <style scoped>
-
+.banner-img{
+  max-width: 1080px;
+  height: auto;
+}
 </style>

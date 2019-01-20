@@ -20,12 +20,15 @@
             </router-link>
           </div>
         </div>
-        <div class="main-title flex">
-          限时精品课程
-        </div>
+        <!--<div class="main-title flex">-->
+          <!--限时精品课程-->
+        <!--</div>-->
 
         <div class="main-title flex">
           联系我们
+        </div>
+        <div class="flex" v-if="$root.app_info && $root.app_info.content_us">
+          <img :src="$root.app_info.content_us"/>
         </div>
       </div>
     </div>
@@ -54,7 +57,13 @@
       }
     },
     created() {
-        this._init()
+      this._init();
+      if (!this.$root.app_info) {
+        this.$router.replace({
+          path: '/index'
+        });
+        return false
+      }
     },
     methods: {
       _init() {
