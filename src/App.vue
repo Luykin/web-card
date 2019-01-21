@@ -15,8 +15,7 @@
 import MHeader from 'components/header/header'
 import foot from 'components/footer/footer'
 import loading from 'base/loading/loading'
-// import XCanvas from 'components/canvas/canvas'
-// import centerTips from 'base/centerTips/centerTips'
+import {app_info} from 'api/index'
 
 export default {
   data() {
@@ -25,6 +24,7 @@ export default {
     }
   },
   created() {
+    this._getAppinfo()
   },
   mounted() {
     this.$root.eventHub.$on('loading', (loading) => {
@@ -42,10 +42,17 @@ export default {
       }
     })
   },
-  updated() {
-
-  },
   methods: {
+    async _getAppinfo() {
+      this.$root.eventHub.$emit('loading', true);
+      const ret = await app_info();
+      this.$root.eventHub.$emit('loading', null);
+      if (ret.status === 200 && ret.data.state === 200) {
+        this.$root.app_info = ret.data;
+      }
+    },
+  },
+  updated() {
 
   },
   components: {

@@ -2,12 +2,17 @@
   <transition name="layer">
     <div class="index">
       <div class="card-set-header flex">
-        <img src="../../assets/carset.jpg"/>
+        <img :src="setImage($route.params.Introduction_picture)"/>
+        <div class="csh-btn-warp flex fw" v-if="!$route.params.free">
+          <div class="csh-price">现价：{{$route.params.current_price}}元<span v-if="$route.params.current_price>$route.params.original_price">原价{{$route.params.original_price}}元</span></div>
+          <div class="flex csh-btn cur">立即购买</div>
+          <router-link tag='div' to='/vip' class="csh-btn flex cur">更多优惠</router-link>
+        </div>
       </div>
       <div class="index-main">
         <crumbs :crumbs="crumbs_list"></crumbs>
         <div class="main-title flex">
-          卡片集
+          {{$route.params.Internal_headings}}
         </div>
         <div class="card-set-warp flex fw js">
           <div class="card-set-item" v-for="item in list" :style="`background:url(${item.image}) no-repeat; background-size:100% 100%;`">
@@ -21,7 +26,7 @@
           </div>
         </div>
         <div class="main-title flex">
-          视频介绍
+          {{$route.params.video_title}}
         </div>
         <div class="audio-warp" v-if="this.$route.params.video_introduction">
           <!--controls-->
@@ -60,6 +65,13 @@
           }
           this._getCardSetList(this.$route.params.id)
         },
+        computed: {
+          setImage() {
+            return (pic) => {
+              return pic || 'http://cdn.01icon.xingkwh.com/carset.e0a01ae.jpg'
+            }
+          }
+        },
         methods: {
           async _getCardSetList(id) {
             this.$root.eventHub.$emit('loading', true);
@@ -90,6 +102,42 @@
   .card-set-header{
     height: 430px;
     min-width: 1920px;
+    position: relative;
+  }
+  .csh-btn-warp{
+    width: 400px;
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    height: 120px;
+    transform: translate(-50%, 0);
+  }
+  .csh-price{
+    width: 100%;
+    font-size: 26px;
+    font-weight: 600;
+    color: #EB7B2D;
+    margin-bottom: 35px;
+    vertical-align: bottom;
+    text-align: center;
+  }
+  .csh-price span{
+    text-decoration: line-through;
+    font-size: 18px;
+    font-weight: 400;
+    margin-left: 10px;
+  }
+  .csh-btn{
+    width: 140px;
+    height: 45px;
+    border-radius: 1000px;
+    background: #EB7B2D;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    box-sizing: border-box;
+    transition: all .3s;
+    margin: 0 auto;
   }
   .card-set-header img{
     width: 100%;
@@ -157,9 +205,9 @@
     transform: translate(-50%, 0);
     transition: all .3s;
   }
-  .csw-btn:hover{
+  .csw-btn:hover, .csh-btn:hover{
     color: #fff;
-    background: #eba015;
+    background: #eb531c;
     border: 1px solid #eb7b2d;
   }
 </style>

@@ -223,7 +223,7 @@
 
   .card-detail-warp {
     width: 70%;
-    padding: 3% 5%;
+    padding: 5% 5% 3%;
     height: auto;
     /*min-height: 70px;*/
     box-shadow: 0 0 10px rgba(0, 0, 0, .1);

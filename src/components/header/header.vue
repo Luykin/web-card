@@ -18,7 +18,7 @@
       name: '方法课',
       path: '/course'
     }, {
-      name: '服务于价格',
+      name: '服务与价格',
       path: '/vip'
     }];
   // , {

@@ -5,7 +5,9 @@
         <div v-for="item in course_type_list" v-if="item.show === 0" class="course-header-item flex cur" :class="{'active-chi': activeId=== item.id}" @click="_chose(item)">{{item.name}}</div>
       </div>
       <div class="course-warp flex fw">
-        <div v-for="item in list" v-if="item.link" class="course cur" :style="`background: url(${item.image}) no-repeat; background-size: cover;`" @click="_window(item)">
+        <div v-for="item in list" v-if="item.link" class="course cur" @click="_window(item)">
+          <!--:style="`background: url(${item.image}) no-repeat; background-size: cover;`"-->
+          <img :src="item.image" v-if="item.image"/>
           <div class="course-name flex">{{item.name}}</div>
         </div>
       </div>
@@ -178,22 +180,31 @@
   .course{
     width: 242px;
     height: 301px;
-    background: #fff;
+    background: #f8f8f8;
     margin: 0 40px 20px 0;
     position: relative;
     box-shadow: 0 0 8px rgba(0,0,0,.1);
     color: #666;
     transition: all .3s;
   }
+  .course img{
+    width: 100%;
+    height: 100%;
+  }
   .course:hover{
     box-shadow: 0 0 16px rgba(0,0,0,.1);
     transform: translate(0, -10px);
   }
   .course-name{
+    width: 90%;
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 80px;
-    background: rgba(255,255,255,.9);
+    padding: 10px 5%;
+    justify-content: flex-start;
+    min-height: 70px;
+    height: auto;
+    max-height: 90%;
+    background: rgba(255,255,255,.88);
   }
 </style>

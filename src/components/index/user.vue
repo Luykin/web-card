@@ -12,7 +12,7 @@
           </router-link>
         </div>
         <div class="header-other flex">
-          <span class="ip-user">上次登录IP地址: {{$root.user.ip}}</span>
+          <!--<span class="ip-user">上次登录IP地址: {{$root.user.ip}}</span>-->
           <div class="flex login-out-btn cur" @click="dialogVisible = true">退出登录</div>
         </div>
       </div>

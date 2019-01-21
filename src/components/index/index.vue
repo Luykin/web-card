@@ -8,8 +8,8 @@
         <!--<div class="swiper-pagination" slot="pagination"></div>-->
       </swiper>
       <div class="index-main">
-        <div class="main-title flex">
-          我们的优势
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.index_window_title1||'我们的优势'}}
         </div>
         <div class="flex index-info" v-if="$root.app_info">
           <img :src="$root.app_info.index_card_image"/>
@@ -18,16 +18,16 @@
             <span class="flex index-info-text-detail">{{$root.app_info.index_card_text}}</span>
           </div>
         </div>
-        <div class="main-title flex">
-          视频介绍
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.index_window_title2||'视频介绍'}}
         </div>
         <div class="audio-warp" v-if="$root.app_info">
           <!--controls-->
           <video controls :src="$root.app_info.index_audio">
           </video >
         </div>
-        <div class="main-title flex">
-          学员口碑
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.index_window_title3||'学员口碑'}}
         </div>
         <div v-if="$root.app_info" class="flex">
           <img :src="$root.app_info.index_praise"/>
@@ -92,7 +92,6 @@
         }
       },
       methods: {
-        // app_info
         async _getAppinfo() {
           this.$root.eventHub.$emit('loading', true);
           const ret = await app_info();

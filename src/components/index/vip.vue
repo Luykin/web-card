@@ -5,8 +5,8 @@
         <img src="../../assets/carset.jpg"/>
       </div>
       <div class="index-main">
-        <div class="main-title flex">
-          把训练集打包回家
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.vip_window_title1||'把训练集打包带回家'}}
         </div>
         <div class="good-list-warp flex">
           <div class="good-item flex cur fw" v-for="item in list">
@@ -20,12 +20,14 @@
             </router-link>
           </div>
         </div>
-        <!--<div class="main-title flex">-->
-          <!--限时精品课程-->
-        <!--</div>-->
-
-        <div class="main-title flex">
-          联系我们
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.vip_window_title2||'限时精品课程'}}
+        </div>
+        <div class="flex" v-if="$root.app_info && $root.app_info.vip_course_image">
+          <img :src="$root.app_info.vip_course_image"/>
+        </div>
+        <div class="main-title flex" v-if="$root.app_info">
+          {{$root.app_info.vip_window_title3||'联系我们'}}
         </div>
         <div class="flex" v-if="$root.app_info && $root.app_info.content_us">
           <img :src="$root.app_info.content_us"/>
@@ -97,7 +99,7 @@
     width: 16%;
     flex-shrink: 0;
     flex-grow: 0;
-    height: 70%;
+    height: 82%;
     box-shadow: 0 0 10px rgba(235, 123, 45, 0.25);
     margin: 0 2%;
     transition: all .3s;
@@ -106,6 +108,7 @@
     align-items: flex-start;
     align-content: flex-start;
     position: relative;
+    overflow: hidden;
   }
   .good-item:hover{
     box-shadow: 0 0 15px rgba(235, 123, 45, 0.6);
@@ -117,6 +120,7 @@
     font-size: 17px;
     height: 40px;
     color: rgb(235, 123, 45);
+    margin-top: 4%;
   }
   .org{
     color: rgb(235, 123, 45);
