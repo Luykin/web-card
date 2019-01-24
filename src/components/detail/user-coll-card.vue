@@ -69,6 +69,7 @@
       } else {
         this.exercise_group_index = localStorage.getItem('exercise_group_index') || 0;
       }
+      console.log(1)
       if (this.$root.exercise_group.length) {
         this.info = this.$root.exercise_group[this.exercise_group_index]
       } else {
@@ -91,14 +92,15 @@
     },
     methods: {
       _init(time) {
-        if (!this.info || !this.info.id) {
+        // console.log(this.info);
+        if (!this.info || !this.info.card_info.id) {
           this.$router.replace({
             name: `train-index`
           });
           return false
         }
         setTimeout(() => {
-          this._getCardDetail(this.info.id);
+          this._getCardDetail(this.info.card_info.id);
           this._setDisable()
         }, time || 0);
       },

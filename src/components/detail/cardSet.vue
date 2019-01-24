@@ -63,7 +63,8 @@
             });
             return false
           }
-          this._getCardSetList(this.$route.params.id)
+          this._getCardSetList(this.$route.params.id);
+          document.documentElement.scrollTop = 0;
         },
         computed: {
           setImage() {

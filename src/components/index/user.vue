@@ -19,7 +19,7 @@
       <!--<div class="">-->
         <!--<div v-for="item in $root.user.cards">{{item.title}}</div>-->
       <!--</div>-->
-      <router-view></router-view>
+      <router-view :collectionlist="collectionlist" :sub_list="sub_list" :page="page" :total="total" @chose="chose_sub" @pageChange="pageChange"></router-view>
       <el-dialog
         title="提示"
         :visible.sync="dialogVisible"
@@ -36,12 +36,17 @@
 </template>
 
 <script>
-  import {user_info} from 'api/index'
+  import {user_info, collection_list, subject_list} from 'api/index'
   export default {
     name: "user",
     data() {
       return {
-        dialogVisible: false
+        dialogVisible: false,
+        collectionlist: [],
+        sub_list:[],
+        page: 0,
+        total: 0,
+        collcache: [],
       }
     },
     created() {
@@ -50,6 +55,7 @@
         // console.log(this.$root.user)
         this._updateUserInfo(this.$root.user.id)
       }, 300);
+      this._getSubject()
     },
     computed: {
       user_vip() {
@@ -61,6 +67,14 @@
       }
     },
     methods: {
+      pageChange(info) {
+        this.page = info.value - 1;
+        this._getCollectionList(info.choseId, true);
+      },
+      chose_sub(item) {
+        this.page = 0;
+        this._getCollectionList(item.id);
+      },
       async _updateUserInfo(id) {
         if (!id && id !== 0) {
           return false
@@ -71,6 +85,7 @@
         if (ret.status === 200 && ret.data.state === 200) {
           this.$root.user = ret.data;
           localStorage.setItem('user-info', encodeURIComponent(JSON.stringify(ret.data)));
+          this._getCollectionList('all');
           return false
         } else {
           // console.log(ret)
@@ -96,17 +111,39 @@
         this.$root.user = null;
         localStorage.setItem('user-info', null);
       },
-      // async _getCollectionList() {
-      //   if (!this.$root.user) {
-      //     return false
-      //   }
-      //   this.$root.eventHub.$emit('loading', true);
-      //   const ret = await collection_list(this.$root.user.id);
-      //   this.$root.eventHub.$emit('loading', null);
-      //   if (ret.status === 200 && ret.data.state === 200) {
-      //     this.list= res.data.rows
-      //   }
-      // },
+      async _getCollectionList(id, must) {
+        if (!this.$root.user) {
+          return false
+        }
+        if (this.collcache[id] && !must) {
+          this.collectionlist = this.collcache[id].value;
+          this.total =this.collcache[id].total;
+          return false
+        }
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await collection_list(this.$root.user.id, 4, this.page*4, id);
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          this.collectionlist= ret.data.rows;
+          this.collcache[id] = {};
+          this.collcache[id].value = ret.data.rows;
+          this.collcache[id].total =ret.data.count;
+          this.total = ret.data.count
+        }
+      },
+      async _getSubject(id) {
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await subject_list(id);
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          this.sub_list = [{
+            name: '全部',
+            id: 'all',
+            show: 0
+          },...ret.data.rows];
+          console.log(this.sub_list)
+        }
+      },
     }
   }
 </script>

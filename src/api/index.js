@@ -3,10 +3,10 @@ import qs from 'qs'
 import {PREFIX_URL} from './config'
 import {getSign, getTime} from './util'
 
-export function subject_list() {
+export function subject_list(show_list='all') {
   const url = `${PREFIX_URL}/subject/list`;
   let data = {
-    show_list: 'all'
+    show_list
   };
   return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
     .then((res) => {
@@ -185,11 +185,18 @@ export function collection(user_id, card_id, collection) {
 }
 
 //collection 收藏列表
-export function collection_list(user_id) {
+export function collection_list(user_id,page_size = 20,offset = 0, subject_id) {
   const url = `${PREFIX_URL}/card/collection_list`;
   let data = {
-    user_id
+    user_id,
+    page_size,
+    offset
   };
+  if (subject_id) {
+    Object.assign(data, {
+      subject_id
+    })
+  }
   return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
     .then((res) => {
       return Promise.resolve(res)

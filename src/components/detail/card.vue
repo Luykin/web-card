@@ -8,6 +8,7 @@
         <div class="flex card-right fw">
           <div class="flex tb-item-right-title js">{{item.title}}</div>
           <div class="flex tb-item-right-info js">{{item.min_title}}</div>
+          <div class="flex tb-item-right-info js">难度：{{item.difficulty === 0 ? '简单': item.difficulty === 1 ? '普通': '困难'}}</div>
         </div>
       </div>
     </div>
@@ -47,8 +48,9 @@
         name: 'cardSet',
         params: this.$route.params.cardSetParams
       };
-      console.log(this.$route.params);
-      this.getCardList(this.$route.params.id)
+      // console.log(this.$route.params);
+      this.getCardList(this.$route.params.id);
+      document.documentElement.scrollTop = 0;
     },
     methods: {
       async getCardList(id) {
