@@ -2,10 +2,12 @@
   <transition name="layer">
     <div class="index">
       <!--method_course_video-->
-      <div class="audio-warp" v-if="$root.app_info">
-        <!--controls-->
-        <video controls :src="$root.app_info.method_course_video">
-        </video >
+      <div class="audio-header-all">
+        <div class="audio-warp" v-if="$root.app_info">
+          <!--controls-->
+          <video controls :src="$root.app_info.method_course_video">
+          </video >
+        </div>
       </div>
       <div class="flex course-header">
         <div v-for="item in course_type_list" v-if="item.show === 0" class="course-header-item flex cur" :class="{'active-chi': activeId=== item.id}" @click="_chose(item)">{{item.name}}</div>
@@ -116,9 +118,15 @@
 </script>
 
 <style scoped>
+  .audio-header-all{
+    width: 100%;
+    height: auto;
+    background: #f8f8f8;
+  }
   .audio-warp{
     box-shadow: none;
-    width: auto;
+    width: 60%;
+    background: #f8f8f8;
   }
   .index{
     width: 100%;
