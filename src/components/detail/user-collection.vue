@@ -20,7 +20,7 @@
           :total="total" page-size="4" :current-page="page + 1" @current-change="currentChange" class="flex">
         </el-pagination>
       </div>
-      <div class="fix-btn flex ell cur" @click="_start">开始训练</div>
+      <div class="fix-btn flex ell cur" @click="_start">开始复习</div>
     </div>
   </transition>
 </template>

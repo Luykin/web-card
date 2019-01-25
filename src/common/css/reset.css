@@ -63,17 +63,6 @@ h6 {
   font-weight: normal;
 }
 
-address,
-cite,
-code,
-em,
-th,
-i,
-var {
-  font-weight: normal;
-  font-style: normal;
-}
-
 a:link,
 a:visited {
   color: #000;
