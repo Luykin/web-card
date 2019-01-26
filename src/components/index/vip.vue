@@ -1,8 +1,8 @@
 <template>
   <transition name="layer">
     <div class="index">
-      <div class="card-set-header flex">
-        <img src="../../assets/carset.jpg"/>
+      <div class="card-set-header flex" v-if="$root.app_info">
+        <img :src="$root.app_info.index_card_text"/>
       </div>
       <div class="index-main">
         <div class="main-title flex" v-if="$root.app_info">
@@ -12,7 +12,7 @@
           <div class="good-item flex cur fw" v-for="item in list">
             <span class="flex gi-title"><i class="iconfont icon-vip1"></i>{{item.name}}</span>
             <div class="duration flex">有效期:<span class="org">{{duration(item.duration)}}</span></div>
-            <p class="describe flex">{{item.describe}}</p>
+            <div class="describe-text" v-html="item.describe"></div>
             <p class="flex">现价: <span class="current-price">{{item.current_price}}元</span></p>
             <span class="flex original-price">原价: {{item.original_price}}元</span>
             <router-link tag='div' to='/vip/buy' class="gi-btn flex" :class="{'disable': item.duration < 0}">
@@ -128,6 +128,11 @@
   .describe{
     padding: 15px 0;
     color: #777;
+    min-height: 50px;
+    height: auto;
+  }
+  .describe-text{
+    padding: 15px 0;
     min-height: 50px;
     height: auto;
   }

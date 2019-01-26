@@ -56,9 +56,14 @@
           });
         }
       },
-      _choseItem(item) {
-        this.$emit('chose', item);
-        this.choseId = item.id;
+      _choseItem(item, must) {
+        this.$emit('chose', {
+          item,
+          callback: () => {
+            this.choseId = item.id;
+          },
+          must
+        });
       },
       currentChange(value) {
         // this.page
@@ -75,7 +80,6 @@
         } catch(e) {
           console.log(e)
         }
-        // console.log(index, '第几个');
         this.$router.push({
           name: `/user/card`,
           params: {

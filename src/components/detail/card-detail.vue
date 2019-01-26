@@ -49,7 +49,7 @@
         disabled: true,
         crumbs_list: [{
           name: '训练首页',
-          path: '/trainingSet'
+          path: '/trainingSet/index'
         }, {
           name: '卡片集',
           path: '/trainingSet/cardSet'
@@ -102,7 +102,7 @@
           return false
         }
       }
-      console.log(this.info, this.exercise_group_index, this.$root.exercise_group);
+      // console.log(this.info, this.exercise_group_index, this.$root.exercise_group);
       this._init(300)
     },
     methods: {

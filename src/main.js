@@ -44,3 +44,9 @@ export function setuser(user) {
     app.user = user
   }
 }
+export function getEventHub() {
+  if (!app) {
+    return false
+  }
+  return app.eventHub;
+}

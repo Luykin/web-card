@@ -17,9 +17,10 @@
         </div>
       </div>
       <!--<div class="">-->
-        <!--<div v-for="item in $root.user.cards">{{item.title}}</div>-->
+      <!--<div v-for="item in $root.user.cards">{{item.title}}</div>-->
       <!--</div>-->
-      <router-view :collectionlist="collectionlist" :sub_list="sub_list" :page="page" :total="total" @chose="chose_sub" @pageChange="pageChange"></router-view>
+      <router-view ref="routerview" :collectionlist="collectionlist" :sub_list="sub_list" :page="page" :total="total"
+                   @chose="chose_sub" @pageChange="pageChange"></router-view>
       <el-dialog
         title="提示"
         :visible.sync="dialogVisible"
@@ -37,25 +38,37 @@
 
 <script>
   import {user_info, collection_list, subject_list} from 'api/index'
+
   export default {
     name: "user",
     data() {
       return {
         dialogVisible: false,
         collectionlist: [],
-        sub_list:[],
+        sub_list: [],
         page: 0,
         total: 0,
-        collcache: [],
+        nowChose: {
+          name: '全部',
+          id: 'all',
+          show: 0
+        }
       }
     },
     created() {
       setTimeout(() => {
-        // this._getCollectionList()
-        // console.log(this.$root.user)
         this._updateUserInfo(this.$root.user.id)
       }, 300);
-      this._getSubject()
+      this._getSubject();
+      this.$root.eventHub.$on('updateUser', () => {
+        console.log('更新收藏列表');
+        let timer = setTimeout(() => {
+          if (this.$refs.routerview && this.$refs.routerview._choseItem) {
+            this.$refs.routerview._choseItem(this.nowChose, true)
+          }
+          clearTimeout(timer);
+        },200);
+      })
     },
     computed: {
       user_vip() {
@@ -71,9 +84,13 @@
         this.page = info.value - 1;
         this._getCollectionList(info.choseId, true);
       },
-      chose_sub(item) {
+      chose_sub({item, callback, must}) {
         this.page = 0;
-        this._getCollectionList(item.id);
+        this._getCollectionList(item.id, must);
+        this.nowChose = item;
+        if (callback) {
+          callback()
+        }
       },
       async _updateUserInfo(id) {
         if (!id && id !== 0) {
@@ -115,19 +132,20 @@
         if (!this.$root.user) {
           return false
         }
-        if (this.collcache[id] && !must) {
-          this.collectionlist = this.collcache[id].value;
-          this.total =this.collcache[id].total;
-          return false
-        }
+        // if (this.collcache[id] && !must) {
+        //   console.log('缓存', id);
+        //   this.collectionlist = this.collcache[id].value;
+        //   this.total = this.collcache[id].total;
+        //   return false
+        // }
         this.$root.eventHub.$emit('loading', true);
-        const ret = await collection_list(this.$root.user.id, 4, this.page*4, id);
+        const ret = await collection_list(this.$root.user.id, 4, this.page * 4, id);
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
-          this.collectionlist= ret.data.rows;
-          this.collcache[id] = {};
-          this.collcache[id].value = ret.data.rows;
-          this.collcache[id].total =ret.data.count;
+          this.collectionlist = ret.data.rows;
+          // this.collcache[id] = {};
+          // this.collcache[id].value = ret.data.rows;
+          // this.collcache[id].total = ret.data.count;
           this.total = ret.data.count
         }
       },
@@ -140,7 +158,7 @@
             name: '全部',
             id: 'all',
             show: 0
-          },...ret.data.rows];
+          }, ...ret.data.rows];
           console.log(this.sub_list)
         }
       },
@@ -217,7 +235,8 @@
   .login-out-btn:hover {
     border: 1px solid rgba(255, 255, 255, .9);
   }
-  .ip-user{
+
+  .ip-user {
     color: rgba(255, 255, 255, 0.35);
     font-size: 12px;
     margin: 0 10px;

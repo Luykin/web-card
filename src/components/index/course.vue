@@ -2,20 +2,18 @@
   <transition name="layer">
     <div class="index">
       <!--method_course_video-->
-      <div class="audio-header-all">
-        <div class="audio-warp" v-if="$root.app_info">
-          <!--controls-->
-          <video controls :src="$root.app_info.method_course_video">
-          </video >
-        </div>
-      </div>
+      <!--<div class="audio-header-all">-->
+        <!--<div class="audio-warp" v-if="$root.app_info">-->
+          <!--&lt;!&ndash;controls&ndash;&gt;-->
+          <!--<video controls :src="$root.app_info.method_course_video">-->
+          <!--</video >-->
+        <!--</div>-->
+      <!--</div>-->
       <div class="flex course-header">
         <div v-for="item in course_type_list" v-if="item.show === 0" class="course-header-item flex cur" :class="{'active-chi': activeId=== item.id}" @click="_chose(item)">{{item.name}}</div>
       </div>
       <div class="course-warp flex fw">
-        <div v-for="item in list" v-if="item.link" class="course cur" @click="_window(item)">
-          <!--:style="`background: url(${item.image}) no-repeat; background-size: cover;`"-->
-          <img :src="item.image" v-if="item.image"/>
+        <div v-for="item in list" v-if="item.link" class="course cur" @click="_window(item)" :style="_setBg(item)">
           <div class="course-name flex">{{item.name}}</div>
         </div>
       </div>
@@ -69,6 +67,11 @@
     computed: {
       swiper() {
         return this.$refs.mySwiper.swiper
+      },
+      _setBg() {
+        return (item) => {
+          return `background: url(${item.image}) no-repeat left top;background-size:100% auto;`;
+        }
       }
     },
     created() {
@@ -196,19 +199,21 @@
     transform: translate(0, 100%);
   }
   .course{
-    width: 242px;
-    height: 301px;
+    width: 30%;
+    height: 0;
+    padding-top: 25%;
     background: #f8f8f8;
-    margin: 0 40px 20px 0;
+    margin: 0 3% 20px 0;
     position: relative;
     box-shadow: 0 0 8px rgba(0,0,0,.1);
     color: #666;
-    transition: all .3s;
+    transition: transform .3s;
+    background-size: 100% auto;
   }
-  .course img{
-    width: 100%;
-    height: 100%;
-  }
+  /*.course img{*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+  /*}*/
   .course:hover{
     box-shadow: 0 0 16px rgba(0,0,0,.1);
     transform: translate(0, -10px);

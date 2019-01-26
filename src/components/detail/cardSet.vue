@@ -25,14 +25,14 @@
             <div class="csw-btn cur" @click="_toCard(item.id)">开始训练</div>
           </div>
         </div>
-        <div class="main-title flex">
-          {{$route.params.video_title}}
-        </div>
-        <div class="audio-warp" v-if="this.$route.params.video_introduction">
-          <!--controls-->
-          <video controls :src="this.$route.params.video_introduction">
-          </video >
-        </div>
+        <!--<div class="main-title flex">-->
+          <!--{{$route.params.video_title}}-->
+        <!--</div>-->
+        <!--<div class="audio-warp" v-if="this.$route.params.video_introduction">-->
+          <!--&lt;!&ndash;controls&ndash;&gt;-->
+          <!--<video controls :src="this.$route.params.video_introduction">-->
+          <!--</video >-->
+        <!--</div>-->
       </div>
     </div>
   </transition>

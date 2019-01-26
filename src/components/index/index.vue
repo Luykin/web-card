@@ -13,19 +13,19 @@
         </div>
         <div class="flex index-info" v-if="$root.app_info">
           <img :src="$root.app_info.index_card_image"/>
-          <div class="flex fw index-info-text-warp">
-            <span class="flex index-info-text-title">{{$root.app_info.index_card_title}}</span>
-            <span class="flex index-info-text-detail">{{$root.app_info.index_card_text}}</span>
-          </div>
+          <!--<div class="flex fw index-info-text-warp">-->
+            <!--<span class="flex index-info-text-title">{{$root.app_info.index_card_title}}</span>-->
+            <!--<span class="flex index-info-text-detail">{{$root.app_info.index_card_text}}</span>-->
+          <!--</div>-->
         </div>
-        <div class="main-title flex" v-if="$root.app_info">
-          {{$root.app_info.index_window_title2||'视频介绍'}}
-        </div>
-        <div class="audio-warp" v-if="$root.app_info">
-          <!--controls-->
-          <video controls :src="$root.app_info.index_audio">
-          </video >
-        </div>
+        <!--<div class="main-title flex" v-if="$root.app_info">-->
+          <!--{{$root.app_info.index_window_title2||'视频介绍'}}-->
+        <!--</div>-->
+        <!--<div class="audio-warp" v-if="$root.app_info">-->
+          <!--&lt;!&ndash;controls&ndash;&gt;-->
+          <!--<video controls :src="$root.app_info.index_audio">-->
+          <!--</video >-->
+        <!--</div>-->
         <div class="main-title flex" v-if="$root.app_info">
           {{$root.app_info.index_window_title3||'学员口碑'}}
         </div>
@@ -150,7 +150,8 @@
     overflow: hidden;
   }
   .index-info img{
-    width: 569px;
+    width: auto;
+    max-width: 1100px;
     height: auto;
   }
   .index-info-text-warp{

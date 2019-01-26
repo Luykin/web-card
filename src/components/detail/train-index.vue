@@ -102,7 +102,12 @@
     },
     mounted() {
       vm = this;
-      this._init()
+      this._init();
+      try{
+        this._chose(JSON.parse(sessionStorage.getItem('train-active')));
+      } catch (err){
+        console.log(err)
+      }
     },
     methods: {
       _init(){
@@ -159,7 +164,9 @@
       async _getTrainList(id, must, sucess) {
         if (this.trainListCache[id] && !must) {
           this.list = this.trainListCache[id];
-          sucess();
+          if (sucess) {
+            sucess()
+          }
           return false
         }
         this.$root.eventHub.$emit('loading', true);
@@ -174,8 +181,16 @@
         }
       },
       _chose(item) {
+        if (!item) {
+          return false
+        }
         this._getTrainList(item.id, null,() => {
-          this.activeId = item.id
+          this.activeId = item.id;
+          try {
+            sessionStorage.setItem('train-active', JSON.stringify(item))
+          } catch (err){
+            console.log(err)
+          }
         });
       },
       _toCarSet(item) {

@@ -21,7 +21,8 @@
         if (ret.status === 200 && ret.data.state === 200) {
           this.$message({
             message: '登录成功',
-            type: 'success'
+            type: 'success',
+            duration: 1000
           });
           this.$router.replace({
             path: '/index'

@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import {
   getuser,
-  setuser
+  setuser,
+  getEventHub
 } from '../main.js'
 Vue.use(Router);
 
@@ -123,6 +124,10 @@ const routerconst = new Router({
 // txLogin
 
 routerconst.beforeEach((to, from, next) => {
+  // console.log(to.path);
+  if ((to.path === '/user' || to.path === '/user/collection') && getuser()) {
+    getEventHub().$emit('updateUser');
+  }
   if (!getuser()) {
     try {
       const userinfo = localStorage.getItem('user-info');
