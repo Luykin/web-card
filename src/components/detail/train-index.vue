@@ -43,21 +43,7 @@
   export default {
     data() {
       return{
-        training_list: [
-          {
-            name:'英语',
-            id: 0
-          },{
-            name:'语文',
-            id: 1
-          },{
-            name:'数学',
-            id: 2
-          },{
-            name:'物理',
-            id: 3
-          },
-        ],
+        training_list: [],
         list: [],
         // cardSet: null,
         activeId: 0,
@@ -104,14 +90,16 @@
       vm = this;
       this._init();
       try{
-        this._chose(JSON.parse(sessionStorage.getItem('train-active')));
+        this._getSubject(() => {
+          this._chose(JSON.parse(sessionStorage.getItem('train-active')));
+        });
       } catch (err){
-        console.log(err)
+        console.log(err);
       }
+      // this._getSubject();
     },
     methods: {
       _init(){
-        this._getSubject();
         if (!this.$root || !this.$root.app_info) {
           this._getAppinfo()
         } else {
@@ -135,7 +123,7 @@
         this.banner[1].info = this.$root.app_info.train_path2;
         this.banner[2].info = this.$root.app_info.train_path3;
       },
-      async _getSubject() {
+      async _getSubject(callback) {
         this.$root.eventHub.$emit('loading', true);
         const ret = await subject_list();
         this.$root.eventHub.$emit('loading', null);
@@ -144,6 +132,9 @@
             this.training_list = this._formatShow(ret.data.rows);
             this.activeId = this.training_list[0].id;
             this._getTrainList(this.activeId);
+          }
+          if (callback) {
+            callback()
           }
         }
       },
@@ -181,6 +172,7 @@
         }
       },
       _chose(item) {
+        // console.log(item);
         if (!item) {
           return false
         }
