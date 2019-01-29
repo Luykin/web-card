@@ -69,6 +69,12 @@
     },
     methods: {
       async add_order(item) {
+        if (!this.$root.user) {
+          this.$router.replace({
+            path: '/login'
+          });
+          return false
+        }
         this.$root.eventHub.$emit('loading', true);
         const ret = await buy_vip(this.$root.user.id, item.id);
         this.$root.eventHub.$emit('loading', null);
