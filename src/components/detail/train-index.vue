@@ -90,9 +90,13 @@
       vm = this;
       this._init();
       try{
-        this._getSubject(() => {
-          this._chose(JSON.parse(sessionStorage.getItem('train-active')));
-        });
+        let callback = null;
+        if (sessionStorage.getItem('train-active')) {
+          callback = () => {
+            this._chose(JSON.parse(sessionStorage.getItem('train-active')));
+          };
+        }
+        this._getSubject(callback);
       } catch (err){
         console.log(err);
       }
@@ -131,10 +135,11 @@
           if (ret.data.count) {
             this.training_list = this._formatShow(ret.data.rows);
             this.activeId = this.training_list[0].id;
-            this._getTrainList(this.activeId);
-          }
-          if (callback) {
-            callback()
+            if (callback) {
+              callback()
+            } else {
+              this._getTrainList(this.activeId);
+            }
           }
         }
       },
@@ -172,7 +177,6 @@
         }
       },
       _chose(item) {
-        // console.log(item);
         if (!item) {
           return false
         }

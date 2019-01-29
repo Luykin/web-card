@@ -164,13 +164,32 @@ export function card_id(card_id, user_id) {
 }
 
 //collection 收藏
-
 export function collection(user_id, card_id, collection) {
   const url = `${PREFIX_URL}/card/collection`;
   let data = {
     card_id,
     user_id,
     collection
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
+//购买vip
+export function buy_vip(user_id, good_id) {
+  const url = `${PREFIX_URL}/wxpay/buy_vip`;
+  let data = {
+    good_id,
+    user_id,
+    _tm: +new Date()
   };
   return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
     .then((res) => {

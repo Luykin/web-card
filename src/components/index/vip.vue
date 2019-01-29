@@ -15,9 +15,9 @@
             <div class="describe-text" v-html="item.describe"></div>
             <p class="flex">现价: <span class="current-price">{{item.current_price}}元</span></p>
             <span class="flex original-price">原价: {{item.original_price}}元</span>
-            <router-link tag='div' to='/vip/buy' class="gi-btn flex" :class="{'disable': item.duration < 0}">
+            <div class="gi-btn flex" :class="{'disable': item.duration < 0}" @click="add_order(item)">
               {{good_btn(item.duration)}}
-            </router-link>
+            </div>
           </div>
         </div>
         <div class="main-title flex" v-if="$root.app_info">
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-  import {good_list} from 'api/index'
+  import {good_list, buy_vip} from 'api/index'
   export default {
       name: "vip",
     data() {
@@ -68,6 +68,14 @@
       }
     },
     methods: {
+      async add_order(item) {
+        this.$root.eventHub.$emit('loading', true);
+        const ret = await buy_vip(this.$root.user.id, item.id);
+        this.$root.eventHub.$emit('loading', null);
+        if (ret.status === 200 && ret.data.state === 200) {
+          console.log(ret);
+        }
+      },
       _init() {
         this._getGoodList()
       },

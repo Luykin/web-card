@@ -3,8 +3,8 @@
     <div class="index">
       <div class="card-set-header flex">
         <img :src="setImage($route.params.Introduction_picture)"/>
-        <div class="csh-btn-warp flex fw" v-if="!$route.params.free">
-          <div class="csh-price">现价：{{$route.params.current_price}}元<span v-if="$route.params.current_price>$route.params.original_price">原价{{$route.params.original_price}}元</span></div>
+        <div class="csh-btn-warp flex fw">
+          <div class="csh-price">现价：{{$route.params.current_price}}元原价{{$route.params.original_price}}元</div>
           <div class="flex csh-btn cur">立即购买</div>
           <router-link tag='div' to='/vip' class="csh-btn flex cur">更多优惠</router-link>
         </div>
