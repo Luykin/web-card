@@ -55,10 +55,21 @@
     methods: {
       async getCardList(id) {
         this.$root.eventHub.$emit('loading', true);
-        const ret = await card_list(id);
+        const ret = await card_list(id, this.$root.user.id);
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
           this.list = ret.data.rows
+        }
+        if (ret.data.state === 436) {
+          this.$message({
+            message: '您还未购买该训练集',
+            type: 'warning'
+          });
+          this.$router.replace({
+            name: 'cardSet',
+            params: this.$route.params.cardSetParams
+          });
+          return false
         }
       },
       _toCard(index) {

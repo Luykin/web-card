@@ -55,10 +55,11 @@ export function cardSet_list(id_list) {
     })
 }
 
-export function card_list(id_list) {
+export function card_list(id_list, user_id) {
   const url = `${PREFIX_URL}/card/list`;
   let data = {
-    id_list
+    id_list,
+    user_id
   };
   return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
     .then((res) => {
