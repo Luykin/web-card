@@ -33,17 +33,31 @@
           <img :src="$root.app_info.content_us"/>
         </div>
       </div>
+      <el-dialog title="微信支付" :visible.sync="dialogTableVisible" :show-close="false">
+        <img :src="payImg" class="pay-img">
+        <div class="flex">请用微信扫码支付</div>
+        <span slot="footer" class="dialog-footer">
+                <el-button @click="_close">取 消</el-button>
+                <el-button type="success" @click="_surePay">确定已完成支付</el-button>
+            </span>
+      </el-dialog>
     </div>
   </transition>
 </template>
 
 <script>
-  import {good_list, buy_vip} from 'api/index'
+  import {good_list, buy_vip, order_query} from 'api/index'
+  import QRCode from 'qrcode'
   export default {
       name: "vip",
     data() {
         return{
-          list: []
+          list: [],
+          dialogTableVisible: null,
+          payImg: null,
+          payInfo: null,
+          timeCunt: 0,
+          timer: null
         }
     },
     computed: {
@@ -68,6 +82,46 @@
       }
     },
     methods: {
+      changeUrlToQrcode(pay_url) {
+        const opts = {
+          type: 'image/jpeg'
+        };
+        QRCode.toDataURL(pay_url, opts, (err, url) => {
+          if (err) {
+            console.log(err, '二维码错误')
+          } else {
+            this.payImg = url;
+            this.dialogTableVisible = true;
+            this.timer = setInterval(() => {
+              this.timeCunt++;
+              this._paySuc();
+              if (this.timeCunt >= 50) {
+                this._close()
+              }
+            }, 3000)
+          }
+        })
+      },
+      async _paySuc() {
+        const ret = await order_query(this.payInfo.order_code);
+        if (ret.status === 200 && ret.data.code === 200) {
+          this._close();
+          let timer = setTimeout(() => {
+            this.$root.eventHub.$emit('updateUserInfo');
+            clearTimeout(timer)
+          }, 1000);
+        }
+      },
+      // order_query
+      _surePay() {
+
+      },
+      _close() {
+        this.dialogTableVisible= false;
+        this.payImg = null;
+        this.timeCunt = 0;
+        clearInterval(this.timer);
+      },
       async add_order(item) {
         if (!this.$root.user) {
           this.$router.replace({
@@ -79,7 +133,11 @@
         const ret = await buy_vip(this.$root.user.id, item.id);
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
-          console.log(ret);
+          // console.log(ret);
+          if (ret.data.code_url && ret.data.prepay_id) {
+            this.payInfo = ret.data;
+            this.changeUrlToQrcode(this.payInfo.code_url)
+          }
         }
       },
       _init() {
@@ -189,5 +247,9 @@
     background: #ededed;
     color: #999;
     border: 1px solid #ddd;
+  }
+  .pay-img{
+    display: block;
+    margin: 0 auto 10px;
   }
 </style>
