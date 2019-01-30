@@ -89,7 +89,7 @@
     },
     computed: {
       user_vip() {
-        if (!this.$root.user.membership_exp_time) {
+        if (!this.$root.user.membership_exp_time || parseInt(this.$root.user.membership_exp_time) + 28800000 < +new Date()) {
           return '非VIP'
         } else {
           const exp_time = parseInt(this.$root.user.membership_exp_time) + 28800000;

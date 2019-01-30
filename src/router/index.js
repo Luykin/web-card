@@ -69,12 +69,12 @@ const routerconst = new Router({
     name: 'vip',
     component: () =>
       import (`components/index/vip`),
-    children: [{
-      path: '/vip/buy',
-      meta: {login: true},
-      component: () =>
-        import (`components/detail/vip-buy`),
-    }]
+    // children: [{
+    //   path: '/vip/buy',
+    //   meta: {login: true},
+    //   component: () =>
+    //     import (`components/detail/vip-buy`),
+    // }]
   }, {
     path: '/user',
     name: 'user',

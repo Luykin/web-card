@@ -204,6 +204,26 @@ export function buy_vip(user_id, good_id) {
     })
 }
 
+//购买训练集
+export function buy_tran(user_id, tran_id) {
+  const url = `${PREFIX_URL}/wxpay/buy_tran`;
+  let data = {
+    tran_id,
+    user_id,
+    _tm: +new Date()
+  };
+  return axios.post(url, qs.stringify(Object.assign(data, {'_sg': getSign(data)})))
+    .then((res) => {
+      return Promise.resolve(res)
+    })
+    .catch((error) => {
+      return Promise.resolve({
+        err_code: error.response.status,
+        err_msg: error.response.status
+      })
+    })
+}
+
 //支付查询
 export function order_query(out_trade_no) {
   const url = `${PREFIX_URL}/wxpay/query`;

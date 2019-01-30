@@ -35,8 +35,8 @@
       </div>
       <el-dialog title="微信支付" :visible.sync="dialogTableVisible" :show-close="false">
         <div v-if="payInfo">
-          <div class="flex">商品名称:{{payInfo.other_info.body}}</div>
-          <div class="flex">商品价钱:{{parseFloat(payInfo.other_info.total_fee/100)}}元</div>
+          <div class="flex">商品名称:<span class="ori">{{payInfo.other_info.body}}</span></div>
+          <div class="flex">商品价钱:<span class="ori">{{parseFloat(payInfo.other_info.total_fee/100)}}元</span></div>
           <div class="flex">订单号:{{payInfo.other_info.out_trade_no}}</div>
         </div>
         <img :src="payImg" class="pay-img">
@@ -147,7 +147,6 @@
         const ret = await buy_vip(this.$root.user.id, item.id);
         this.$root.eventHub.$emit('loading', null);
         if (ret.status === 200 && ret.data.state === 200) {
-          // console.log(ret);
           if (ret.data.code_url && ret.data.prepay_id) {
             this.payInfo = ret.data;
             this.changeUrlToQrcode(this.payInfo.code_url)
@@ -265,5 +264,8 @@
   .pay-img{
     display: block;
     margin: 0 auto 10px;
+  }
+  .ori{
+    color: #EB7B2D;
   }
 </style>
