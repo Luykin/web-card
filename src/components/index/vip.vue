@@ -122,7 +122,7 @@
               path: '/user'
             });
             clearTimeout(timer)
-          }, 500);
+          }, 1100);
         }
       },
       // order_query

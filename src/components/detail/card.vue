@@ -4,7 +4,7 @@
       <crumbs :crumbs="crumbs_list"></crumbs>
       <empty v-show="!list.length"></empty>
       <div class="flex card js cur" v-for="(item,index) in list" @click="_toCard(index)">
-        <img src="../../assets/card.jpg"/>
+        <img :src="item.image ||'http://cdn.jiangzhifan.com/card.jpg'"/>
         <div class="flex card-right fw">
           <div class="flex tb-item-right-title js">{{item.title}}</div>
           <div class="flex tb-item-right-info js">{{item.min_title}}</div>
