@@ -16,7 +16,7 @@
     },
     methods: {
       async _getAccessToken() {
-        const ret = await access_token(this.$route.query.code, 'http%3a%2f%2fwww.jiangzhifan.com%2f%23%2ftxLogin');
+        const ret = await access_token(this.$route.query.code, 'http%3a%2f%2fwww.kexuekao.com%2f%23%2ftxLogin');
         // console.log(ret)
         if (ret.status === 200 && ret.data.state === 200) {
           this.$message({
